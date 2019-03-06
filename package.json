@@ -2,16 +2,32 @@
   "name": "yonglog",
   "version": "0.1.0",
   "private": true,
+  "main": "main.js",
+  "homepage": "./",
   "dependencies": {
+    "express": "^4.16.4",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
-    "react-scripts": "2.1.5"
+    "react-scripts": "2.1.5",
+    "socket.io": "^2.2.0",
+    "socket.io-client": "^2.2.0",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.9",
+    "electron": "^4.0.6",
+    "nodemon": "^1.18.10",
+    "electron-devtools-installer": "^2.2.4",
+    "jest-dom": "^3.1.2",
+    "react-testing-library": "^6.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "server": "nodemon server/index.js",
+    "electron-dev": "set ELECTRON_START_URL=http://localhost:3000 && electron . --debug"
   },
   "eslintConfig": {
     "extends": "react-app"
