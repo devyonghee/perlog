@@ -1,10 +1,11 @@
-import {render} from 'react-testing-library';
+import testRenderer  from 'react-test-renderer';
 import React from 'react';
 import App from '../App';
 
-test('renders without crashing', () => {
-    const { getByText } = render(<App />);
-    expect(getByText('Learn React')).toBeInTheDocument();
+describe('renders without crashing', () => {
+    const testRenderer = testRenderer.create(<App/>);
+
+    expect(testRenderer.toJSON()).toMatchSnapshot();
 });
 
 

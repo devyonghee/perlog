@@ -42,6 +42,7 @@ const LogFile = class {
         if (curr < prev) return;
         const readStream = fs.createReadStream(this._path, {encoding: 'utf8', start: prev, end: curr});
         readStream.on('data', data => {
+            console.log(data);
             const lines = data.split('\n');
             lines.map(line => (!!line && this._server.notify('log', this._path, line)));
         })

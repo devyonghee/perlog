@@ -45,7 +45,10 @@ const Server = class {
     }
 
     _watch(path) {
-        if (this._file.has(path)) return this._file.get(path).addWatcher();
+        if (this._file.has(path)) {
+            this.client.request('watched', path);
+            return this._file.get(path).addWatcher();
+        }
 
         const file = (new LogFile(path, this));
 

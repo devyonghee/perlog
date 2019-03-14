@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Stream = ({node, path, color, onChange, watch = false}) => {
+const Stream = ({name, color, onChange, watch = false}) => {
     return (
         <div className='item'>
             <div className="screen_buttons">
@@ -10,7 +10,7 @@ const Stream = ({node, path, color, onChange, watch = false}) => {
                        />
             </div>
             <div className={`diode floatl color${color}`}/>
-            <div className={`object_name floatl color${color}`}>{path}</div>
+            <div className={`object_name floatl color${color}`}>{name}</div>
             <div style={{clear: 'both'}}/>
         </div>
     );

@@ -16,14 +16,14 @@ const Controls = ({color, name, request, streams}) => {
                 <div style={{clear: 'both'}}/>
             </div>
             <div className='items'>
-                {Object.entries(streams).map(([streamName, stream], index) =>
-                    <Stream key={index}
+                {streams.map(stream =>
+                    <Stream key={stream.name}
                             onChange={e => {
                                 e.preventDefault();
                                 onChange(stream.path, !stream.watch)
                             }}
                             node={name}
-                            name={streamName} {...stream}/>
+                            {...stream}/>
                 )}
             </div>
         </div>

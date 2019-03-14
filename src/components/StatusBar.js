@@ -1,13 +1,18 @@
 import React from 'react';
 import Stat from './Stat'
+import {useState, useEffect,useLayoutEffect} from "react";
 
+
+const start = new Date().getTime();
 
 const StatusBar = () => {
-    this.state = {
-        start: new Date().getTime(),
-        now: (new Date().getTime())
-    };
-    const elapsed = (this.state.now - this.state.start) / 1000;
+    const [now, setNow] = useState(new Date().getTime());
+
+    useLayoutEffect(()=>{
+        setInterval(() => setNow(new Date().getTime()), 1000)
+    });
+
+    const elapsed = (now - start) / 1000;
     const minutes = Number(elapsed / 60).toFixed(0);
     let seconds = Number(elapsed % 60).toFixed(0);
     seconds = (seconds < 10) ? "0" + seconds : seconds;
@@ -29,5 +34,14 @@ const StatusBar = () => {
         </div>
     );
 };
+
+const propTypes = {};
+
+const defaultProps = {};
+
+asd.propTypes = propTypes;
+asd.defaultProps = defaultProps;
+
+export default asd;
 
 export default StatusBar;
