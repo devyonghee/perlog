@@ -1,10 +1,11 @@
 import './log.css';
 import React, {useReducer, useEffect} from 'react';
-import {nodeReducer, messageReducer, actions} from './store';
-import Controls from "./components/Controls";
-import Message from "./components/Message";
-import StatusBar from "./components/StatusBar";
+import {nodeReducer, messageReducer, actions} from '../../store';
+import Controls from "../Controls";
+import Message from "../Message";
+import StatusBar from "../StatusBar";
 import io from 'socket.io-client';
+
 
 const App = () => {
     const [nodes, nodesDispatch] = useReducer(nodeReducer, []);
@@ -22,7 +23,7 @@ const App = () => {
         e.target.value = '';
     };
 
-
+    const onInputChecked = (socket, type, ...args) => socket.emit('data', type, ...args);
     const connectHost = (nodeName, host) => {
         const socket = io.connect(host, {
             'reconnection': true,
@@ -44,7 +45,7 @@ const App = () => {
 
     useEffect(() => {
         connectHost('pdev2', 'http://localhost:50000');
-    }, true);
+    }, []);
 
     return (
         <div className='app'>
@@ -54,7 +55,7 @@ const App = () => {
                     <input type='text' className='filter' onKeyUp={onKeyUp}/>
                     <div className='groups' style={{height: '898px'}}>
                         <div className='items'>
-                            {nodes.map(node => <Controls key={node.name} {...node}/>)}
+                            {nodes.map(node => <Controls key={node.name} {onInputChecked} {...node}/>)}
                         </div>
                     </div>
                 </div>
@@ -81,14 +82,15 @@ const App = () => {
                                         };
                                         return (<Message key={index} node={node} stream={stream}
                                                          message={message.message}/>);
-                                    })}
+                                    })
+                                }
                             </div>
                         </div>
                     </div>
                 </div>
-                <StatusBar messagesCount={messages.length}
-                           streamsCount={nodes.reduce((sum, {streams}) => sum + streams.length, 0)}
-                           nodesCount={nodes.length}
+                <StatusBar messages={messages.length}
+                           streams={nodes.reduce((sum, {streams}) => sum + streams.length, 0)}
+                           nodes={nodes.length}
                 />
             </div>
         </div>

@@ -1,11 +1,22 @@
 import React from 'react';
-import Stream from "./Stream";
+import Stream from "../Stream";
+import PropTypes from "prop-types";
 
-const Controls = ({color, name, request, streams}) => {
-    const onChange = (path, watch = false) => {
-        watch ? request('watch', path) : request('forget', path);
-    };
+const propTypes = {
+    node: PropTypes.object.isRequired,
+    stream: PropTypes.object.isRequired,
+    message: PropTypes.string.isRequired,
+    onInputChecked : PropTypes.func.isRequired
+};
 
+const defaultProps = {
+    nodes: {name: '', color: 0},
+    streams: {name: '', color: 0},
+    messages: '',
+    onInputChecked: () => new Error('no prop')
+};
+
+const Controls = ({color, name, streams, request}) => {
     return (
         <div className='group'>
             <div className='header'>
@@ -18,10 +29,7 @@ const Controls = ({color, name, request, streams}) => {
             <div className='items'>
                 {streams.map(stream =>
                     <Stream key={stream.name}
-                            onChange={e => {
-                                e.preventDefault();
-                                onChange(stream.path, !stream.watch)
-                            }}
+                            request={request}
                             node={name}
                             {...stream}/>
                 )}
@@ -29,5 +37,8 @@ const Controls = ({color, name, request, streams}) => {
         </div>
     );
 };
+
+Controls.propTypes = propTypes;
+Controls.defaultProps = defaultProps;
 
 export default Controls;

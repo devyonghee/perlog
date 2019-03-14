@@ -34,7 +34,7 @@ export const nodeReducer = (state, action) => {
                     color: colorIndex.next().value,
                     streams: [],
                     host: action.host,
-                    request: (type, ...args) => action.socket.emit('data', type, ...args),
+                    socket: action.socket,
                 })
             });
 
