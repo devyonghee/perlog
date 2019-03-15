@@ -1,11 +1,10 @@
-import './log.css';
 import React, {useReducer, useEffect} from 'react';
 import {nodeReducer, messageReducer, actions} from '../../store';
 import Controls from "../Controls";
 import Message from "../Message";
 import StatusBar from "../StatusBar";
 import io from 'socket.io-client';
-
+import styles from './styles.module.scss';
 
 const App = () => {
     const [nodes, nodesDispatch] = useReducer(nodeReducer, []);
@@ -41,7 +40,6 @@ const App = () => {
             nodesDispatch({type: 'toggleWatch', nodeName, path, watch: false});
         });
     };
-    connectHost.bind(messages);
 
     useEffect(() => {
         connectHost('pdev2', 'http://localhost:50000');
@@ -49,26 +47,25 @@ const App = () => {
 
     return (
         <div className='app'>
-            <div id='log_controls'>
-                <a className="select_mode active">Nodes</a>
-                <div id='log_control_nodes' className='object_controls'>
-                    <input type='text' className='filter' onKeyUp={onKeyUp}/>
-                    <div className='groups' style={{height: '898px'}}>
-                        <div className='items'>
-                            {nodes.map(node => <Controls key={node.name} {onInputChecked} {...node}/>)}
+            <div className={styles.log_controls}>
+                <div className={styles.object_controls}>
+                    <input type='text' className={styles.filter} onKeyUp={onKeyUp}/>
+                    <div className={styles.groups} style={{height: '898px'}}>
+                        <div>
+                            {nodes.map(node => <Controls key={node.name} onInputChecked={onInputChecked} {...node}/>)}
                         </div>
                     </div>
                 </div>
             </div>
-            <div id='log_screens' style={{width: '1047px'}}>
-                <div className='log_screens'>
-                    <div className="log_screen">
-                        <div className="controls">
-                            <a className="clear">clear</a>
-                            <a className="filter">filter <input type="text" placeholder='Filter...'/></a>
+            <div className={styles.screens}>
+                <div>
+                    <div className={styles.screen}>
+                        <div className={styles.controls}>
+                            <a>clear</a>
+                            <a className={styles.filter}>filter <input type="text" placeholder='Filter...'/></a>
                         </div>
-                        <div className="messages" style={{height: "918px"}}>
-                            <div className="msg">
+                        <div className={styles.messages} style={{height: "918px"}}>
+                            <div className={styles.message}>
                                 {
                                     messages.map((message, index) => {
                                         const node = nodes.find(({name}) => name === message.nodeName) || {

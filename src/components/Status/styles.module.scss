@@ -1,0 +1,15 @@
+.stat {
+  float: right;
+  margin: 0 30px 0 0;
+  line-height: 30px;
+
+  .num {
+    font-size: 32px;
+    color: #eee;
+  }
+
+  .label {
+    font-size: 12px;
+    color: #666;
+  }
+}

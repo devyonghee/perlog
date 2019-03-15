@@ -12,7 +12,7 @@ const render = Component => {
 render(App);
 
 if (module.hot) {
-    module.hot.accept('./App', () => {
+    module.hot.accept('./components/App', () => {
         const NextApp = require('./components/App').default;
         render(NextApp);
     });

@@ -3,34 +3,34 @@ import Stream from "../Stream";
 import PropTypes from "prop-types";
 
 const propTypes = {
-    node: PropTypes.object.isRequired,
-    stream: PropTypes.object.isRequired,
-    message: PropTypes.string.isRequired,
-    onInputChecked : PropTypes.func.isRequired
+    name: PropTypes.string.isRequired,
+    color: PropTypes.string.isRequired,
+    streams: PropTypes.object.isRequired,
+    onInputChecked: PropTypes.func.isRequired
 };
 
 const defaultProps = {
-    nodes: {name: '', color: 0},
+    name: '',
+    color: 0,
     streams: {name: '', color: 0},
-    messages: '',
     onInputChecked: () => new Error('no prop')
 };
 
-const Controls = ({color, name, streams, request}) => {
+const Controls = prop => {
     return (
         <div className='group'>
             <div className='header'>
                 <div className="screen_buttons">
                 </div>
-                <div className={`diode floatl active color${color}`}/>
-                <div className="object_name floatl">{name}</div>
+                <div className={`diode floatl active color-${prop.color}`}/>
+                <div className="object_name floatl">{prop.name}</div>
                 <div style={{clear: 'both'}}/>
             </div>
             <div className='items'>
-                {streams.map(stream =>
+                {prop.streams.map(stream =>
                     <Stream key={stream.name}
-                            request={request}
-                            node={name}
+                            node={prop.name}
+                            onInputChecked={prop.onInputChecked}
                             {...stream}/>
                 )}
             </div>

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 const propTypes = {
     name: PropTypes.string.isRequired,
-    value: PropTypes.number.isRequired,
+    value: PropTypes.any.isRequired,
 };
 
 const Status = ({name = '', value = 0}) => (
