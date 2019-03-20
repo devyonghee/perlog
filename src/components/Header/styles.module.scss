@@ -1,0 +1,68 @@
+@import "../../sass/sizes";
+@import "../../sass/mixin";
+
+.app_bar {
+  padding-left: $drawer-width;
+  @include transition();
+  .toolbar {
+    color: $grey-color;
+
+    .menuButton {
+      margin-left: -12px;
+      margin-right: 20px;
+    }
+
+    .title {
+      flex: 1;
+      display: block;
+    }
+
+    .grow {
+      flex: 2;
+    }
+
+    .search {
+      flex: 1;
+      position: relative;
+      background-color: $white-color;
+      margin-left: 0;
+      border-radius: 10px;
+      width: 100%;
+
+
+      &:hover {
+        background-color: rgba($grey-color, 0.1);
+      }
+
+      .search_icon {
+        width: 10px;
+        height: 100%;
+        position: absolute;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .input_root {
+        color: inherit;
+        width: 100%;
+      }
+
+      .input_input {
+        padding: 10px 10px 10px 10px;
+        border: 1px solid rgba($grey-color, 0.8);
+        border-radius: 10px;
+        width: 100%;
+        @include transition();
+        &:focus {
+          width: calc(+300px);
+          transform: translate(-300px);
+        }
+      }
+    }
+
+  }
+
+}
+

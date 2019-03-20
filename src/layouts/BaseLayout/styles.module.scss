@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css?family=Work+Sans');
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans+KR|Work+Sans');
+@import '../../sass/sizes';
+
+* {
+  padding: 0;
+  margin: 0;
+  font-family: 'Work Sans', 'Noto Sans KR', sans-serif;
+  font-size: $normal-font-size;
+}
+
+.wrapper {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  .mainPanel {
+    padding-left: $drawer-width;
+    float: right;
+  }
+}

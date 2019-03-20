@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './components/App';
+import BaseLayout from './layouts/BaseLayout';
 
 const render = Component => {
     return ReactDOM.render(
@@ -9,11 +9,11 @@ const render = Component => {
     );
 };
 
-render(App);
+render(BaseLayout);
 
 if (module.hot) {
-    module.hot.accept('./components/App', () => {
-        const NextApp = require('./components/App').default;
+    module.hot.accept('./layouts/BaseLayout', () => {
+        const NextApp = require('./layouts/BaseLayout').default;
         render(NextApp);
     });
 }

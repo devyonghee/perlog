@@ -1,6 +1,7 @@
 import React from 'react';
 import Stream from "../Stream";
 import PropTypes from "prop-types";
+import styles from "./styles.module.scss";
 
 const propTypes = {
     name: PropTypes.string.isRequired,
@@ -18,14 +19,6 @@ const defaultProps = {
 
 const Controls = prop => {
     return (
-        <div className='group'>
-            <div className='header'>
-                <div className="screen_buttons">
-                </div>
-                <div className={`diode floatl active color-${prop.color}`}/>
-                <div className="object_name floatl">{prop.name}</div>
-                <div style={{clear: 'both'}}/>
-            </div>
             <div className='items'>
                 {prop.streams.map(stream =>
                     <Stream key={stream.name}
@@ -34,7 +27,6 @@ const Controls = prop => {
                             {...stream}/>
                 )}
             </div>
-        </div>
     );
 };
 
