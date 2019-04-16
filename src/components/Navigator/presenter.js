@@ -14,14 +14,12 @@ import Typography from '@material-ui/core/Typography';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Switch from '@material-ui/core/Switch';
 import FolderIcon from '@material-ui/icons/Folder';
-import ExpandLess from '@material-ui/icons/ExpandLess';
 import DeleteIcon from '@material-ui/icons/Delete';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-
+import {withStyles} from '@material-ui/core/styles';
+import styles from "./styles";
 import ArrowDropDownRounded from '@material-ui/icons/ArrowDropDownRounded';
 
-const Navigator = ({classes}) => {
+const presenter = ({classes}) => {
     return (
         <Drawer anchor="left" variant="persistent" open={true}>
             <FormControl style={{'align-items': 'center', "margin-bottom": '20px'}}>
@@ -42,12 +40,8 @@ const Navigator = ({classes}) => {
                             <ArrowDropDownRounded/>
                         </span>
                 </ButtonBase>
-                <Paper style={{position: 'absolute', top: '45px', "z-index": '1'}}>
-                    <Button>stg2</Button>
-                </Paper>
             </FormControl>
-            <Button size='small' variant='text' className={classes.closeNavBtn}>
-
+            <Button size='small' variant='text'>
             </Button>
             <Divider/>
 
@@ -60,7 +54,6 @@ const Navigator = ({classes}) => {
                     <IconButton aria-label="Delete">
                         <DeleteIcon fontSize='small'/>
                     </IconButton>
-                    {true ? <ExpandLess/> : <ExpandMore/>}
                 </ListItem>
 
                 <Collapse in timeout="auto">
@@ -76,4 +69,5 @@ const Navigator = ({classes}) => {
     );
 };
 
-export default Navigator;
+
+export default withStyles(styles)(presenter);

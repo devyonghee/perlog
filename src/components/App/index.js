@@ -1,6 +1,16 @@
-import {withStyles} from '@material-ui/core/styles';
-import App from './presenter';
-import styles from "./styles";
+import {bindActionCreators} from "redux";
+import container from './container';
+import {connect} from 'react-redux';
 
-export default withStyles(styles)(App);
 
+const mapStateToProps = state => {
+    return {}
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+    };
+};
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(container);

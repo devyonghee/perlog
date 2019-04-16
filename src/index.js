@@ -1,19 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import BaseLayout from './layouts/BaseLayout';
+import App from 'components/App';
+import {Provider} from "react-redux";
+import store from './redux/configStore';
+
 
 const render = Component => {
     return ReactDOM.render(
-        <Component/>,
+        <Provider store={store}>
+            <App/>
+        </Provider>,
         document.getElementById('root')
     );
 };
 
-render(BaseLayout);
+render(App);
 
 if (module.hot) {
-    module.hot.accept('./layouts/BaseLayout', () => {
-        const NextApp = require('./layouts/BaseLayout').default;
+    module.hot.accept('./components/App', () => {
+        const NextApp = require('components/App').default;
         render(NextApp);
     });
 }

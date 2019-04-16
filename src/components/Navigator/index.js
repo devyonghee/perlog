@@ -1,6 +1,4 @@
-import {withStyles} from '@material-ui/core/styles';
-import Navigator from './container';
-import styles from "./styles";
+import container from './container';
 
-export default withStyles(styles)(Navigator);
+export default container;
 
