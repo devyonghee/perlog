@@ -8,13 +8,13 @@ const defaultProps = {};
 
 const container = class extends Component {
     componentDidMount() {
-        const socket = io.connect('http://localhost:50000');
-        socket.on('connect', () => {
-            socket.emit('connected', 'shiw111');
-            socket.emit('watch', 'D:/test.txt');
-        });
-
-        socket.on('log', (path, log) => console.log(path, log));
+        // const socket = io.connect('http://localhost:50000');
+        // socket.on('connect', () => {
+        //     socket.emit('connected', 'shiw111');
+        //     socket.emit('watch', 'D:/test.txt');
+        // });
+        //
+        // socket.on('log', (path, log) => console.log(path, log));
     }
 
     render() {

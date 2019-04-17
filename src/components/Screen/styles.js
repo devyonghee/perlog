@@ -16,9 +16,6 @@ const styles = theme => ({
     },
     dense: {
         marginTop: 19,
-    },
-    list: {
-        backgroundColor: theme.palette.background.paper,
     }
 });
 

@@ -27,7 +27,7 @@ export default handleActions({
     },
 
     [ADD_FILE]: (state, action) => {
-        const {path} = action;
+        const {payload: path} = action;
         return [...state, {path}];
     },
 

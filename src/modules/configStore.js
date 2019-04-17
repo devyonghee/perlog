@@ -1,7 +1,7 @@
 import {createStore, combineReducers, applyMiddleware} from "redux";
 import thunk from "redux-thunk";
 import directory from "./directory";
-import message from "./messages";
+import message from "./message";
 import {composeWithDevTools} from "redux-devtools-extension";
 
 const env = process.env.NODE_ENV;
