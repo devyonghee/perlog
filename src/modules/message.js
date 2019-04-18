@@ -6,6 +6,7 @@ export const addMessage = createAction(ADD_MESSAGE);
 
 export default handleActions({
     [ADD_MESSAGE]: (state, action) => {
-        return state;
+        const {payload: {path, message, color}} = action;
+        return [...state, {path, message, color}];
     },
 }, []);

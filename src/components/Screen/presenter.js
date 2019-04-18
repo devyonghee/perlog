@@ -1,10 +1,21 @@
 import React from 'react';
-import Drawer from '@material-ui/core/Drawer';
 import {withStyles} from '@material-ui/core/styles';
 import styles from "./styles";
 
-const presenter = ({classes}) => {
-    return (<div>dd</div>
+const presenter = ({messages}) => {
+    return (
+        <div style={{'padding-left': '260px'}}>
+            {
+                messages.map(message => (
+                    <div>
+                        <span>{message.path}</span>
+                        <span>{message.color}</span>
+                        <span>{message.message}</span>
+                    </div>
+
+                ))
+            }
+        </div>
     );
 };
 

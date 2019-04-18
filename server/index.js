@@ -41,6 +41,8 @@ const Server = class {
             case 'error' :
 
                 break;
+            default:
+                break;
         }
     }
 
@@ -75,8 +77,8 @@ const Server = class {
 };
 
 const config = {
-        "host": "0.0.0.0",
-        "port": 50000
-    };
+    "host": "127.0.0.1",
+    "port": 50000
+};
 const logServer = new Server(config);
 logServer.run();

@@ -1,5 +1,15 @@
 import {createAction, handleActions} from "redux-actions";
 
+function* generatorColor() {
+    const colors = ['red', 'blue', 'green', 'purple', 'orange', 'yellow'];
+    let index = 0;
+    while (true) {
+        if (!colors[index]) index = 0;
+        yield colors[index++];
+    }
+}
+const colors = generatorColor();
+
 const ADD_DIRECTORY = Symbol('ADD_DIRECTORY');
 const REMOVE_DIRECTORY = Symbol('REMOVE_DIRECTORY');
 const ADD_FILE = Symbol('ADD_FILE');
@@ -28,7 +38,7 @@ export default handleActions({
 
     [ADD_FILE]: (state, action) => {
         const {payload: path} = action;
-        return [...state, {path}];
+        return [...state, {path, watch: false, color: colors.next().value}];
     },
 
     [REMOVE_FILE]: (state, action) => {
@@ -36,11 +46,17 @@ export default handleActions({
     },
 
     [WATCH]: (state, action) => {
-        return state;
+        const {payload: path} = action;
+        return state.map(file => {
+            return (file.path === path) ? {...file, watch: true} : file;
+        })
     },
 
     [FORGOT]: (state, action) => {
-        return state;
+        const {payload: path} = action;
+        return state.map(file => {
+            return (file.path === path) ? {...file, watch: false} : file;
+        })
     },
 
 }, [])

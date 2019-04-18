@@ -2,13 +2,9 @@ import {connect} from "react-redux";
 import container from "./container";
 
 const mapStateToProps = state => {
-    return {}
-};
-
-const mapDispatchToProps = dispatch => {
     return {
-    };
+        messages: state.message
+    }
 };
 
-
-export default connect(mapStateToProps, mapDispatchToProps)(container);
+export default connect(mapStateToProps)(container);

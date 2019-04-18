@@ -12,16 +12,8 @@ import {withStyles} from '@material-ui/core/styles';
 import styles from "./styles";
 
 
-const fileList = (fileName, onClick) => (
-    <ListItem>
-        <ListItemText primary="Starred"/>
-        <Switch/>
-    </ListItem>
-);
-
-
 const presenter = (prop) => {
-    const {classes, handlePathChange, handlePathKeyPress, path, files} = prop;
+    const {classes, handlePathChange, handlePathKeyPress, handleFileSwitchChange, path, files} = prop;
 
     return (
         <Drawer anchor="left" variant="persistent" open={true}>
@@ -48,7 +40,8 @@ const presenter = (prop) => {
                     files.map((file, index) =>
                         <ListItem key={index}>
                             <ListItemText primary={file.path}/>
-                            <Switch/>
+                            <Switch onChange={e => handleFileSwitchChange(e.target.checked, file.path)}
+                                    checked={file.watch}/>
                         </ListItem>)
                 }
             </List>

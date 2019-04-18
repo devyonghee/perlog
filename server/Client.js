@@ -1,6 +1,5 @@
 const express = require('express');
 const http = require('http');
-const https = require('https');
 const io = require('socket.io');
 
 const Client = class {
@@ -12,7 +11,7 @@ const Client = class {
 
     listen() {
         if (!this.config.host || !this.config.port) return this.server.log('client has not enough config');
-        const httpServer = this._createServer();
+        const httpServer = http.createServer(express());
         const socket = io(httpServer.listen(this.config.port, this.config.host));
 
         socket.sockets.on('connection', socket => {
@@ -27,12 +26,12 @@ const Client = class {
         this.socket.emit(`@${type}`, from, ...args);
     }
 
-    _createServer() {
-        return (!!this.config.ssl) ? https.createServer({
-            key: fs.readFileSync(this.config.ssl.key),
-            cert: fs.readFileSync(this.config.ssl.cert)
-        }, express()) : http.createServer(express());
-    }
+    // _createServer() {
+    //     return (!!this.config.ssl) ? https.createServer({
+    //         key: fs.readFileSync(this.config.ssl.key),
+    //         cert: fs.readFileSync(this.config.ssl.cert)
+    //     }, express()) : http.createServer(express());
+    // }
 };
 
 module.exports = Client;

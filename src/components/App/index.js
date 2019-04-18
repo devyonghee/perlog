@@ -1,4 +1,3 @@
-import {bindActionCreators} from "redux";
 import container from './container';
 import {connect} from 'react-redux';
 
