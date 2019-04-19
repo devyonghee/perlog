@@ -76,9 +76,6 @@ const Server = class {
     }
 };
 
-const config = {
-    "host": "127.0.0.1",
-    "port": 50000
-};
+const config = require('./config');
 const logServer = new Server(config);
 logServer.run();

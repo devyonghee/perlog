@@ -1,7 +1,7 @@
 import {connect} from "react-redux";
 import container from "./container";
 import {addFile, watch, forgot} from "../../modules/directory";
-import {addMessage} from "../../modules/message";
+import {addMessageFromFile} from "../../modules/message";
 
 
 const mapStateToProps = state => {
@@ -24,8 +24,8 @@ const mapDispatchToProps = (dispatch) => {
             dispatch(forgot(path))
         },
 
-        addMessage: (path, message, color) => {
-            dispatch(addMessage({path, message, color}));
+        addMessage: (path, message) => {
+            dispatch(addMessageFromFile(path, message));
         }
     };
 };

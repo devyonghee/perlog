@@ -9,13 +9,8 @@ const container = (props) => {
 
     useEffect(() => {
         const newSocket = io.connect('http://127.0.0.1:50000');
-        newSocket.on('connect', () => {
-            setSocket(newSocket);
-        });
-
-        newSocket.on('@log', (path, message) => {
-            addMessage(path, message);
-        });
+        newSocket.on('connect', () => setSocket(newSocket));
+        newSocket.on('@log', (path, message) => addMessage(path, message));
     }, []);
 
     const handlePathChange = e => {
