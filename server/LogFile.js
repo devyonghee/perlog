@@ -1,41 +1,35 @@
 const fs = require('fs');
 
 const LogFile = class {
-    constructor(path, server) {
+    constructor(path, notify) {
         this._path = path;
-        this._server = server;
-        this._watchers = 0;
-    }
-
-    addWatcher() {
-        return ++this._watchers;
-    }
-
-    removeWatcher() {
-        return --this._watchers;
+        this._notify = notify;
+        console.log(this._notify);
     }
 
     watch() {
-        if (!fs.existsSync(this._path)) return false;
+        if (!fs.existsSync(this._path)) throw new Error(`${this._path} file is not exist`);
 
-        let preSize = fs.statSync(this._path).size;
-
-        this.watching = fs.watch(this._path, event => {
-            if (event === 'rename' || this._watchers <= 0) return this.forget();
-            if (event !== 'change') return false;
-
-            fs.stat(this._path, (error, stat) => {
-                this._readLogs(stat.size, preSize);
-                preSize = stat.size;
-            })
-        });
-
-        ++this._watchers;
-        return true;
+        this.preSize = fs.statSync(this._path).size;
+        this.watching = fs.watch(this._path, event => this._registerWatchEvents(event));
+        console.log(`${this._path} file is watching`);
+        return this;
     }
 
     forget() {
-        return (this._watchers <= 0 && !!this.watching && this.watching.close());
+        return (!!this.watching && this.watching.close());
+    }
+
+    _registerWatchEvents(event) {
+        if (event === 'rename' || event !== 'change') {
+            this.forget();
+            throw new Error('File changed status');
+        }
+
+        fs.stat(this._path, (error, stat) => {
+            this._readLogs(stat.size, this.preSize);
+            this.preSize = stat.size;
+        })
     }
 
     _readLogs(curr, prev) {
@@ -43,10 +37,10 @@ const LogFile = class {
         const readStream = fs.createReadStream(this._path, {encoding: 'utf8', start: prev, end: curr});
         readStream.on('data', data => {
             console.log(data);
-            const lines = data.split('\n');
-            lines.map(line => (!!line && this._server.notify('log', this._path, line)));
-        })
+            data.split('\n').map(line => (!!line && this._notify(line)))
+        });
     }
+
 };
 
 module.exports = LogFile;

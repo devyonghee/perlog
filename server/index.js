@@ -1,78 +1,70 @@
-const winston = require('winston');
-const Client = require('./Client');
 const LogFile = require('./LogFile');
 
 const Server = class {
     constructor(config) {
-        this.client = new Client(config, this);
-        this._file = new Map();
-
-        this._logger = winston.createLogger({
-            level: 'debug',
-            format: winston.format.combine(
-                winston.format.printf(({message}) => String(message)),
-                winston.format.colorize()
-            ),
-            transports: [new winston.transports.Console()]
-        });
+        this.config = config;
+        this.files = {};
     }
 
     run() {
-        this.client.listen();
+        if (!this.config.host || !this.config.port) return console.log('client has not enough config');
+
+        const app = require('express')();
+        const server = require('http').createServer(app).listen(this.config.port, this.config.host);
+        this.io = require('socket.io')(server);
+
+        app.get('/', function (req, res) {
+            res.send('<script src="/socket.io/socket.io.js"></script><script>' +
+                ' var socket = io();' +
+                'socket.on("message", data=>console.log(data));' +
+                '</script>')
+        });
+
+        this._registerEvents();
     }
 
-    log(message, type = 'error') {
-        this._logger.log(type, message);
+    _registerEvents() {
+        this.io.sockets.on('connection', socket => {
+            console.log(`${socket.id} is connected`);
+
+            socket.on('watch', path => this._watch(path, socket));
+            socket.on('forget', path => this._forget(path, socket));
+            socket.on('disconnect', () => {
+                console.log(`${socket.id} is disconnected`);
+                Object.keys(socket.rooms).map(path => this._forget(path, socket))
+            });
+        });
     }
 
-    notify(type, ...args) {
-        switch (type) {
-            case 'watch' :
-                return this._watch(args.shift());
-            case 'forget' :
-                return this._forget(args.shift());
-            case 'lost' :
-                break;
+    _watch(path, socket) {
+        socket.join(path, () => {
+            if (!!this.files[path]) return;
 
-            case 'log' :
-                const [path, log = ''] = args;
-                this.client.request('log', path, log);
-                break;
-            case 'error' :
-
-                break;
-            default:
-                break;
-        }
+            try {
+                this.files[path] = (new LogFile(path, message => this.io.sockets.to(path).emit('log', message))).watch();
+            } catch (e) {
+                console.log(e.message);
+                socket.leave(path, () => this.io.sockets.to(path).emit('err', path));
+            }
+        });
     }
 
-    _watch(path) {
-        if (this._file.has(path)) {
-            this.client.request('watched', path);
-            return this._file.get(path).addWatcher();
-        }
-
-        const file = (new LogFile(path, this));
-
-        if (!file.watch()) return this.client.request('fileError', path, `${path} Is Not Existed`);
-
-        this.log(`Watching file: '${path}'`, 'info');
-        this.client.request('watched', path);
-        this._file.set(path, file);
+    _forget(path, socket) {
+        socket.leave(path, () =>
+            !this._isSomeoneWatching(path) &&
+            this.files.hasOwnProperty(path) &&
+            this.files.forget() &&
+            delete this.files[path] &&
+            console.log(`${path} is forgotten`)
+        );
     }
 
-    _forget(path) {
-        if (!this._file.has(path)) {
-            this.client.request('error', path);
-            return this.log(`${path} Is Not Watched`);
-        }
-        this.client.request('forgotten', path);
-        const file = this._file.get(path);
-        const watchers = file.removeWatcher();
-        if (watchers > 0) return;
-
-        if (file.forget()) this.log(`${path} is close`);
-        this._file.delete(path);
+    _isSomeoneWatching(path) {
+        console.log(Object.values(this.io.sockets.rooms));
+        return Object.values(this.io.sockets).some(socket => {
+            // console.log(socket.rooms);
+            // socket.rooms.hasOwnProperty(path)
+        });
     }
 };
 

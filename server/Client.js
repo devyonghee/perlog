@@ -1,23 +1,25 @@
-const express = require('express');
-const http = require('http');
-const io = require('socket.io');
 
 const Client = class {
-    constructor(config, server) {
-        this.config = config;
-        this.server = server;
-        this.socket = null
+    constructor(id) {
+        this.id = id;
+        this.files = [];
     }
 
-    listen() {
-        if (!this.config.host || !this.config.port) return this.server.log('client has not enough config');
-        const httpServer = http.createServer(express());
-        const socket = io(httpServer.listen(this.config.port, this.config.host));
+    addWatchingFile(path) {
+        this.files.push(path);
+        return this;
+    }
 
-        socket.sockets.on('connection', socket => {
-            this.socket = socket;
-            this.socket.on('data', (type, path) => this.server.notify(type, path));
-        });
+    isWatching(path) {
+        return this.files.hasOwnProperty(path);
+    }
+
+    isId(id) {
+        return this.id === id;
+    }
+
+    forgotFile() {
+
     }
 
     request(type, from, ...args) {
