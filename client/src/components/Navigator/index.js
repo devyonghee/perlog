@@ -1,6 +1,6 @@
 import {connect} from "react-redux";
 import container from "./container";
-import {addFile, watch, forgot} from "../../modules/directory";
+import {addFile, watch, forget} from "../../modules/directory";
 import {addMessageFromFile} from "../../modules/message";
 
 
@@ -20,8 +20,8 @@ const mapDispatchToProps = (dispatch) => {
             dispatch(watch(path))
         },
 
-        forgotFile: path => {
-            dispatch(forgot(path))
+        forgetFile: path => {
+            dispatch(forget(path))
         },
 
         addMessage: (path, message) => {

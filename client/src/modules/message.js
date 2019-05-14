@@ -8,7 +8,6 @@ export const addMessageFromFile = (path, message) => {
     return (dispatch, getState) => {
         const file = getState().directory.find(file => file.path === path);
         if (!file || !file.watch) return;
-
         dispatch(addMessage({path, message, color: file.color}))
     }
 };

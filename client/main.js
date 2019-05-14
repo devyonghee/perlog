@@ -5,7 +5,15 @@ const path = require('path');
 let mainWindow = null;
 
 const createWindow = () => {
-    const windowOption = {width: 1100, height: 960, icon: path.join(__dirname, './public/favicon.png')};
+    const windowOption = {
+        width: 1100,
+        height: 960,
+        icon: path.join(__dirname, './public/favicon.png'),
+        webPreferences:{
+            nodeIntegration: true,
+            preload: __dirname + '/preload.js'
+        }
+    };
     const mainWindow = new BrowserWindow(windowOption);
 
     const startUrl = process.env.ELECTRON_START_URL || url.format({
@@ -24,11 +32,9 @@ const createWindow = () => {
 
 app.on('ready', createWindow);
 app.on('window-all-closed', () => {
-
     app.quit()
 });
 app.on('activate', () => (mainWindow === null) && createWindow());
-
 if (!process.mas) {
     app.requestSingleInstanceLock();
     app.on('second-instance', () => {

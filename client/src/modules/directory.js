@@ -15,7 +15,7 @@ const REMOVE_DIRECTORY = Symbol('REMOVE_DIRECTORY');
 const ADD_FILE = Symbol('ADD_FILE');
 const REMOVE_FILE = Symbol('REMOVE_FILE');
 const WATCH = Symbol('WATCH');
-const FORGOT = Symbol('FORGOT');
+const FORGET = Symbol('FORGET');
 
 export const addDirectory = createAction(ADD_DIRECTORY);
 export const removeDirectory = createAction(REMOVE_DIRECTORY);
@@ -24,7 +24,7 @@ export const addFile = createAction(ADD_FILE);
 export const removeFile = createAction(REMOVE_FILE);
 
 export const watch = createAction(WATCH);
-export const forgot = createAction(FORGOT);
+export const forget = createAction(FORGET);
 
 
 export default handleActions({
@@ -52,7 +52,7 @@ export default handleActions({
         })
     },
 
-    [FORGOT]: (state, action) => {
+    [FORGET]: (state, action) => {
         const {payload: path} = action;
         return state.map(file => {
             return (file.path === path) ? {...file, watch: false} : file;

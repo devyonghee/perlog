@@ -4,7 +4,6 @@ const LogFile = class {
     constructor(path, notify) {
         this._path = path;
         this._notify = notify;
-        console.log(this._notify);
     }
 
     watch() {
@@ -17,7 +16,12 @@ const LogFile = class {
     }
 
     forget() {
-        return (!!this.watching && this.watching.close());
+        if (!!this.watching) {
+            this.watching.close();
+            return true;
+        }
+        console.log(`${this._path} file is not watching!!`);
+        return false;
     }
 
     _registerWatchEvents(event) {
