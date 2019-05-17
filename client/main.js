@@ -1,15 +1,19 @@
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, Menu} = require('electron');
 const url = require('url');
 const path = require('path');
+const glob = require('glob');
 
 let mainWindow = null;
+
+const files = glob.sync(path.join(__dirname, 'main/*.js'));
+files.forEach((file) => require(file));
 
 const createWindow = () => {
     const windowOption = {
         width: 1100,
         height: 960,
         icon: path.join(__dirname, './public/favicon.png'),
-        webPreferences:{
+        webPreferences: {
             nodeIntegration: true,
             preload: __dirname + '/preload.js'
         }
@@ -35,6 +39,7 @@ app.on('window-all-closed', () => {
     app.quit()
 });
 app.on('activate', () => (mainWindow === null) && createWindow());
+
 if (!process.mas) {
     app.requestSingleInstanceLock();
     app.on('second-instance', () => {

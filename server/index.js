@@ -33,7 +33,7 @@ const Server = class {
             if (!!this.files[path]) return;
             try {
                 this.files[path]
-                    = (new LogFile(path, message => this.io.sockets.to(path).emit('log', paht, message))).watch();
+                    = (new LogFile(path, message => this.io.sockets.to(path).emit('log', path, message))).watch();
             } catch (e) {
                 console.log(e.message);
                 this.io.sockets.to(path).emit('fileError', path, e.message);

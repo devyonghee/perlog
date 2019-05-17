@@ -17,7 +17,9 @@ const styles = theme => ({
     dense: {
         marginTop: 19,
     },
+
     list: {
+        height: '100vh',
         backgroundColor: theme.palette.background.paper,
     }
 });

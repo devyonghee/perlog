@@ -4,13 +4,12 @@ import App from 'components/App';
 import {Provider} from "react-redux";
 import store from './modules/configStore';
 
-
 const render = Component => {
     return ReactDOM.render(
         <Provider store={store}>
             <App/>
         </Provider>,
-        document.getElementById('root')
+        document.getElementsByTagName('body').item(0)
     );
 };
 

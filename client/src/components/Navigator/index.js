@@ -1,34 +1,37 @@
 import {connect} from "react-redux";
 import container from "./container";
-import {addFile, watch, forget} from "../../modules/directory";
-import {addMessageFromFile} from "../../modules/message";
+import serverAction from "../../modules/actions/server";
+import directoryActions from "../../modules/actions/directory";
 
 
 const mapStateToProps = state => {
     return {
-        files: state.directory
+        directories: state.directory,
     }
 };
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        addFile: path => {
-            dispatch(addFile(path))
+        connect: url => dispatch(serverAction.connectServer(url)),
+        disconnect: () => {
+            dispatch(serverAction.resetSocket());
+            dispatch(directoryActions.setAllForget());
         },
 
         watchFile: path => {
-            dispatch(watch(path))
+            dispatch(serverAction.request('watch', path));
+            dispatch(directoryActions.setWatch(path))
         },
 
         forgetFile: path => {
-            dispatch(forget(path))
+            dispatch(serverAction.request('forget', path));
+            dispatch(directoryActions.setForget(path))
         },
 
-        addMessage: (path, message) => {
-            dispatch(addMessageFromFile(path, message));
-        }
+        addFile: path => dispatch(directoryActions.addFile(path)),
+        removeFile: path => dispatch(directoryActions.removeFile(path)),
+
     };
 };
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(container);

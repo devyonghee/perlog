@@ -1,54 +1,55 @@
 import React, {useState, useEffect} from 'react';
+import PropTypes from 'prop-types';
 import Presenter from './presenter';
-import io from 'socket.io-client'
+
+const propTypes = {
+    connect: PropTypes.func.isRequired,
+    disconnect: PropTypes.func.isRequired,
+    watchFile: PropTypes.func.isRequired,
+    forgetFile: PropTypes.func.isRequired,
+    addFile: PropTypes.func.isRequired,
+    removeFile: PropTypes.func.isRequired,
+};
+
+const defaultProps = {};
 
 const container = (props) => {
-    const {files, addFile, addMessage, watchFile, forgetFile} = props;
-    const [socket, setSocket] = useState(null);
+    const {connect, watchFile, forgetFile, addFile} = props;
     const [path, setPath] = useState('');
+    const [openModal, setNewModal] = useState(false);
 
-    useEffect(() => {
-        const socket = io.connect('http://127.0.0.1:50000');
-        socket.on('connect', () => {
-            setSocket(socket);
-        });
+    useEffect(() => connect('http://127.0.0.1:50000'), []);
 
-        socket.on('log', (path, message) => addMessage(path, message));
-        socket.on('fileError', (path, message) => {
-            console.log(message);
-            forgetFile(path);
-            window.ipcRenderer.send('get-app-path')
-        });
-        window.ipcRenderer.on('test', ()=>console.log('zxcvzxcvzvxvcv'));
-
-    }, []);
-
-    const handlePathChange = e => {
-        const {target: {value}} = e;
-        setPath(value);
-    };
-
+    const handleFileWatchSwitch = (checked, path) => (!!checked) ? watchFile(path) : forgetFile(path);
+    const handlePathChange = ({target: {value}}) => setPath(value);
     const handlePathKeyPress = e => {
-        const {key} = e;
-        if (key.toLowerCase() !== "enter" || !path) return;
-
+        if (e.key.toLowerCase() !== "enter" || !path) return;
         e.preventDefault();
         addFile(path);
         setPath('');
     };
 
-    const handleFileSwitchChange = (checked, path) => {
-        if (!checked) return forgetFile(path);
-        if (!socket) return;
-        watchFile(path);
-        socket.emit('watch', path)
+    const handleListContextMenu = (e) => {
+        e.preventDefault();
+        const {Menu, MenuItem} = window.remote;
+        const menu = new Menu();
+        menu.append(new MenuItem({label: 'New File', click: () => setNewModal(true)}));
+        menu.append(new MenuItem({label: 'New Directory', click: () => setNewModal(true)}));
+        menu.popup({window: window.remote.getCurrentWindow()})
     };
 
-    return <Presenter files={files}
-                      handlePathChange={handlePathChange}
-                      handlePathKeyPress={handlePathKeyPress}
-                      handleFileSwitchChange={handleFileSwitchChange}
-                      path={path}/>;
+    return <Presenter
+        handlePathChange={handlePathChange}
+        handlePathKeyPress={handlePathKeyPress}
+        handleFileWatchSwitch={handleFileWatchSwitch}
+        handleListContextMenu={handleListContextMenu}
+        path={path}
+        openModal={openModal}
+        {...props}
+    />;
 };
+
+container.propTypes = propTypes;
+container.defaultProps = defaultProps;
 
 export default container;

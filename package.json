@@ -18,6 +18,7 @@
   "homepage": "https://github.com/shiw122333/yonglog#readme",
   "dependencies": {
     "express": "^4.16.4",
+    "glob": "^7.1.4",
     "socket.io": "^2.2.0"
   },
   "devDependencies": {

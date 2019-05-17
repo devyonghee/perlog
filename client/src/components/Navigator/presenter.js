@@ -10,13 +10,27 @@ import TextField from '@material-ui/core/TextField';
 import classnames from 'classnames';
 import {withStyles} from '@material-ui/core/styles';
 import styles from "./styles";
+import PropTypes from "prop-types";
 
+const propTypes = {
+    directories: PropTypes.object,
+    path: PropTypes.string,
+    handlePathChange: PropTypes.func.isRequired,
+    handlePathKeyPress: PropTypes.func.isRequired,
+    handleFileWatchSwitch: PropTypes.func.isRequired,
+    handleListContextMenu: PropTypes.func.isRequired
+};
+
+const defaultProps = {
+    directories: {},
+    path: ''
+};
 
 const presenter = (prop) => {
-    const {classes, handlePathChange, handlePathKeyPress, handleFileSwitchChange, path, files} = prop;
+    const {classes, handlePathChange, handlePathKeyPress, handleFileWatchSwitch, handleListContextMenu, path, directories} = prop;
 
     return (
-        <Drawer anchor="left" variant="persistent" open={true}>
+        <Drawer anchor="left" variant="persistent" open={true} >
             <div className={classes.toolbar}>
                 <Typography className={classes.title}>
                     pdev2
@@ -35,19 +49,22 @@ const presenter = (prop) => {
                     value: path
                 }}
             />
-            <List className={classes.list}>
+            <List className={classes.list} onContextMenu={handleListContextMenu}>
                 {
-                    files.map((file, index) =>
-                        <ListItem key={index}>
-                            <ListItemText primary={file.path}/>
-                            <Switch onChange={e => handleFileSwitchChange(e.target.checked, file.path)}
+                    Object.entries(directories).map(([path, file]) =>
+                        <ListItem key={path} button>
+                            <ListItemText primary={path}/>
+                            <Switch onChange={e => handleFileWatchSwitch(e.target.checked, path)}
                                     checked={file.watch}/>
-                        </ListItem>)
+                        </ListItem>
+                    )
                 }
             </List>
         </Drawer>
     );
 };
 
+presenter.propTypes = propTypes;
+presenter.defaultProps = defaultProps;
 
 export default withStyles(styles)(presenter);

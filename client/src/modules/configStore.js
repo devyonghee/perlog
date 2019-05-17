@@ -1,7 +1,8 @@
 import {createStore, combineReducers, applyMiddleware} from "redux";
 import thunk from "redux-thunk";
-import directory from "./directory";
-import message from "./message";
+import server from "./reducers/server";
+import directory from "./reducers/directory";
+import message from "./reducers/message";
 import {composeWithDevTools} from "redux-devtools-extension";
 
 const env = process.env.NODE_ENV;
@@ -16,7 +17,7 @@ if (env === "development") {
     applyMiddle = composeWithDevTools(applyMiddleware(...middle))
 }
 
-const reducer = combineReducers({directory, message});
+const reducer = combineReducers({server, directory, message});
 
 const store = initialState => createStore(reducer, applyMiddle);
 export default store();

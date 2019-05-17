@@ -6,6 +6,10 @@ const propTypes = {};
 const defaultProps = {};
 
 const container = class extends Component {
+    componentDidMount(){
+        window.ipcRenderer.on('changeThemes', (e, type) => console.log(type))
+    }
+
     render() {
         return (
             <Presenter/>
