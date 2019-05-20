@@ -12,8 +12,8 @@ const presenter = (props) => {
             {
                 messages.map((message, index) => (
                     <div className={classes.message} key={index}>
-                        <Typography inline variant='subtitle1' className={classes.name} style={{'color': message.color}}>{message.file}</Typography>
-                        <Typography inline variant='subtitle2' className={classes.contents}>{message.contents}</Typography>
+                        <Typography inline className={classes.name} style={{'color': message.color}}>{message.file}</Typography>
+                        <Typography inline className={classes.contents}>{message.contents}</Typography>
                     </div>
                 ))
             }

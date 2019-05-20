@@ -20,7 +20,8 @@ const removeFile = (state, {path}) => {
     return removed;
 };
 
-const setFileWatchState = (state, {path}, flag = false) => ({...state, [path]: {...state[path], watch: flag}});
+const setFileWatchState = (state, {path}, flag = false) =>
+    (state.hasOwnProperty(path)) ? ({...state, [path]: {...state[path], watch: flag}}) : state;
 
 const setAllForget = (state) =>
     Object.entries(state).reduce((pre, [path, state]) => ({...pre, [path]: {...state, watch: false}}), {});

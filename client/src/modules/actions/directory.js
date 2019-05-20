@@ -7,6 +7,8 @@ const SET_FORGET = Symbol('SET_FORGET');
 const SET_ALL_FORGET = Symbol('SET_ALL_FORGET');
 
 export const types = {
+    ADD_DIRECTORY,
+    REMOVE_DIRECTORY,
     ADD_FILE,
     REMOVE_FILE,
     SET_WATCH,
@@ -14,12 +16,20 @@ export const types = {
     SET_ALL_FORGET,
 };
 
-const addDirectory = (path) => {
+const addDirectory = (name) => {
     return {
         type: ADD_FILE,
-        path
+        name
     };
 };
+
+const removeDirectory = (name) => {
+    return {
+        type: REMOVE_DIRECTORY,
+        name
+    };
+};
+
 
 const addFile = (path) => {
     return {
@@ -56,6 +66,8 @@ const setAllForget = () => {
 };
 
 export default {
+    addDirectory,
+    removeDirectory,
     addFile,
     removeFile,
     setWatch,

@@ -1,20 +1,26 @@
-import React, {Component} from 'react';
+import React, {useEffect} from 'react';
 import Presenter from './presenter';
+import PropTypes from 'prop-types';
 
-const propTypes = {};
+const propTypes = {
+    openFileAddModal: PropTypes.bool
 
-const defaultProps = {};
+};
 
-const container = class extends Component {
-    componentDidMount(){
-        window.ipcRenderer.on('changeThemes', (e, type) => console.log(type))
-    }
+const defaultProps = {
+    openFileAddModal: false
+};
 
-    render() {
-        return (
-            <Presenter/>
-        );
-    }
+const container = (props) => {
+    useEffect(() => {
+        window.ipcRenderer.on('changeThemes', (e, type) => console.log(type));
+    }, []);
+
+    return (
+        <Presenter
+            {...props}
+        />
+    );
 };
 
 container.propTypes = propTypes;

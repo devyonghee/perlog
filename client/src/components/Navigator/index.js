@@ -2,6 +2,7 @@ import {connect} from "react-redux";
 import container from "./container";
 import serverAction from "../../modules/actions/server";
 import directoryActions from "../../modules/actions/directory";
+import fileModalActions from "../../modules/actions/fileModal";
 
 
 const mapStateToProps = state => {
@@ -13,24 +14,12 @@ const mapStateToProps = state => {
 const mapDispatchToProps = (dispatch) => {
     return {
         connect: url => dispatch(serverAction.connectServer(url)),
-        disconnect: () => {
-            dispatch(serverAction.resetSocket());
-            dispatch(directoryActions.setAllForget());
-        },
-
-        watchFile: path => {
-            dispatch(serverAction.request('watch', path));
-            dispatch(directoryActions.setWatch(path))
-        },
-
-        forgetFile: path => {
-            dispatch(serverAction.request('forget', path));
-            dispatch(directoryActions.setForget(path))
-        },
-
+        disconnect: () => dispatch(serverAction.disconnectServer()),
+        watchFile: path => dispatch(serverAction.watch(path)),
+        forgetFile: path => dispatch(serverAction.forget(path)),
         addFile: path => dispatch(directoryActions.addFile(path)),
         removeFile: path => dispatch(directoryActions.removeFile(path)),
-
+        openModal: type => dispatch(fileModalActions.open(true, type)),
     };
 };
 

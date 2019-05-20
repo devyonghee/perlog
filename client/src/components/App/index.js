@@ -3,13 +3,9 @@ import {connect} from 'react-redux';
 
 
 const mapStateToProps = state => {
-    return {}
-};
-
-const mapDispatchToProps = dispatch => {
     return {
-    };
+        openFileAddModal: state.fileModal.isOpen
+    }
 };
 
-
-export default connect(mapStateToProps, mapDispatchToProps)(container);
+export default connect(mapStateToProps)(container);

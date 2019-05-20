@@ -1,9 +1,14 @@
 const fs = require('fs');
 
-const LogFile = class {
-    constructor(path, notify) {
+const File = class {
+    constructor(path, notify = null) {
         this._path = path;
         this._notify = notify;
+    }
+
+    search() {
+        if (!fs.existsSync(this._path)) throw new Error(`${this._path} file is not exist`);
+        return fs.readdirSync(this._path, {encoding: 'utf8', withFileTypes: true});
     }
 
     watch() {
@@ -47,4 +52,4 @@ const LogFile = class {
 
 };
 
-module.exports = LogFile;
+module.exports = File;

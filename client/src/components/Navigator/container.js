@@ -3,22 +3,25 @@ import PropTypes from 'prop-types';
 import Presenter from './presenter';
 
 const propTypes = {
+    directories: PropTypes.object.isRequired,
     connect: PropTypes.func.isRequired,
     disconnect: PropTypes.func.isRequired,
     watchFile: PropTypes.func.isRequired,
     forgetFile: PropTypes.func.isRequired,
     addFile: PropTypes.func.isRequired,
     removeFile: PropTypes.func.isRequired,
+    openModal: PropTypes.func.isRequired,
 };
 
 const defaultProps = {};
 
 const container = (props) => {
-    const {connect, watchFile, forgetFile, addFile} = props;
+    const {connect, watchFile, forgetFile, addFile, openModal} = props;
     const [path, setPath] = useState('');
-    const [openModal, setNewModal] = useState(false);
 
-    useEffect(() => connect('http://127.0.0.1:50000'), []);
+    useEffect(() => {
+        connect('http://127.0.0.1:50000');
+    }, []);
 
     const handleFileWatchSwitch = (checked, path) => (!!checked) ? watchFile(path) : forgetFile(path);
     const handlePathChange = ({target: {value}}) => setPath(value);
@@ -33,8 +36,8 @@ const container = (props) => {
         e.preventDefault();
         const {Menu, MenuItem} = window.remote;
         const menu = new Menu();
-        menu.append(new MenuItem({label: 'New File', click: () => setNewModal(true)}));
-        menu.append(new MenuItem({label: 'New Directory', click: () => setNewModal(true)}));
+        menu.append(new MenuItem({label: 'New File', click: () => openModal('file')}));
+        menu.append(new MenuItem({label: 'New Directory', click: () => openModal('directory')}));
         menu.popup({window: window.remote.getCurrentWindow()})
     };
 
@@ -44,7 +47,6 @@ const container = (props) => {
         handleFileWatchSwitch={handleFileWatchSwitch}
         handleListContextMenu={handleListContextMenu}
         path={path}
-        openModal={openModal}
         {...props}
     />;
 };

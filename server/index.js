@@ -1,8 +1,10 @@
-const LogFile = require('./LogFile');
+const File = require('./File');
 
 const Server = class {
     constructor(config) {
         this.config = config;
+        this.defaultDirectory = config.defaultDirectory || '/';
+
         this.files = {};
     }
 
@@ -21,6 +23,7 @@ const Server = class {
 
             socket.on('watch', path => this._watch(path, socket));
             socket.on('forget', path => this._forget(path, socket));
+            socket.on('search', path => this._search(path, socket));
             socket.on('disconnecting', () => {
                 console.log(`${socket.id} is disconnected`);
                 Object.keys(socket.rooms).map(path => this._forget(path, socket))
@@ -28,16 +31,32 @@ const Server = class {
         });
     }
 
+    _search(path, socket) {
+        const searchPath = this.defaultDirectory+path;
+        try {
+            const file = new File(searchPath);
+            const files = file.search();
+            this.io.sockets.to(socket.id).emit(
+                'searched',
+                searchPath,
+                files.map(file => ({name: file.name, isDirectory: file.isDirectory()}))
+            );
+        } catch (e) {
+            console.log(e.message);
+            this.io.sockets.to(socket.id).emit('fileError', searchPath, e.message);
+        }
+    }
+
     _watch(path, socket) {
         socket.join(path, () => {
             if (!!this.files[path]) return;
             try {
                 this.files[path]
-                    = (new LogFile(path, message => this.io.sockets.to(path).emit('log', path, message))).watch();
+                    = (new File(path, message => this.io.sockets.to(path).emit('log', path, message))).watch();
             } catch (e) {
                 console.log(e.message);
-                this.io.sockets.to(path).emit('fileError', path, e.message);
-                socket.leave(path);
+                this.io.sockets.to(socket.id).emit('fileError', path, e.message);
+                socket.leave(path, () => null);
             }
         });
     }

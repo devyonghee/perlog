@@ -9,6 +9,7 @@ import Switch from '@material-ui/core/Switch';
 import TextField from '@material-ui/core/TextField';
 import classnames from 'classnames';
 import {withStyles} from '@material-ui/core/styles';
+import NewFolder from "../FileModal";
 import styles from "./styles";
 import PropTypes from "prop-types";
 
@@ -27,7 +28,15 @@ const defaultProps = {
 };
 
 const presenter = (prop) => {
-    const {classes, handlePathChange, handlePathKeyPress, handleFileWatchSwitch, handleListContextMenu, path, directories} = prop;
+    const {
+        classes,
+        handlePathChange,
+        handlePathKeyPress,
+        handleFileWatchSwitch,
+        handleListContextMenu,
+        path,
+        directories
+    } = prop;
 
     return (
         <Drawer anchor="left" variant="persistent" open={true} >
@@ -49,13 +58,14 @@ const presenter = (prop) => {
                     value: path
                 }}
             />
-            <List className={classes.list} onContextMenu={handleListContextMenu}>
+            <List className={classes.list} dense onContextMenu={handleListContextMenu}>
                 {
                     Object.entries(directories).map(([path, file]) =>
-                        <ListItem key={path} button>
+                        <ListItem key={path} dense>
                             <ListItemText primary={path}/>
                             <Switch onChange={e => handleFileWatchSwitch(e.target.checked, path)}
-                                    checked={file.watch}/>
+                                    checked={file.watch}
+                            />
                         </ListItem>
                     )
                 }

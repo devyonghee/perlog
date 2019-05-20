@@ -18,11 +18,11 @@ const template = [
         label: 'Themes',
         submenu: [
             {
-                label: 'white',
+                label: 'light',
                 type: 'radio',
                 checked: true,
                 click: (item, focusedWindow) => {
-                    if (item.checked) focusedWindow.send('changeThemes', 'white');
+                    if (item.checked) focusedWindow.send('changeThemes', 'light');
                 }
             },
             {

@@ -7,9 +7,9 @@ import store from './modules/configStore';
 const render = Component => {
     return ReactDOM.render(
         <Provider store={store}>
-            <App/>
+            <Component/>
         </Provider>,
-        document.getElementsByTagName('body').item(0)
+        document.getElementById('root')
     );
 };
 

@@ -1,22 +1,17 @@
 import {types} from "../actions/server";
 
-const initialState = null;
+const initialState = {socket: null, directory: {}};
 
-export default (socket = initialState, action) => {
+export default (state = initialState, action) => {
     switch (action.type) {
         case types.SET_SOCKET:
-            return action.socket;
+            return {...state, socket: action.socket};
 
         case types.RESET_SOCKET:
-            if (!!socket) socket.disconnect();
+            if (!!state.socket) state.socket.disconnect();
             return null;
 
-        case types.REQUEST:
-            if (!socket || !action.hasOwnProperty('event') || !action.hasOwnProperty('path')) return socket;
-            socket.emit(action.event, action.path);
-            return socket;
-
         default:
-            return socket;
+            return state;
     }
 }
