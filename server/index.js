@@ -31,19 +31,27 @@ const Server = class {
         });
     }
 
-    _search(path, socket) {
-        const searchPath = this.defaultDirectory+path;
+    _search(searchPath, socket) {
+        const path = require('path');
+        searchPath = path.resolve(this.defaultDirectory, searchPath);
+
         try {
             const file = new File(searchPath);
             const files = file.search();
-            this.io.sockets.to(socket.id).emit(
-                'searched',
+            console.log('searching... ', searchPath);
+            this.io.sockets.to(socket.id).emit('searched',
                 searchPath,
-                files.map(file => ({name: file.name, isDirectory: file.isDirectory()}))
+                files.reduce((filesObject, file) => ({
+                    ...filesObject, [file.name]: {
+                        name: file.name,
+                        path: path.resolve(searchPath, file.name),
+                        isDirectory: file.isDirectory(),
+                    }
+                }), {})
             );
         } catch (e) {
             console.log(e.message);
-            this.io.sockets.to(socket.id).emit('fileError', searchPath, e.message);
+            this.io.sockets.to(socket.id).emit('fileError', searchPath, ' 경로가 잘못 되었습니다.');
         }
     }
 

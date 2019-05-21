@@ -1,10 +1,9 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import Presenter from './presenter';
 
 const propTypes = {
-    isOpen: PropTypes.bool,
-    type: PropTypes.string,
+    isFileType: PropTypes.bool,
     directory: PropTypes.object.isRequired,
     search: PropTypes.func.isRequired,
     close: PropTypes.func.isRequired,
@@ -13,25 +12,38 @@ const propTypes = {
 };
 
 const defaultProps = {
-    isOpen: false,
-    type: '',
+    isFileType: false,
 };
 
 const container = (props) => {
+    const {search, close, isFileType, directory} = props;
     const [name, setName] = useState('');
 
+    const handleCloseForm = () => setName('') & close();
     const handleNameChange = ({target: {value}}) => setName(value);
     const handleNameKeyPress = e => {
         if (e.key.toLowerCase() !== "enter" || !name) return;
         e.preventDefault();
         setName('');
     };
+    const handleDoubleClickFile = (e, path) => {
+        e.preventDefault();
+
+        search(path)
+    };
+
+    useEffect(() => {
+        !!isFileType && !Object.keys(directory).length && search('')
+    }, []);
 
     return (
         <Presenter
-            {...props}
+            isFileType={isFileType}
+            directory={directory}
+            handleCloseForm={handleCloseForm}
             handleNameChange={handleNameChange}
             handleNameKeyPress={handleNameKeyPress}
+            handleDoubleClickFile={handleDoubleClickFile}
             name={name}
         />
     )

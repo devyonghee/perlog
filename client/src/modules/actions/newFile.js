@@ -1,29 +1,28 @@
-const OPEN = Symbol('OPEN');
-const CLOSE = Symbol('CLOSE');
-const SET_DIRECTORY_CHILDREN = Symbol('SET_DIRECTORY_CHILDREN');
+const SET_OPEN = Symbol('SET_OPEN');
+const SET_DIRECTORY_FILES = Symbol('SET_DIRECTORY_FILES');
 const EXTENSION = Symbol('EXTENSION');
 const SHRINK = Symbol('SHRINK');
 
 export const types = {
-    OPEN,
-    CLOSE,
-    SET_DIRECTORY_CHILDREN,
+    SET_OPEN,
+    SET_DIRECTORY_FILES,
     EXTENSION,
     SHRINK,
 };
 
-const open = (isOpen, addType = '') => {
+const setOpen = (isOpened, isFileType = false) => {
     return {
-        type: OPEN,
-        isOpen,
-        addType
+        type: SET_OPEN,
+        isOpened,
+        isFileType
     };
 };
 
-const setDirectoryChildren = path => {
+const setDirectoryFiles = (path, files) => {
     return {
-        type: SET_DIRECTORY_CHILDREN,
-        path
+        type: SET_DIRECTORY_FILES,
+        path,
+        files,
     };
 };
 
@@ -43,8 +42,8 @@ const shrink = path => {
 
 
 export default {
-    open,
-    setDirectoryChildren,
+    setOpen,
+    setDirectoryFiles,
     extension,
     shrink
 };

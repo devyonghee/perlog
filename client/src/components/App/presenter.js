@@ -1,7 +1,7 @@
 import React from 'react';
 import Navigator from "../Navigator";
 import Screen from "../Screen";
-import FileModal from "../FileModal";
+import NewFileForm from "../NewFileForm";
 import CssBaseline from '@material-ui/core/CssBaseline';
 import {MuiThemeProvider} from '@material-ui/core/styles';
 import themes from './themes';
@@ -12,7 +12,7 @@ const presenter = (props) => {
             <CssBaseline/>
             <Navigator/>
             <Screen/>
-            {props.openFileAddModal ? <FileModal/> : null}
+            {props.openNewFileForm ? <NewFileForm/> : null}
         </MuiThemeProvider>
     );
 };

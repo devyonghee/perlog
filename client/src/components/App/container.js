@@ -3,12 +3,11 @@ import Presenter from './presenter';
 import PropTypes from 'prop-types';
 
 const propTypes = {
-    openFileAddModal: PropTypes.bool
-
+    openNewFileForm: PropTypes.bool
 };
 
 const defaultProps = {
-    openFileAddModal: false
+    openNewFileForm: false
 };
 
 const container = (props) => {

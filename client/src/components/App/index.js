@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 
 const mapStateToProps = state => {
     return {
-        openFileAddModal: state.fileModal.isOpen
+        openNewFileForm: state.newFile.isOpened
     }
 };
 

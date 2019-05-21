@@ -1,4 +1,5 @@
 import io from 'socket.io-client';
+import newFileActions from './newFile';
 import directoryActions from './directory';
 import messageActions from './message';
 
@@ -45,10 +46,8 @@ const connectServer = url => {
             window.remote.dialog.showErrorBox('파일이 존재하지 않습니다.', message);
         });
 
-        socket.on('searched', (path, list) => {
-            const paths = path.replace(/\/+/g).split('/');
-            console.log(path);
-            console.log(list);
+        socket.on('searched', (path, files) => {
+            dispatch(newFileActions.setDirectoryFiles(path, files));
         });
 
         socket.on('error', (path, message) => {

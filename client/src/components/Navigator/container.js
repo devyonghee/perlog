@@ -10,13 +10,13 @@ const propTypes = {
     forgetFile: PropTypes.func.isRequired,
     addFile: PropTypes.func.isRequired,
     removeFile: PropTypes.func.isRequired,
-    openModal: PropTypes.func.isRequired,
+    openNewFileForm: PropTypes.func.isRequired,
 };
 
 const defaultProps = {};
 
 const container = (props) => {
-    const {connect, watchFile, forgetFile, addFile, openModal} = props;
+    const {connect, watchFile, forgetFile, addFile, openNewFileForm} = props;
     const [path, setPath] = useState('');
 
     useEffect(() => {
@@ -36,8 +36,8 @@ const container = (props) => {
         e.preventDefault();
         const {Menu, MenuItem} = window.remote;
         const menu = new Menu();
-        menu.append(new MenuItem({label: 'New File', click: () => openModal('file')}));
-        menu.append(new MenuItem({label: 'New Directory', click: () => openModal('directory')}));
+        menu.append(new MenuItem({label: 'New File', click: () => openNewFileForm('file')}));
+        menu.append(new MenuItem({label: 'New Directory', click: () => openNewFileForm('directory')}));
         menu.popup({window: window.remote.getCurrentWindow()})
     };
 

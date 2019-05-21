@@ -2,7 +2,7 @@ import {connect} from "react-redux";
 import container from "./container";
 import serverAction from "../../modules/actions/server";
 import directoryActions from "../../modules/actions/directory";
-import fileModalActions from "../../modules/actions/fileModal";
+import fileModalActions from "../../modules/actions/newFile";
 
 
 const mapStateToProps = state => {
@@ -19,7 +19,7 @@ const mapDispatchToProps = (dispatch) => {
         forgetFile: path => dispatch(serverAction.forget(path)),
         addFile: path => dispatch(directoryActions.addFile(path)),
         removeFile: path => dispatch(directoryActions.removeFile(path)),
-        openModal: type => dispatch(fileModalActions.open(true, type)),
+        openNewFileForm: type => dispatch(fileModalActions.setOpen(true, type === 'file')),
     };
 };
 

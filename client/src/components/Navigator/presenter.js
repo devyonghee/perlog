@@ -9,7 +9,6 @@ import Switch from '@material-ui/core/Switch';
 import TextField from '@material-ui/core/TextField';
 import classnames from 'classnames';
 import {withStyles} from '@material-ui/core/styles';
-import NewFolder from "../FileModal";
 import styles from "./styles";
 import PropTypes from "prop-types";
 
