@@ -11,6 +11,9 @@ const styles = theme => ({
         alignItems : 'center',
         verticalAlign : 'middle',
     },
+    title:{
+        userSelect: 'none'
+    },
 
     directoryWrap : {
         width: theme.spacing.unit * 30,

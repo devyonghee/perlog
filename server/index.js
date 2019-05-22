@@ -41,13 +41,11 @@ const Server = class {
             console.log('searching... ', searchPath);
             this.io.sockets.to(socket.id).emit('searched',
                 searchPath,
-                files.reduce((filesObject, file) => ({
-                    ...filesObject, [file.name]: {
-                        name: file.name,
-                        path: path.resolve(searchPath, file.name),
-                        isDirectory: file.isDirectory(),
-                    }
-                }), {})
+                files.map(file => ({
+                    name: file.name,
+                    path: path.resolve(searchPath, file.name),
+                    isDirectory: file.isDirectory()
+                }))
             );
         } catch (e) {
             console.log(e.message);

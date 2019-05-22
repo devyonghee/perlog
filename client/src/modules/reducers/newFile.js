@@ -1,47 +1,43 @@
 import {types} from '../actions/newFile';
+import File from '../model/File';
 
 const initialState = {
     isOpened: false,
     isFileType: false,
-    directory: {},
+    files: [],
 };
 
 const openModal = (state, {isOpened, isFileType}) => ({...state, isOpened, isFileType});
 
-const setDirectory = (state, {path, files}) => {
+const setFiles = (state, {path, files:newFiles}) => {
     const paths = path.replace(/(\\+|\/+)/g, '/').split('/').filter(String);
-    const {directory} = state;
+    const {files: [...stateFiles]} = state;
 
-    paths.reduce((directory, path, currentIndex, paths) => {
+    paths.reduce((files, path, currentIndex, paths) => {
+        const newDirectory = new File(path, paths.slice(0, currentIndex + 1).join('/'), true);
 
-        if (!directory.hasOwnProperty(path)) {
-            directory[path] = {
-                name: path,
-                path: paths.slice(0, currentIndex + 1).join('/'),
-                isDirectory: true,
-                depth: currentIndex,
-                child: {}
-            };
+        let directory = files.find(file => file.is(newDirectory));
+        if (!directory) {
+            files.push(newDirectory);
+            directory = newDirectory;
+            directory.extend();
         }
-
-        directory[path]['isExtended'] = true;
 
         if (paths.length !== (currentIndex + 1)) {
-            return directory[path].child;
+            return directory.child;
         }
 
-        return directory[path].child = Object.entries(files).reduce((files, [name, file]) => {
-            files[name] = (files.hasOwnProperty(name) && !!file.isDirectory) ?
-                {...files[name], isExtended: false, depth: currentIndex + 1, child: {}} :
-                {...files[name], depth: currentIndex + 1};
-            return files;
-        }, files);
+        if(!newFiles || !newFiles.length){
+            directory.setChild(null);
+            return;
+        }
 
-    }, directory);
+        directory.setChild(newFiles.map(file => (new File(file.name, file.path, file.isDirectory))).sort(file => file.isDirectory ? -1 : 1));
+    }, stateFiles);
 
     return {
         ...state,
-        directory: Object.assign({}, directory)
+        files: [...stateFiles]
     }
 };
 
@@ -50,12 +46,16 @@ export default (state = initialState, action) => {
         case types.SET_OPEN:
             return openModal(state, action);
 
-        case types.SET_DIRECTORY_FILES:
-            return setDirectory(state, action);
+        case types.SET_FILES:
+            return setFiles(state, action);
 
-        case types.EXTENSION:
+        case types.EXTEND:
+            action.file.extend();
+            return {...state, files: [...state.files]};
+
         case types.SHRINK:
-            return state;
+            action.file.shrink();
+            return {...state, files: [...state.files]};
         default:
             return state;
     }

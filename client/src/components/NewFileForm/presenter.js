@@ -6,45 +6,9 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import FolderIcon from '@material-ui/icons/Folder';
-import FileIcon from '@material-ui/icons/InsertDriveFile';
-import ArrowRightIcon from '@material-ui/icons/ArrowRightRounded';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDownRounded';
-import ListItemText from '@material-ui/core/ListItemText';
 import Button from '@material-ui/core/Button';
 import styles from './styles';
-
-
-const generateFileList = (directories, handleDoubleClickFile) => {
-    if (!Object.keys(directories).length) {
-        return (<ListItem><ListItemText primary={'...loading'}/></ListItem>);
-    }
-
-    return Object.entries(directories).map(([name, file], index) => {
-        return (
-            <Fragment key={index}>
-                <ListItem
-                    onDoubleClick={(e) => handleDoubleClickFile(e, file.path)}
-                    style={{paddingLeft: `${file.depth * 20}px`}}
-                >
-                    <ListItemIcon>
-                        {file.isDirectory ?
-                            (<Fragment>
-                                {file.isExtended ? <ArrowDropDownIcon/> : <ArrowRightIcon/>}
-                                <FolderIcon/>
-                            </Fragment>) :
-                            <FileIcon style={{marginLeft: '23px'}}/>
-                        }
-                    </ListItemIcon>
-                    <ListItemText primary={name}/>
-                </ListItem>
-                {file.isExtended ? generateFileList(file.child, handleDoubleClickFile) : null}
-            </Fragment>
-        )
-    });
-};
+import FileList from '../FileList';
 
 const NewFolder = (props) => {
     const {
@@ -54,7 +18,9 @@ const NewFolder = (props) => {
         handleNameChange,
         handleNameKeyPress,
         handleDoubleClickFile,
-        directory,
+        handleSelectFile,
+        files,
+        selectedFile,
         isFileType
     } = props;
 
@@ -70,14 +36,17 @@ const NewFolder = (props) => {
                 className={classnames(classes.wrapPaper, (!!isFileType) ? classes.fileWrap : classes.directoryWrap)}
                 elevation={0}
             >
-                <Typography variant="h6">
+                <Typography variant="h6" className={classes.title}>
                     New {!!isFileType ? 'File' : 'Directory'}
                 </Typography>
                 {(!!isFileType) ?
                     <List dense className={classes.folderList}>
-                        {
-                            generateFileList(directory, handleDoubleClickFile)
-                        }
+                        <FileList
+                            files={files}
+                            selectedFile={selectedFile}
+                            handleSelectFile={handleSelectFile}
+                            handleDoubleClickFile={handleDoubleClickFile}
+                        />
                     </List> :
                     <TextField
                         id="standard-name"

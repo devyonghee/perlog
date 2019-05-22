@@ -1,12 +1,12 @@
 const SET_OPEN = Symbol('SET_OPEN');
-const SET_DIRECTORY_FILES = Symbol('SET_DIRECTORY_FILES');
-const EXTENSION = Symbol('EXTENSION');
+const SET_FILES = Symbol('SET_FILES');
+const EXTEND = Symbol('EXTEND');
 const SHRINK = Symbol('SHRINK');
 
 export const types = {
     SET_OPEN,
-    SET_DIRECTORY_FILES,
-    EXTENSION,
+    SET_FILES,
+    EXTEND,
     SHRINK,
 };
 
@@ -18,33 +18,33 @@ const setOpen = (isOpened, isFileType = false) => {
     };
 };
 
-const setDirectoryFiles = (path, files) => {
+const setFiles = (path, files) => {
     return {
-        type: SET_DIRECTORY_FILES,
+        type: SET_FILES,
         path,
         files,
     };
 };
 
-const extension = path => {
+const extend = file => {
     return {
-        type: EXTENSION,
-        path
+        type: EXTEND,
+        file
     };
 };
 
-const shrink = path => {
+const shrink = file => {
     return {
         type: SHRINK,
-        path
+        file
     };
 };
 
 
 export default {
     setOpen,
-    setDirectoryFiles,
-    extension,
+    setFiles,
+    extend,
     shrink
 };
 

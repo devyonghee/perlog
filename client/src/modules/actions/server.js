@@ -47,7 +47,7 @@ const connectServer = url => {
         });
 
         socket.on('searched', (path, files) => {
-            dispatch(newFileActions.setDirectoryFiles(path, files));
+            dispatch(newFileActions.setFiles(path, files));
         });
 
         socket.on('error', (path, message) => {
