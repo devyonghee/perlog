@@ -1,6 +1,5 @@
 import React, {Fragment, createElement} from 'react';
 import classNames from 'classnames';
-import {withStyles} from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -11,8 +10,8 @@ import ArrowRightIcon from '@material-ui/icons/ArrowRightRounded';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDownRounded';
 import Switch from '@material-ui/core/Switch';
 import ListItemText from '@material-ui/core/ListItemText';
-import styles from './styles';
-
+import {useTheme} from '@material-ui/styles';
+import useStyles from './styles';
 
 const propTypes = {
     files: PropTypes.arrayOf(
@@ -44,7 +43,6 @@ const defaultProps = {
 
 const FileList = props => {
     const {
-        classes,
         files,
         selectedFile,
         depth,
@@ -55,6 +53,7 @@ const FileList = props => {
         handleContextMenuList
     } = props;
 
+    const classes = useStyles();
     if (files === null || !files.length) {
 
         return (
@@ -93,9 +92,9 @@ const FileList = props => {
                     <ListItemText className={classes.textList} primary={<Typography>{file.name}</Typography>}/>
                     {!file.isDirectory && !!handleFileWatchSwitch ?
                         <Switch classes={{
-                            switchBase: classes.colorSwitchBase,
-                            checked: classes.colorSwitchChecked,
-                            bar: classes.colorSwitchBar,
+                            switchBase: colorSwitchBase,
+                            checked: colorSwitchChecked,
+                            bar: colorSwitchBar,
                         }} onChange={e => handleFileWatchSwitch(e.target.checked, file)} checked={file.watch}/> : null}
                 </ListItem>
                 {file.isExtended ?
@@ -109,4 +108,4 @@ const FileList = props => {
 FileList.propTypes = propTypes;
 FileList.defaultProps = defaultProps;
 
-export default withStyles(styles)(FileList);
+export default FileList;

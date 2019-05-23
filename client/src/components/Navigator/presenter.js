@@ -3,8 +3,7 @@ import Drawer from '@material-ui/core/Drawer';
 import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
-import {withStyles} from '@material-ui/core/styles';
-import styles from "./styles";
+import useStyle from "./styles";
 import PropTypes from "prop-types";
 import FileList from '../FileList';
 
@@ -24,11 +23,11 @@ const defaultProps = {
 
 const presenter = (prop) => {
     const {
-        classes,
         handleClickList,
         handleContextMenuList,
     } = prop;
 
+    const classes = useStyle();
     return (
         <Drawer anchor="left" variant="persistent" className={classes.drawer} open={true}>
             <div className={classes.toolbar}>
@@ -53,4 +52,4 @@ const presenter = (prop) => {
 presenter.propTypes = propTypes;
 presenter.defaultProps = defaultProps;
 
-export default withStyles(styles)(presenter);
+export default presenter;

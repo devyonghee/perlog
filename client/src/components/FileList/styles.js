@@ -1,5 +1,8 @@
-import {green,purple} from '@material-ui/core/colors'
-const styles = theme => ({
+import {green, purple} from '@material-ui/core/colors'
+import {makeStyles} from '@material-ui/styles'
+
+
+const useStyles = makeStyles(theme => ({
     listItem: {
         padding: '2px',
         "&:hover": {
@@ -24,23 +27,23 @@ const styles = theme => ({
     },
 
     colorSwitchBase: {
-        color: green[500],
+        color: ({color})=>color[theme.type][50],
         '&$colorSwitchChecked': {
-            color: purple[500],
+            color: ({color})=>color[theme.type][300],
             '& + $colorSwitchBar': {
-                backgroundColor: purple[500],
+                backgroundColor: ({color})=>color[theme.type][500],
             },
         }
     },
 
-    colorSwitchChecked: {},
-    colorSwitchBar:{},
+    colorSwitchChecked: {color: ({color})=>color[theme.type][300]},
+    colorSwitchBar: {backgroundColor: ({color})=>color[theme.type][500]},
 
     textList: {
         paddingLeft: '10px',
         userSelect: 'none'
     }
 
-});
+}));
 
-export default styles;
+export default useStyles;

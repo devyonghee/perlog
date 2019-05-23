@@ -8,7 +8,7 @@ let mainWindow = null;
 const files = glob.sync(path.join(__dirname, 'main/*.js'));
 files.forEach((file) => require(file));
 
-const createWindow = () => {
+const createWindow = (dev = true, devUrl = '') => {
     const windowOption = {
         width: 1100,
         height: 960,
@@ -20,21 +20,23 @@ const createWindow = () => {
     };
     const mainWindow = new BrowserWindow(windowOption);
 
-    const startUrl = process.env.ELECTRON_START_URL || url.format({
-        pathname: path.join(__dirname, './build/index.html'),
-        protocol: 'file:',
-        slashes: true
-    });
-    mainWindow.loadURL(startUrl);
-
-    if (/--debug/.test(process.argv[2])) {
+    if (dev) {
         mainWindow.webContents.openDevTools();
         const {default: installExtension, REACT_DEVELOPER_TOOLS} = require('electron-devtools-installer');
         installExtension(REACT_DEVELOPER_TOOLS).then((name) => console.log(`Added Extension:  ${name}`));
+        return mainWindow.loadURL(devUrl);
     }
+
+    mainWindow.loadFile(url.format({
+        pathname: path.join(__dirname, './build/index.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
 };
 
-app.on('ready', createWindow);
+
+const starter = (/--dev/.test(process.argv[2])) ? require('./scripts/start')(createWindow) : createWindow(false);
+app.on('ready', () => starter);
 app.on('window-all-closed', () => {
     app.quit()
 });

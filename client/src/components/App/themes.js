@@ -1,15 +1,17 @@
-import {createMuiTheme} from "@material-ui/core/styles";
 import {lightBlue, red} from "@material-ui/core/colors";
 
-export default createMuiTheme({
+const theme = {
     palette: {
         primary: lightBlue,
         secondary: red,
         background: {
             paper: 'white'
         },
-        type: 'light',
     },
+    spacing: {
+        unit: '8px'
+    },
+
     typography: {
         fontFamily: [
             '-apple-system',
@@ -26,4 +28,6 @@ export default createMuiTheme({
         fontWeightMedium: 500,
         useNextVariants: true,
     }
-});
+};
+
+export default theme;

@@ -64,6 +64,7 @@ if (process.env.HOST) {
 // We require that you explictly set browsers and do not fall back to
 // browserslist defaults.
 const {checkBrowsers} = require('react-dev-utils/browsersHelper');
+module.exports = electronStarter =>
 checkBrowsers(paths.appPath, isInteractive)
     .then(() => {
         // We attempt to use the default port but if it is busy, we offer the user to
@@ -100,8 +101,7 @@ checkBrowsers(paths.appPath, isInteractive)
             }
             console.log(chalk.cyan('Starting the development server...\n'));
 
-            const exec = require('child_process').exec;
-            exec('npm run electron-dev');
+            electronStarter(true, urls.localUrlForBrowser);
             console.log(chalk.red('Starting the electron...\n'));
         });
 

@@ -1,7 +1,8 @@
-const styles = theme => ({
-    toolbar: theme.mixins.toolbar,
+import {makeStyles} from '@material-ui/styles'
+
+const useStyles = makeStyles(theme => ({
     drawer: {
-        width : '300vh',
+        width: '300vh',
     },
     title: {
         width: '200px',
@@ -26,6 +27,6 @@ const styles = theme => ({
         height: '100vh',
         backgroundColor: theme.palette.background.paper,
     }
-});
+}));
 
-export default styles;
+export default useStyles;

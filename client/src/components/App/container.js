@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import Presenter from './presenter';
 import PropTypes from 'prop-types';
 
@@ -11,13 +11,15 @@ const defaultProps = {
 };
 
 const container = (props) => {
+    const [themeType, setThemeType] = useState('light');
     useEffect(() => {
-        window.ipcRenderer.on('changeThemes', (e, type) => console.log(type));
+        window.ipcRenderer.on('changeThemes', (e, type) => setThemeType(type));
     }, []);
 
     return (
         <Presenter
             {...props}
+            themeType={themeType}
         />
     );
 };
