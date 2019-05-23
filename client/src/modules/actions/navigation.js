@@ -1,3 +1,4 @@
+const SET_SELECT_TARGET = Symbol('SET_SELECT_TARGET');
 const ADD_DIRECTORY = Symbol('ADD_DIRECTORY');
 const REMOVE_DIRECTORY = Symbol('REMOVE_DIRECTORY');
 const ADD_FILE = Symbol('ADD_FILE');
@@ -7,6 +8,7 @@ const SET_FORGET = Symbol('SET_FORGET');
 const SET_ALL_FORGET = Symbol('SET_ALL_FORGET');
 
 export const types = {
+    SET_SELECT_TARGET,
     ADD_DIRECTORY,
     REMOVE_DIRECTORY,
     ADD_FILE,
@@ -16,62 +18,61 @@ export const types = {
     SET_ALL_FORGET,
 };
 
+const setSelectTarget = file => {
+    return {
+        type: SET_SELECT_TARGET,
+        file
+    };
+};
+
 const addDirectory = (name) => {
     return {
-        type: ADD_FILE,
-        name
+        type: ADD_DIRECTORY,
+        name,
     };
 };
 
-const removeDirectory = (name) => {
+const removeDirectory = () => {
     return {
         type: REMOVE_DIRECTORY,
-        name
     };
 };
 
 
-const addFile = (path) => {
+const addFile = file => {
     return {
         type: ADD_FILE,
-        path
+        file,
     };
 };
 
-const removeFile = (path) => {
+const removeFile = () => {
     return {
         type: REMOVE_FILE,
-        path
     };
 };
 
-const setWatch = (path) => {
+const setWatch = (file, watch) => {
     return {
         type: SET_WATCH,
-        path
-    };
-};
-
-const setForget = (path) => {
-    return {
-        type: SET_FORGET,
-        path
+        file,
+        watch
     };
 };
 
 const setAllForget = () => {
     return {
-        type: SET_FORGET,
+        type: SET_ALL_FORGET,
     };
 };
 
 export default {
+    setSelectTarget,
     addDirectory,
     removeDirectory,
     addFile,
     removeFile,
     setWatch,
-    setForget,
     setAllForget
 };
 

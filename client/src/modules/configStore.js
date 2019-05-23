@@ -1,7 +1,7 @@
 import {createStore, combineReducers, applyMiddleware} from "redux";
 import thunk from "redux-thunk";
 import server from "./reducers/server";
-import directory from "./reducers/directory";
+import navigation from "./reducers/navigation";
 import message from "./reducers/message";
 import newFile from "./reducers/newFile";
 
@@ -15,7 +15,7 @@ if (env === "development") {
 
 const applyMiddle = applyMiddleware(...middle);
 
-const reducer = combineReducers({server, directory, message, newFile});
+const reducer = combineReducers({server, navigation, message, newFile});
 
 const store = initialState => createStore(reducer, applyMiddle);
 export default store();

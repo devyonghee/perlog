@@ -75,11 +75,11 @@
     "react-test-renderer": "^16.8.6"
   },
   "scripts": {
-    "start": "node scripts/start.js | (set ELECTRON_START_URL=http://localhost:3000 && electron . --debug)",
+    "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "react": "node scripts/start.js",
-    "electron": "set ELECTRON_START_URL=http://localhost:3000 && electron . --debug",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "electron-dev": "set ELECTRON_START_URL=http://localhost:3000 && electron . --debug",
+    "electron": "electron ."
   },
   "eslintConfig": {
     "extends": "react-app"

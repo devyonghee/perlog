@@ -1,7 +1,7 @@
 import {types} from '../actions/newFile';
-import File from '../model/File';
 
 const initialState = {
+    selected: null,
     isOpened: false,
     isFileType: false,
     files: [],
@@ -9,53 +9,78 @@ const initialState = {
 
 const openModal = (state, {isOpened, isFileType}) => ({...state, isOpened, isFileType});
 
-const setFiles = (state, {path, files:newFiles}) => {
+const setFiles = (state, {path, files: newFiles}) => {
     const paths = path.replace(/(\\+|\/+)/g, '/').split('/').filter(String);
-    const {files: [...stateFiles]} = state;
+    if(!paths.length) return state;
 
-    paths.reduce((files, path, currentIndex, paths) => {
-        const newDirectory = new File(path, paths.slice(0, currentIndex + 1).join('/'), true);
-
-        let directory = files.find(file => file.is(newDirectory));
-        if (!directory) {
-            files.push(newDirectory);
-            directory = newDirectory;
-            directory.extend();
-        }
-
-        if (paths.length !== (currentIndex + 1)) {
-            return directory.child;
-        }
-
-        if(!newFiles || !newFiles.length){
-            directory.setChild(null);
-            return;
-        }
-
-        directory.setChild(newFiles.map(file => (new File(file.name, file.path, file.isDirectory))).sort(file => file.isDirectory ? -1 : 1));
-    }, stateFiles);
+    const {files: stateFiles} = state;
 
     return {
         ...state,
-        files: [...stateFiles]
+        files: paths.reduce((currentFiles, path, currentIndex, paths) => {
+            const currentPath = paths.slice(0, currentIndex + 1).join('/');
+
+            let currentDirectory = currentFiles.find(file => file.path === currentPath);
+            if (!currentDirectory) {
+                currentDirectory = {
+                    name: path,
+                    path: currentPath,
+                    isDirectory: true,
+                    isExtended: true,
+                    child: []
+                };
+                currentFiles.push(currentDirectory);
+            }
+
+            if (paths.length !== (currentIndex + 1)) {
+                return currentDirectory.child;
+            }
+
+            if (!newFiles || !newFiles.length) {
+                currentDirectory.child = null;
+                return;
+            }
+
+            currentDirectory.child = newFiles.map((file, index) => ({
+                ...file,
+                path: file.path.replace(/(\\+|\/+)/g, '/'),
+                isExtended: false,
+                parent: currentDirectory,
+                child: []
+            })).sort(file => file.isDirectory ? -1 : 1);
+            return [...stateFiles];
+        }, stateFiles)
     }
+};
+
+
+const applyExtend = (state, {extend}) => {
+    const {selected, files} = state;
+    if (!selected) return state;
+    selected.isExtended = extend;
+    return {
+        ...state,
+        files: [...files]
+    };
 };
 
 export default (state = initialState, action) => {
     switch (action.type) {
+        case types.SET_SELECT_TARGET:
+            return {
+                ...state,
+                selected: action.file,
+            };
+
         case types.SET_OPEN:
             return openModal(state, action);
 
         case types.SET_FILES:
             return setFiles(state, action);
 
-        case types.EXTEND:
-            action.file.extend();
-            return {...state, files: [...state.files]};
+        case types.SET_EXTEND:
+            return applyExtend(state, action);
 
-        case types.SHRINK:
-            action.file.shrink();
-            return {...state, files: [...state.files]};
         default:
             return state;
     }

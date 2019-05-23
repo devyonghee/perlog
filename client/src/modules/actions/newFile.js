@@ -1,13 +1,20 @@
+const SET_SELECT_TARGET = Symbol('SET_SELECT_TARGET');
 const SET_OPEN = Symbol('SET_OPEN');
 const SET_FILES = Symbol('SET_FILES');
-const EXTEND = Symbol('EXTEND');
-const SHRINK = Symbol('SHRINK');
+const SET_EXTEND = Symbol('SET_EXTEND');
 
 export const types = {
+    SET_SELECT_TARGET,
     SET_OPEN,
     SET_FILES,
-    EXTEND,
-    SHRINK,
+    SET_EXTEND,
+};
+
+const setSelectTarget = file => {
+    return {
+        type: SET_SELECT_TARGET,
+        file
+    };
 };
 
 const setOpen = (isOpened, isFileType = false) => {
@@ -26,25 +33,17 @@ const setFiles = (path, files) => {
     };
 };
 
-const extend = file => {
+const setExtend = (extend) => {
     return {
-        type: EXTEND,
-        file
+        type: SET_EXTEND,
+        extend
     };
 };
-
-const shrink = file => {
-    return {
-        type: SHRINK,
-        file
-    };
-};
-
 
 export default {
+    setSelectTarget,
     setOpen,
     setFiles,
-    extend,
-    shrink
+    setExtend,
 };
 

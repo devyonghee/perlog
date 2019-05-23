@@ -4,24 +4,15 @@ export const types = {
 };
 
 
-const addMessage = (file, contents, color) => {
+const addMessage = (file, contents) => {
     return {
         type: ADD_MESSAGE,
         file,
         contents,
-        color
     };
-};
-
-const addMessageOfWatchedFile = (path, contents) => {
-    return (dispatch, getState) => {
-        if (!getState().directory.hasOwnProperty(path)) return;
-        const file = getState().directory[path];
-        dispatch(addMessage(file.name, contents, file.color))
-    }
 };
 
 
 export default {
-    addMessageOfWatchedFile
+    addMessage
 };

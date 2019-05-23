@@ -1,7 +1,8 @@
 import {types} from "../actions/message";
 
-
-const addMessage = (state, {file, contents, color}) => [...state, {file, contents, color}];
+const addMessage = (state, {file, contents}) => [...state, {
+    file: file.name, contents, color: file.color}
+    ];
 
 const initialState = [
     {file: 'test', contents: 'asdfadsf', color: 'red'},

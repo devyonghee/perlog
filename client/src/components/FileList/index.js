@@ -1,5 +1,5 @@
-import React, {Fragment} from 'react';
-import classnames from 'classnames';
+import React, {Fragment, createElement} from 'react';
+import classNames from 'classnames';
 import {withStyles} from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import ListItem from '@material-ui/core/ListItem';
@@ -9,26 +9,54 @@ import FolderIcon from '@material-ui/icons/Folder';
 import FileIcon from '@material-ui/icons/InsertDriveFile';
 import ArrowRightIcon from '@material-ui/icons/ArrowRightRounded';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDownRounded';
+import Switch from '@material-ui/core/Switch';
 import ListItemText from '@material-ui/core/ListItemText';
 import styles from './styles';
 
 
 const propTypes = {
-    files: PropTypes.array,
+    files: PropTypes.arrayOf(
+        PropTypes.shape({
+            child: PropTypes.array,
+            name: PropTypes.string,
+            path: PropTypes.string,
+            isDirectory: PropTypes.bool,
+            isExtended: PropTypes.bool,
+        })),
     depth: PropTypes.number,
-    handleDoubleClickFile: PropTypes.func.isRequired
+    indexes: PropTypes.array,
+    handleDoubleClickFile: PropTypes.func,
+    handleContextMenuList: PropTypes.func,
+    handleFileWatchSwitch: PropTypes.func,
+    handleClickFile: PropTypes.func
 };
 
 const defaultProps = {
     files: null,
     depth: 0,
+    indexes: [],
+    handleDoubleClickFile: () => null,
+    handleClickFile: () => null,
+    handleContextMenuList: () => null,
+    handleFileWatchSwitch: null,
 };
 
 
 const FileList = props => {
-    const {classes, handleDoubleClickFile, files, selectedFile, handleSelectFile, depth} = props;
+    const {
+        classes,
+        files,
+        selectedFile,
+        depth,
+        indexes,
+        handleClickFile,
+        handleDoubleClickFile,
+        handleFileWatchSwitch,
+        handleContextMenuList
+    } = props;
 
     if (files === null || !files.length) {
+
         return (
             <ListItem>
                 <ListItemText
@@ -38,30 +66,43 @@ const FileList = props => {
         );
     }
 
-    return files.map((file, index) => (
-        <Fragment key={index}>
-            <ListItem
-                dense
-                className={classes.listItem}
-                onDoubleClick={(e) => handleDoubleClickFile(e, file)}
-                selected={!!selectedFile && file.is(selectedFile)}
-                onClick={e => handleSelectFile(e, file)}
-                style={{paddingLeft: `${depth * 20}px`}}
-            >
-                <ListItemIcon className={classes.iconWrap}>
-                    {file.isDirectory ?
-                        (<Fragment>
-                            {file.isExtended ? <ArrowDropDownIcon/> : <ArrowRightIcon/>}
-                            <FolderIcon className={classes.filesIcon}/>
-                        </Fragment>) :
-                        <FileIcon className={classnames(classes.filesIcon, classes.fileIcon)}/>
-                    }
-                </ListItemIcon>
-                <ListItemText className={classes.textList} primary={<Typography>{file.name}</Typography>}/>
-            </ListItem>
-            {file.isExtended ? <FileList {...props} depth={depth+1} files={file.child}/> : null}
-        </Fragment>
-    ));
+    return files.map((file, index) => {
+        const currentIndexes = [...indexes, index];
+        return (
+            <Fragment key={index}>
+                <ListItem
+                    className={classes.listItem}
+                    selected={!!selectedFile && file === selectedFile}
+                    style={{paddingLeft: `${depth * 20}px`}}
+                    onClick={e => handleClickFile(e, file)}
+                    onDoubleClick={e => handleDoubleClickFile(e, file, currentIndexes)}
+                    onContextMenu={e => handleContextMenuList(e, file)}
+                >
+                    <ListItemIcon className={classes.iconWrap}>
+                        {file.isDirectory ?
+                            (<Fragment>
+                                {createElement(file.isExtended ? ArrowDropDownIcon : ArrowRightIcon, {
+                                    onClick: e => handleDoubleClickFile(e, file, currentIndexes),
+                                    className: classes.arrowIcon
+                                })}
+                                <FolderIcon className={classes.icon}/>
+                            </Fragment>) :
+                            <FileIcon className={classNames(classes.icon, classes.fileIcon)}/>
+                        }
+                    </ListItemIcon>
+                    <ListItemText className={classes.textList} primary={<Typography>{file.name}</Typography>}/>
+                    {!file.isDirectory && !!handleFileWatchSwitch ?
+                        <Switch classes={{
+                            switchBase: classes.colorSwitchBase,
+                            checked: classes.colorSwitchChecked,
+                            bar: classes.colorSwitchBar,
+                        }} onChange={e => handleFileWatchSwitch(e.target.checked, file)} checked={file.watch}/> : null}
+                </ListItem>
+                {file.isExtended ?
+                    <FileList {...props} indexes={currentIndexes} depth={depth + 1} files={file.child}/> : null}
+            </Fragment>
+        )
+    });
 
 };
 

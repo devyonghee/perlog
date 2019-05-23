@@ -1,13 +1,17 @@
 const styles = theme => ({
     toolbar: theme.mixins.toolbar,
+    drawer: {
+        width : '300vh',
+    },
     title: {
-        'display': 'flex',
-        'flex-grow': 1,
-        'min-height': '56px',
-        'align-items': 'flex-start',
-        'padding-left': '24px',
-        'flex-direction': 'column',
-        'justify-content': 'center',
+        width: '200px',
+        display: 'flex',
+        flexGrow: 1,
+        minHeight: '56px',
+        alignItems: 'flex-start',
+        paddingLeft: '24px',
+        flexDirection: 'column',
+        justifyContent: 'center',
     },
     textField: {
         marginLeft: theme.spacing.unit,

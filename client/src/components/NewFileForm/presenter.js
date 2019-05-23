@@ -1,5 +1,6 @@
-import React, {Fragment} from 'react';
-import classnames from 'classnames';
+import React from 'react';
+import classNames from 'classnames';
+import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import Paper from '@material-ui/core/Paper';
@@ -10,15 +11,39 @@ import Button from '@material-ui/core/Button';
 import styles from './styles';
 import FileList from '../FileList';
 
-const NewFolder = (props) => {
+const propTypes = {
+    isFileType: PropTypes.bool,
+    classes: PropTypes.object.isRequired,
+    handleCloseForm: PropTypes.func.isRequired,
+    handleNameChange: PropTypes.func.isRequired,
+    handleClickConfirm: PropTypes.func.isRequired,
+    handleNameKeyPress: PropTypes.func.isRequired,
+    handleDoubleClickFile: PropTypes.func.isRequired,
+    selectedFile: PropTypes.object,
+    files: PropTypes.arrayOf(
+        PropTypes.shape({
+            child: PropTypes.array,
+            name: PropTypes.string,
+            path: PropTypes.string,
+            isDirectory: PropTypes.bool,
+            isExtended: PropTypes.bool,
+        })),
+};
+
+const defaultProps = {
+    isFileType: false,
+    files: [],
+};
+
+const presenter = (props) => {
     const {
         classes,
         name,
         handleCloseForm,
         handleNameChange,
+        handleClickConfirm,
         handleNameKeyPress,
         handleDoubleClickFile,
-        handleSelectFile,
         files,
         selectedFile,
         isFileType
@@ -33,7 +58,7 @@ const NewFolder = (props) => {
             onClose={handleCloseForm}
         >
             <Paper
-                className={classnames(classes.wrapPaper, (!!isFileType) ? classes.fileWrap : classes.directoryWrap)}
+                className={classNames(classes.wrapPaper, (!!isFileType) ? classes.fileWrap : classes.directoryWrap)}
                 elevation={0}
             >
                 <Typography variant="h6" className={classes.title}>
@@ -42,9 +67,9 @@ const NewFolder = (props) => {
                 {(!!isFileType) ?
                     <List dense className={classes.folderList}>
                         <FileList
+                            {...props}
                             files={files}
                             selectedFile={selectedFile}
-                            handleSelectFile={handleSelectFile}
                             handleDoubleClickFile={handleDoubleClickFile}
                         />
                     </List> :
@@ -62,10 +87,10 @@ const NewFolder = (props) => {
                     />
                 }
                 <div className={classes.buttonsWrap}>
-                    <Button color="primary" size="small">
+                    <Button color="primary" size="small" onClick={handleClickConfirm}>
                         OK
                     </Button>
-                    <Button color="secondary" size="small">
+                    <Button color="secondary" size="small" onClick={handleCloseForm}>
                         Cancel
                     </Button>
                 </div>
@@ -74,5 +99,8 @@ const NewFolder = (props) => {
     );
 };
 
+presenter.propTypes = propTypes;
+presenter.defaultProps = defaultProps;
 
-export default withStyles(styles)(NewFolder);
+
+export default withStyles(styles)(presenter);

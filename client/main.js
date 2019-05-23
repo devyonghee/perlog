@@ -1,4 +1,4 @@
-const {app, BrowserWindow, Menu} = require('electron');
+const {app, BrowserWindow} = require('electron');
 const url = require('url');
 const path = require('path');
 const glob = require('glob');

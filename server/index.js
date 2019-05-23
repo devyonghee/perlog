@@ -21,7 +21,7 @@ const Server = class {
         this.io.sockets.on('connection', socket => {
             console.log(`${socket.id} is connected`);
 
-            socket.on('watch', path => this._watch(path, socket));
+            socket.on('watch', file => this._watch(file, socket));
             socket.on('forget', path => this._forget(path, socket));
             socket.on('search', path => this._search(path, socket));
             socket.on('disconnecting', () => {
@@ -53,15 +53,16 @@ const Server = class {
         }
     }
 
-    _watch(path, socket) {
+    _watch(file, socket) {
+        const {path} = file;
         socket.join(path, () => {
             if (!!this.files[path]) return;
             try {
                 this.files[path]
-                    = (new File(path, message => this.io.sockets.to(path).emit('log', path, message))).watch();
+                    = (new File(path, message => this.io.sockets.to(path).emit('log', file, message))).watch();
             } catch (e) {
                 console.log(e.message);
-                this.io.sockets.to(socket.id).emit('fileError', path, e.message);
+                this.io.sockets.to(socket.id).emit('fileError', file, e.message);
                 socket.leave(path, () => null);
             }
         });

@@ -4,39 +4,59 @@ import Presenter from './presenter';
 
 const propTypes = {
     isFileType: PropTypes.bool,
-    files: PropTypes.array.isRequired,
     search: PropTypes.func.isRequired,
     close: PropTypes.func.isRequired,
     extend: PropTypes.func.isRequired,
-    shrink: PropTypes.func.isRequired,
+    addDirectory : PropTypes.func.isRequired,
+    addFile : PropTypes.func.isRequired,
+    selectedFile : PropTypes.object,
+    setSelectTarget : PropTypes.func.isRequired,
+    files: PropTypes.arrayOf(
+        PropTypes.shape({
+            child: PropTypes.array,
+            name: PropTypes.string,
+            path: PropTypes.string,
+            isDirectory: PropTypes.bool,
+            isExtended: PropTypes.bool,
+        })),
 };
 
 const defaultProps = {
     isFileType: false,
+    selectedFile: null,
+    files: []
 };
 
 const container = (props) => {
-    const {search, close, isFileType, files, shrink, extend} = props;
+    const {search, close, isFileType, files, extend, addDirectory, setSelectTarget, selectedFile, addFile} = props;
     const [name, setName] = useState('');
-    const [selectedFile, setSelectedFile] = useState(null);
 
-    const handleSelectFile = (e, file) => {
+    const handleClickFile = (e, file) => {
         e.preventDefault();
-        setSelectedFile(file);
+        setSelectTarget(file);
     };
     const handleCloseForm = () => setName('') & close();
     const handleNameChange = ({target: {value}}) => setName(value);
+    const handleClickConfirm = e => {
+        e.preventDefault();
+        if (!isFileType) {
+            if (!name) return window.remote.dialog.showErrorBox('directory', '폴더명을 입력해주세요.');
+            return addDirectory(name) & setName('');
+        }
+    };
+
     const handleNameKeyPress = e => {
         if (e.key.toLowerCase() !== "enter" || !name) return;
         e.preventDefault();
+        addDirectory(name);
         setName('');
     };
-    const handleDoubleClickFile = (e, file) => {
+    const handleDoubleClickFile = (e, file, indexes) => {
         e.preventDefault();
-        if (!file.isDirectory) return;
-        if (file.isExtended) return shrink(file);
+        if (!file.isDirectory) return addFile(file);
+        if (file.isExtended) return extend(indexes, false);
         if (!!file.child && file.child.length < 1) search(file.path);
-        extend(file);
+        extend(indexes, true);
     };
 
     useEffect(() => {
@@ -45,12 +65,13 @@ const container = (props) => {
 
     return (
         <Presenter
-            isFileType={isFileType}
             files={files}
-             selectedFile={selectedFile}
-            handleSelectFile={handleSelectFile}
+            isFileType={isFileType}
+            selectedFile={selectedFile}
+            handleClickFile={handleClickFile}
             handleCloseForm={handleCloseForm}
             handleNameChange={handleNameChange}
+            handleClickConfirm={handleClickConfirm}
             handleNameKeyPress={handleNameKeyPress}
             handleDoubleClickFile={handleDoubleClickFile}
             name={name}

@@ -1,6 +1,6 @@
 import {types} from "../actions/server";
 
-const initialState = {socket: null, directory: {}};
+const initialState = {socket: null};
 
 export default (state = initialState, action) => {
     switch (action.type) {
@@ -9,7 +9,19 @@ export default (state = initialState, action) => {
 
         case types.RESET_SOCKET:
             if (!!state.socket) state.socket.disconnect();
-            return null;
+            return {...state, socket: null};
+
+        case types.SEARCH:
+            if (!!state.socket && action.hasOwnProperty('path')) {
+                state.socket.emit('search', action.path);
+            }
+
+            return state;
+        case types.REQUEST_WATCH:
+            if (!!state.socket && action.file.hasOwnProperty('path')) {
+                action.watch ? state.socket.emit('watch', action.file) : state.socket.emit('forget', action.file);
+            }
+            return state;
 
         default:
             return state;

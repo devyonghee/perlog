@@ -1,16 +1,20 @@
 import io from 'socket.io-client';
 import newFileActions from './newFile';
-import directoryActions from './directory';
+import directoryActions from './navigation';
 import messageActions from './message';
 
 const SET_SOCKET = Symbol('SET_SOCKET');
 const RESET_SOCKET = Symbol('RESET_SOCKET');
 const SET_DIRECTORY = Symbol('SET_DIRECTORY');
+const REQUEST_WATCH = Symbol('REQUEST_WATCH');
+const SEARCH = Symbol('SEARCH');
 
 export const types = {
     SET_SOCKET,
     RESET_SOCKET,
-    SET_DIRECTORY
+    SET_DIRECTORY,
+    REQUEST_WATCH,
+    SEARCH
 };
 
 const setSocket = socket => {
@@ -26,9 +30,17 @@ const resetSocket = () => {
     };
 };
 
-const setDirectory = path => {
+const requestWatch = (file, watch) => {
     return {
-        type: SET_DIRECTORY,
+        type: REQUEST_WATCH,
+        file,
+        watch,
+    };
+};
+
+const search = (path = '') => {
+    return {
+        type: SEARCH,
         path
     };
 };
@@ -39,10 +51,10 @@ const connectServer = url => {
         const socket = io.connect(url);
         socket.on('connect', () => dispatch(setSocket(socket)));
 
-        socket.on('log', (path, message) => dispatch(messageActions.addMessageOfWatchedFile(path, message)));
+        socket.on('log', (file, message) => dispatch(messageActions.addMessage(file, message)));
 
-        socket.on('fileError', (path, message) => {
-            dispatch(directoryActions.setForget(path));
+        socket.on('fileError', (file, message) => {
+            dispatch(directoryActions.setWatch(file, false));
             window.remote.dialog.showErrorBox('파일이 존재하지 않습니다.', message);
         });
 
@@ -66,39 +78,9 @@ const disconnectServer = () => {
     }
 };
 
-
-const watch = path => {
-    return (dispatch, getState) => {
-        const {server: {socket}} = getState();
-        if (!socket) return;
-        socket.emit('watch', path);
-        dispatch(directoryActions.setWatch(path));
-    }
-};
-
-const forget = path => {
-    return (dispatch, getState) => {
-        const {server: {socket}} = getState();
-        if (!socket) return;
-        socket.emit('forget', path);
-        dispatch(directoryActions.setForget(path));
-    }
-};
-
-
-const search = (path = '') => {
-    return (dispatch, getState) => {
-        const {server: {socket}} = getState();
-        if (!socket) return;
-        socket.emit('search', path);
-    }
-};
-
-
 export default {
     connectServer,
     disconnectServer,
-    watch,
-    forget,
+    requestWatch,
     search
 }
