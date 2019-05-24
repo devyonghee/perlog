@@ -52,7 +52,7 @@ const presenter = (props) => {
         <Modal
             aria-labelledby="simple-modal-title"
             aria-describedby="simple-modal-description"
-            disableAutoFocus
+            disableBackdropClick
             open
             onClose={handleCloseForm}
         >
@@ -73,11 +73,11 @@ const presenter = (props) => {
                         />
                     </List> :
                     <TextField
-                        id="standard-name"
                         margin="dense"
                         className={classes.textField}
                         helperText="Enter a New File Name"
                         fullWidth
+                        autoFocus
                         inputProps={{
                             onChange: handleNameChange,
                             onKeyPress: handleNameKeyPress,

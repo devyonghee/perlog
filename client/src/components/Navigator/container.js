@@ -48,7 +48,7 @@ const container = (props) => {
             if (!file) return menu.popup({window: window.remote.getCurrentWindow()});
             menu.append(new MenuItem({type: 'separator'}));
         }
-        menu.append(new MenuItem({label: 'Delete...', click: () => openNewFileForm('file')}));
+        menu.append(new MenuItem({label: 'Delete...', click: () => {}}));
         return menu.popup({window: window.remote.getCurrentWindow()})
     };
 

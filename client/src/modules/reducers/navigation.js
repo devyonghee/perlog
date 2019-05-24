@@ -1,28 +1,29 @@
 import {types} from '../actions/navigation';
+import colors from 'components/colors';
 
 function* generatorColor() {
     let index = 0;
     while (true) {
-        if (index >= 20) index = 0;
+        if (colors.length >= 20) index = 0;
         yield index++;
     }
 }
 
-const colors = generatorColor();
+const colorsIndex = generatorColor();
 
 const initialState = {
     selected: null,
     files: [{
         watch: false,
         name: 'D://test1.txt',
-        color: colors.next().value,
+        color: colorsIndex.next().value,
         path: 'D://test1.txt',
         isDirectory: false,
         child: []
     },{
         watch: false,
         name: 'D://test1.txt',
-        color: colors.next().value,
+        color: colorsIndex.next().value,
         path: 'D://test1.txt',
         isDirectory: false,
         child: []
@@ -62,7 +63,7 @@ const addFile = (state, {file}) => {
         isDirectory: false,
         parent: null,
         watch: false,
-        color: colors.next().value,
+        color: colorsIndex.next().value,
     };
 
     if (!selected) {
