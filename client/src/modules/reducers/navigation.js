@@ -1,16 +1,10 @@
 import {types} from '../actions/navigation';
-import {red, blue, green, amber, cyan, orange, yellow, blueGrey, brown, indigo} from '@material-ui/core/colors';
-
-
 
 function* generatorColor() {
-    const lightThemeColors = [red, blue, green, amber, cyan, orange];
-    const darkThemeColors = [brown, indigo, orange, yellow, blueGrey];
     let index = 0;
     while (true) {
-        if (!lightThemeColors[index] || darkThemeColors[index]) index = 0;
-        index++;
-        yield {'light': lightThemeColors[index], 'dark': darkThemeColors[index]};
+        if (index >= 20) index = 0;
+        yield index++;
     }
 }
 

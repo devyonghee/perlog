@@ -1,11 +1,12 @@
 import {types} from "../actions/message";
 
-const addMessage = (state, {file, contents}) => [...state, {
-    file: file.name, contents, color: file.color}
-    ];
+const addMessage = (state, {file, contents}) => [
+    ...state,
+    {file: file.name, contents, color: file.color}
+];
 
 const initialState = [
-    {file: 'test', contents: 'asdfadsf', color: 'red'},
+    {file: 'test', contents: 'asdfadsf', color: 0},
 ];
 export default (state = initialState, action) => {
     switch (action.type) {

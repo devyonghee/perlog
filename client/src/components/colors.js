@@ -1,0 +1,2 @@
+import {red, green, blue, cyan, indigo, amber, blueGrey, brown, yellow, orange} from "@material-ui/core/colors";
+export default [[red, blue], [green, amber], [cyan, orange], [yellow, blueGrey], [brown, indigo]];

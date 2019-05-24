@@ -20,7 +20,7 @@ const container = (props) => {
     const [path, setPath] = useState('');
 
     useEffect(() => {
-        // connect('http://127.0.0.1:50000');
+        connect('http://127.0.0.1:50000');
     }, []);
 
     const handleFileWatchSwitch = (checked, file) => watchFile(file, !!checked);

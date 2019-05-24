@@ -51,7 +51,18 @@ const connectServer = url => {
         const socket = io.connect(url);
         socket.on('connect', () => dispatch(setSocket(socket)));
 
-        socket.on('log', (file, message) => dispatch(messageActions.addMessage(file, message)));
+        socket.on('log', (file, message) => {
+            if(window.remote.getCurrentWindow().isMinimized()){
+                const notification = {
+                    title: 'Basic Notification',
+                    body: message,
+                    icon: ''
+                };
+                new window.Notification(file.path, notification);
+            }
+
+            dispatch(messageActions.addMessage(file, message))
+        });
 
         socket.on('fileError', (file, message) => {
             dispatch(directoryActions.setWatch(file, false));

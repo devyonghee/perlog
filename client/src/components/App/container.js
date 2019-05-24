@@ -14,6 +14,7 @@ const container = (props) => {
     const [themeType, setThemeType] = useState('light');
     useEffect(() => {
         window.ipcRenderer.on('changeThemes', (e, type) => setThemeType(type));
+        console.log(window.remote);
     }, []);
 
     return (

@@ -1,4 +1,6 @@
-const styles = theme => ({
+import {makeStyles} from '@material-ui/styles'
+
+const useStyles = makeStyles(theme => ({
     wrapPaper: {
         position: 'absolute',
         backgroundColor: theme.palette.background.paper,
@@ -35,6 +37,6 @@ const styles = theme => ({
         height: theme.spacing.unit * 60,
         overflow: 'auto',
     }
-});
+}));
 
-export default styles;
+export default useStyles;

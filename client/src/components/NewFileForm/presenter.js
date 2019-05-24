@@ -1,14 +1,13 @@
 import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import {withStyles} from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
 import Button from '@material-ui/core/Button';
-import styles from './styles';
+import useStyles from './styles';
 import FileList from '../FileList';
 
 const propTypes = {
@@ -37,7 +36,6 @@ const defaultProps = {
 
 const presenter = (props) => {
     const {
-        classes,
         name,
         handleCloseForm,
         handleNameChange,
@@ -48,6 +46,7 @@ const presenter = (props) => {
         selectedFile,
         isFileType
     } = props;
+    const classes = useStyles();
 
     return (
         <Modal
@@ -102,5 +101,4 @@ const presenter = (props) => {
 presenter.propTypes = propTypes;
 presenter.defaultProps = defaultProps;
 
-
-export default withStyles(styles)(presenter);
+export default presenter;

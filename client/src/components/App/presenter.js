@@ -7,8 +7,9 @@ import {ThemeProvider} from '@material-ui/styles';
 import themes from './themes';
 
 const presenter = (props) => {
+
     return (
-        <ThemeProvider theme={{...themes, type: props.themeType}}>
+        <ThemeProvider theme={{...themes, type:props.themeType}}>
             <CssBaseline/>
             <Navigator/>
             <Screen/>

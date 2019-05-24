@@ -1,5 +1,21 @@
-import {green, purple} from '@material-ui/core/colors'
 import {makeStyles} from '@material-ui/styles'
+import colors from '../colors';
+
+const createSwitchColorsClass = (themeType) =>
+    colors.reduce((colorClasses, [lightColor, darkColor], index) => ({
+        ...colorClasses,
+        [`colorSwitchBase${index}`]: {
+            color: themeType === 'light' ? lightColor[300] : darkColor[300],
+            [`&$colorSwitchChecked${index}`]: {
+                color: themeType === 'light' ? lightColor[500] : darkColor[500],
+                [`& + $colorSwitchBar${index}`]: {
+                    backgroundColor: themeType === 'light' ? lightColor[300] : darkColor[300],
+                },
+            }
+        },
+        [`colorSwitchChecked${index}`]: {                color: themeType === 'light' ? lightColor[500] : darkColor[500],},
+        [`colorSwitchBar${index}`]: {                backgroundColor: themeType === 'light' ? lightColor[500] : darkColor[500],},
+    }), {});
 
 
 const useStyles = makeStyles(theme => ({
@@ -26,23 +42,12 @@ const useStyles = makeStyles(theme => ({
         marginLeft: '23px'
     },
 
-    colorSwitchBase: {
-        color: ({color})=>color[theme.type][50],
-        '&$colorSwitchChecked': {
-            color: ({color})=>color[theme.type][300],
-            '& + $colorSwitchBar': {
-                backgroundColor: ({color})=>color[theme.type][500],
-            },
-        }
-    },
-
-    colorSwitchChecked: {color: ({color})=>color[theme.type][300]},
-    colorSwitchBar: {backgroundColor: ({color})=>color[theme.type][500]},
-
     textList: {
         paddingLeft: '10px',
         userSelect: 'none'
-    }
+    },
+
+    ...createSwitchColorsClass(theme.type),
 
 }));
 

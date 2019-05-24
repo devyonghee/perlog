@@ -10,7 +10,6 @@ import ArrowRightIcon from '@material-ui/icons/ArrowRightRounded';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDownRounded';
 import Switch from '@material-ui/core/Switch';
 import ListItemText from '@material-ui/core/ListItemText';
-import {useTheme} from '@material-ui/styles';
 import useStyles from './styles';
 
 const propTypes = {
@@ -92,9 +91,9 @@ const FileList = props => {
                     <ListItemText className={classes.textList} primary={<Typography>{file.name}</Typography>}/>
                     {!file.isDirectory && !!handleFileWatchSwitch ?
                         <Switch classes={{
-                            switchBase: colorSwitchBase,
-                            checked: colorSwitchChecked,
-                            bar: colorSwitchBar,
+                            switchBase: classes[`colorSwitchBase${file.color}`],
+                            checked: classes[`colorSwitchChecked${file.color}`],
+                            bar: classes[`colorSwitchBar${file.color}`],
                         }} onChange={e => handleFileWatchSwitch(e.target.checked, file)} checked={file.watch}/> : null}
                 </ListItem>
                 {file.isExtended ?
