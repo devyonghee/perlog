@@ -23,6 +23,7 @@ const propTypes = {
         })),
     depth: PropTypes.number,
     indexes: PropTypes.array,
+    invisibleWhenEmpty: PropTypes.bool,
     handleDoubleClickFile: PropTypes.func,
     handleContextMenuList: PropTypes.func,
     handleFileWatchSwitch: PropTypes.func,
@@ -33,6 +34,7 @@ const defaultProps = {
     files: null,
     depth: 0,
     indexes: [],
+    invisibleWhenEmpty: false,
     handleDoubleClickFile: () => null,
     handleClickFile: () => null,
     handleContextMenuList: () => null,
@@ -46,6 +48,9 @@ const FileList = props => {
         selectedFile,
         depth,
         indexes,
+        watchedFiles,
+        extendedDirectories,
+        invisibleLoading,
         handleClickFile,
         handleDoubleClickFile,
         handleFileWatchSwitch,
@@ -53,13 +58,13 @@ const FileList = props => {
     } = props;
 
     const classes = useStyles();
-    if (files === null || !files.length) {
 
+    if (files === null || !files.length) {
         return (
             <ListItem>
                 <ListItemText
                     className={classes.textList} style={{paddingLeft: `${depth * 20}px`}}
-                    primary={!!files ? '...loading' : '비어있는 폴더입니다.'}/>
+                    primary={!!files && !invisibleLoading ? '...loading' : '빈 폴더입니다.'}/>
             </ListItem>
         );
     }
@@ -79,7 +84,7 @@ const FileList = props => {
                     <ListItemIcon className={classes.iconWrap}>
                         {file.isDirectory ?
                             (<Fragment>
-                                {createElement(file.isExtended ? ArrowDropDownIcon : ArrowRightIcon, {
+                                {createElement(extendedDirectories.includes(file) ? ArrowDropDownIcon : ArrowRightIcon, {
                                     onClick: e => handleDoubleClickFile(e, file, currentIndexes),
                                     className: classes.arrowIcon
                                 })}
@@ -94,9 +99,9 @@ const FileList = props => {
                             switchBase: classes[`colorSwitchBase${file.color}`],
                             checked: classes[`colorSwitchChecked${file.color}`],
                             bar: classes[`colorSwitchBar${file.color}`],
-                        }} onChange={e => handleFileWatchSwitch(e.target.checked, file)} checked={file.watch}/> : null}
+                        }} onChange={e => handleFileWatchSwitch(e.target.checked, file)} checked={!!watchedFiles.includes(file)}/> : null}
                 </ListItem>
-                {file.isExtended ?
+                {extendedDirectories.includes(file) ?
                     <FileList {...props} indexes={currentIndexes} depth={depth + 1} files={file.child}/> : null}
             </Fragment>
         )

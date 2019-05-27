@@ -12,7 +12,6 @@ import FileList from '../FileList';
 
 const propTypes = {
     isFileType: PropTypes.bool,
-    classes: PropTypes.object.isRequired,
     handleCloseForm: PropTypes.func.isRequired,
     handleNameChange: PropTypes.func.isRequired,
     handleClickConfirm: PropTypes.func.isRequired,
@@ -44,34 +43,26 @@ const presenter = (props) => {
         handleDoubleClickFile,
         files,
         selectedFile,
-        isFileType
+        type,
     } = props;
+
     const classes = useStyles();
 
     return (
         <Modal
             aria-labelledby="simple-modal-title"
             aria-describedby="simple-modal-description"
-            disableBackdropClick
             open
             onClose={handleCloseForm}
         >
             <Paper
-                className={classNames(classes.wrapPaper, (!!isFileType) ? classes.fileWrap : classes.directoryWrap)}
+                className={classNames(classes.wrapPaper, (type === 'directory') ? classes.directoryWrap : classes.fileWrap)}
                 elevation={0}
             >
                 <Typography variant="h6" className={classes.title}>
-                    New {!!isFileType ? 'File' : 'Directory'}
+                    New {type.charAt(0).toUpperCase() + type.slice(1)}
                 </Typography>
-                {(!!isFileType) ?
-                    <List dense className={classes.folderList}>
-                        <FileList
-                            {...props}
-                            files={files}
-                            selectedFile={selectedFile}
-                            handleDoubleClickFile={handleDoubleClickFile}
-                        />
-                    </List> :
+                {(type === 'directory') ?
                     <TextField
                         margin="dense"
                         className={classes.textField}
@@ -83,7 +74,14 @@ const presenter = (props) => {
                             onKeyPress: handleNameKeyPress,
                             value: name
                         }}
-                    />
+                    /> : <List dense className={classes.folderList}>
+                        <FileList
+                            {...props}
+                            files={files}
+                            selectedFile={selectedFile}
+                            handleDoubleClickFile={handleDoubleClickFile}
+                        />
+                    </List>
                 }
                 <div className={classes.buttonsWrap}>
                     <Button color="primary" size="small" onClick={handleClickConfirm}>

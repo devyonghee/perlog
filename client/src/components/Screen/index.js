@@ -3,7 +3,7 @@ import container from "./container";
 
 const mapStateToProps = state => {
     return {
-        messages: state.message
+        messages: state.server.messages
     }
 };
 
