@@ -3,12 +3,12 @@ import colors from '../colors';
 function* generatorColor() {
     let index = 0;
     while (true) {
-        if (colors.length >= 20) index = 0;
+        if (colors.length - 1 < index) index = 0;
         yield index++;
     }
 }
 
-const colorsIndex = generatorColor();
+export const colorsIndex = generatorColor();
 
 const ADD_DIRECTORY = Symbol('ADD_DIRECTORY');
 const REMOVE_DIRECTORY = Symbol('REMOVE_DIRECTORY');
@@ -22,11 +22,13 @@ export const types = {
     REMOVE_FILE,
 };
 
+
 const addDirectory = (state, {name, parent = null}) => {
     const newDirectory = {
-        name,
+        name: name.trim(),
         isDirectory: true,
         parent: null,
+        route: name.trim(),
         child: [],
     };
 
@@ -34,8 +36,9 @@ const addDirectory = (state, {name, parent = null}) => {
         return [...state, newDirectory];
     }
 
-    parent.child.push(newDirectory);
     newDirectory.parent = parent;
+    newDirectory.route = [parent.route, newDirectory.name].join('/');
+    parent.child.push(newDirectory);
     return [...state];
 };
 
@@ -44,7 +47,7 @@ const addFile = (state, {file, parent = null}) => {
     if (!file.name || !file.path) return state;
 
     const newFile = {
-        name: file.name,
+        name: file.name.trim(),
         path: file.path,
         isDirectory: false,
         parent: null,
@@ -55,8 +58,9 @@ const addFile = (state, {file, parent = null}) => {
         return [...state, newFile];
     }
 
-    const selectDirectory = parent.isDirectory ? parent : parent.parent;
-    selectDirectory.child.push(newFile);
+    newFile.parent = parent;
+    newFile.route = [parent.route, newFile.name].join('/');
+    parent.child.push(newFile);
     return [...state];
 };
 

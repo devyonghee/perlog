@@ -13,7 +13,7 @@ const mapDispatchToProps = (dispatch) => {
     return {
         connect: url => dispatch(serverAction.connectServer(url)),
         disconnect: () => dispatch(serverAction.disconnectServer()),
-        search: () => dispatch(serverAction.search()),
+        search: (directory = null) => dispatch(serverAction.search(directory)),
         watchFile: (file, watch) => dispatch(serverAction.requestWatch(file, watch)),
     };
 };

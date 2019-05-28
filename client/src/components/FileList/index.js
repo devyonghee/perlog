@@ -10,6 +10,7 @@ import ArrowRightIcon from '@material-ui/icons/ArrowRightRounded';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDownRounded';
 import Switch from '@material-ui/core/Switch';
 import ListItemText from '@material-ui/core/ListItemText';
+import {useTheme} from '@material-ui/styles';
 import useStyles from './styles';
 
 const propTypes = {
@@ -34,6 +35,7 @@ const defaultProps = {
     files: null,
     depth: 0,
     indexes: [],
+    dense: false,
     invisibleWhenEmpty: false,
     handleDoubleClickFile: () => null,
     handleClickFile: () => null,
@@ -50,6 +52,8 @@ const FileList = props => {
         indexes,
         watchedFiles,
         extendedDirectories,
+        dense,
+        invisibleSwitch,
         invisibleLoading,
         handleClickFile,
         handleDoubleClickFile,
@@ -58,16 +62,7 @@ const FileList = props => {
     } = props;
 
     const classes = useStyles();
-
-    if (files === null || !files.length) {
-        return (
-            <ListItem>
-                <ListItemText
-                    className={classes.textList} style={{paddingLeft: `${depth * 20}px`}}
-                    primary={!!files && !invisibleLoading ? '...loading' : '빈 폴더입니다.'}/>
-            </ListItem>
-        );
-    }
+    const theme = useTheme();
 
     return files.map((file, index) => {
         const currentIndexes = [...indexes, index];
@@ -76,7 +71,7 @@ const FileList = props => {
                 <ListItem
                     className={classes.listItem}
                     selected={!!selectedFile && file === selectedFile}
-                    style={{paddingLeft: `${depth * 20}px`}}
+                    style={{paddingLeft: `${depth * 20}px`, height: dense ? '25px' : '45px'}}
                     onClick={e => handleClickFile(e, file)}
                     onDoubleClick={e => handleDoubleClickFile(e, file, currentIndexes)}
                     onContextMenu={e => handleContextMenuList(e, file)}
@@ -88,21 +83,38 @@ const FileList = props => {
                                     onClick: e => handleDoubleClickFile(e, file, currentIndexes),
                                     className: classes.arrowIcon
                                 })}
-                                <FolderIcon className={classes.icon}/>
+                                <FolderIcon className={classes.iconMargin}
+                                            style={{height: dense ? theme.spacing.unit * 2 : null}}/>
                             </Fragment>) :
-                            <FileIcon className={classNames(classes.icon, classes.fileIcon)}/>
+                            <FileIcon className={classNames(classes.arrowMargin, classes.iconMargin)}
+                                      style={{height: dense ? theme.spacing.unit * 2 : null}}/>
                         }
                     </ListItemIcon>
-                    <ListItemText className={classes.textList} primary={<Typography>{file.name}</Typography>}/>
-                    {!file.isDirectory && !!handleFileWatchSwitch ?
-                        <Switch classes={{
-                            switchBase: classes[`colorSwitchBase${file.color}`],
-                            checked: classes[`colorSwitchChecked${file.color}`],
-                            bar: classes[`colorSwitchBar${file.color}`],
-                        }} onChange={e => handleFileWatchSwitch(e.target.checked, file)} checked={!!watchedFiles.includes(file)}/> : null}
+                    <ListItemText className={classes.textList}
+                                  primary={<Typography className={classes.text}>{file.name}</Typography>}/>
+                    {!invisibleSwitch && !file.isDirectory && handleFileWatchSwitch ?
+                        <Switch
+                            classes={{
+                                root: classes.switchRoot,
+                                switchBase: classes[`colorSwitchBase${file.color}`],
+                                checked: classes[`colorSwitchChecked${file.color}`],
+                                bar: classes[`colorSwitchBar${file.color}`],
+                            }}
+                            onChange={e => handleFileWatchSwitch(e, file)}
+                            checked={watchedFiles.includes(file)}/> : null}
                 </ListItem>
-                {extendedDirectories.includes(file) ?
-                    <FileList {...props} indexes={currentIndexes} depth={depth + 1} files={file.child}/> : null}
+                {
+                    (extendedDirectories.includes(file)) ?
+                        (file.child === null || !file.child.length) ? (
+                                <ListItem className={classes.emptyText}>
+                                    <ListItemText
+                                        style={{paddingLeft: `${(depth + 1) * 20}px`}}
+                                        disableTypography
+                                        primary={!!files && !invisibleLoading ? '...loading' : '빈 폴더입니다.'}/>
+                                </ListItem>) :
+                            <FileList {...props} indexes={currentIndexes} depth={depth + 1} files={file.child}/>
+                        : null
+                }
             </Fragment>
         )
     });

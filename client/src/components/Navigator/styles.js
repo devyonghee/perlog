@@ -1,9 +1,6 @@
 import {makeStyles} from '@material-ui/styles'
 
 const useStyles = makeStyles(theme => ({
-    drawer: {
-        width: '300vh',
-    },
     title: {
         width: '200px',
         display: 'flex',

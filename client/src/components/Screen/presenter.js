@@ -1,5 +1,5 @@
 import React from 'react';
-import classnames from 'classnames';
+import classNames from 'classnames';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import useStyles from "./styles";
@@ -10,10 +10,10 @@ const presenter = (props) => {
     return (
         <Paper className={classes.paper} square elevation={0}>
             {
-                messages.map((message, index) => (
+                messages.map(({file, message}, index) => (
                     <div className={classes.message} key={index}>
-                        <Typography inline className={classnames(classes.name, classes[`fileName${message.color}`])} >{message.file}</Typography>
-                        <Typography inline className={classes.contents}>{message.contents}</Typography>
+                        <Typography inline className={classNames(classes.name, classes[`fileName${file.color}`])} >{file.route}</Typography>
+                        <Typography inline className={classes.contents}>{message}</Typography>
                     </div>
                 ))
             }

@@ -30,25 +30,34 @@ const useStyles = makeStyles(theme => ({
         marginRight: '0'
     },
 
-    icon: {
-        height: theme.spacing.unit * 2
-    },
-
     arrowIcon: {
         cursor: 'pointer',
     },
 
-    fileIcon: {
+    iconMargin:{
+        marginRight: '0px'
+    },
+
+    arrowMargin: {
         marginLeft: '23px'
     },
 
     textList: {
-        paddingLeft: '10px',
+        overflow: 'hidden',
+        width: '100px',
+        paddingLeft: '5px',
         userSelect: 'none'
     },
+    emptyText : {
+        height: '10px'
+    },
 
-    ...createSwitchColorsClass(theme.type),
+    switchRoot: {
+        padding: 0,
+        margin: theme.spacing.unit,
+    },
 
+    ...createSwitchColorsClass(theme.palette.type),
 }));
 
 export default useStyles;

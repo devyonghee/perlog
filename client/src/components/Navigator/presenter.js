@@ -19,12 +19,11 @@ const propTypes = {
 
 const defaultProps = {
     directories: {},
-    isOpenedNewForm : false,
+    isOpenedNewForm: false,
 };
 
 const presenter = props => {
     const {
-        newFileForm,
         handleClickList,
         handleContextMenuList,
         serverFiles,
@@ -33,7 +32,7 @@ const presenter = props => {
 
     const classes = useStyle();
     return (
-        <Drawer anchor="left" variant="persistent" className={classes.drawer} open={true}>
+        <Drawer anchor="left" variant="persistent" open={true}>
             <div className={classes.toolbar}>
                 <Typography className={classes.title}>
                     pdev2
@@ -41,24 +40,18 @@ const presenter = props => {
             </div>
             <Divider/>
             <List className={classes.list} onContextMenu={handleContextMenuList} onClick={handleClickList}>
-                <List className={classes.folderList}>
-                    <FileList
-                        {...props}
-                        invisibleLoading
-                        watchedFiles={watchedFiles}
-                        handleClickFile={handleClickList}
-                        handleContextMenuList={handleContextMenuList}
-                    />
-                </List>
-            </List>
-            {
-                newFileForm.opened &&
-                <NewFileForm
+                <FileList
                     {...props}
-                    files={serverFiles}
-                    type={newFileForm.type}
+                    invisibleLoading
+                    watchedFiles={watchedFiles}
+                    handleClickFile={handleClickList}
+                    handleContextMenuList={handleContextMenuList}
                 />
-            }
+            </List>
+            <NewFileForm
+                {...props}
+                files={serverFiles}
+            />
         </Drawer>
     );
 };

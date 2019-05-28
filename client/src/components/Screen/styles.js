@@ -11,7 +11,6 @@ const createFileNameClass = (themeType) =>
 
 const useStyles = makeStyles(theme => ({
     paper: {
-        paddingLeft: theme.spacing.unit * 30,
         paddingTop: theme.spacing.unit * 2,
         minHeight: '100vh',
     },

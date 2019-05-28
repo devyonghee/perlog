@@ -57,7 +57,6 @@ export default (state = initialState, action) => {
 
         case types.SEARCH:
             if (!state.socket) return state;
-
             state.socket.emit('search', (!!action.directory) ? action.directory.path : '');
             return {...state, searching: action.directory};
 
@@ -65,10 +64,13 @@ export default (state = initialState, action) => {
             return applyFiles(state, action);
 
         case types.REQUEST_WATCH:
-            if (!!state.socket && action.hasOwnProperty('file')) {
-                action.watch ? state.socket.emit('watch', action.file) : state.socket.emit('forget', action.file);
-            }
+            if (!state.socket || !action.hasOwnProperty('file') || action.file.isDirectory) return state;
+            (!!action.watch) ? state.socket.emit('watch', action.file.path) : state.socket.emit('forget', action.file.path);
             return state;
+
+        case types.ADD_MESSAGE:
+            if (!state.socket || !action.hasOwnProperty('file') || !action.hasOwnProperty('message')) return state;
+            return {...state, messages:[...state.messages, {file:action.file, message:action.message}]};
 
         default:
             return state;

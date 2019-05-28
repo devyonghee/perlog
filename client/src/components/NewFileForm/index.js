@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import Presenter from './presenter';
 
@@ -27,17 +27,18 @@ const defaultProps = {
 };
 
 const container = (props) => {
-    const {search, closeNewFileForm, type, addFile, files} = props;
+    const {search, closeNewFileForm, addFile, newFileForm: {type}} = props;
     const [name, setName] = useState('');
     const [selectedFile, setSelectedTarget] = useState(null);
     const [extendedDirectories, setExtendDirectory] = useState([]);
 
+    const initState = () =>  closeNewFileForm() & setName('') & setSelectedTarget();
     const handleClickFile = (e, file) => {
         e.preventDefault();
         selectedFile !== file && setSelectedTarget(file);
     };
 
-    const handleCloseForm = () => closeNewFileForm() & setName('');
+    const handleCloseForm = () => initState();
     const handleNameChange = ({target: {value}}) => setName(value);
     const handleClickConfirm = e => {
         e.preventDefault();
@@ -45,24 +46,24 @@ const container = (props) => {
 
         if (type === 'directory') {
             if (!name) return window.remote.dialog.showErrorBox('New Directory', '폴더명을 입력해주세요.');
-            return addFile(name) & setName('');
+            return addFile({name}) & initState();
         }
         if (!selectedFile) return window.remote.dialog.showErrorBox('New File', '파일을 선택해주세요.');
-        return addFile(selectedFile) & setSelectedTarget(null);
+        return addFile(selectedFile) & initState();
     };
 
     const handleNameKeyPress = e => {
         if (e.key.toLowerCase() !== "enter" || !name) return;
         e.preventDefault();
         closeNewFileForm();
-        addFile(name);
+        addFile({name});
         setName('');
     };
 
     const handleDoubleClickFile = (e, file) => {
         e.preventDefault();
         selectedFile !== file && setSelectedTarget(file);
-        if (!file.isDirectory) return addFile(file);
+        if (!file.isDirectory) return addFile(file) & initState();
 
         if (extendedDirectories.includes(file)) {
             extendedDirectories.splice(extendedDirectories.indexOf(file), 1);
@@ -70,16 +71,15 @@ const container = (props) => {
         }
 
         setExtendDirectory([...extendedDirectories, file]);
-        if (!!file.child && file.child.length < 1) search(file.path);
+        if (!!file.child && file.child.length < 1) search(file);
     };
 
     return (
         <Presenter
             {...props}
-            files={files}
-            type={type}
             name={name}
             selectedFile={selectedFile}
+            extendedDirectories={extendedDirectories}
             handleClickFile={handleClickFile}
             handleCloseForm={handleCloseForm}
             handleNameChange={handleNameChange}

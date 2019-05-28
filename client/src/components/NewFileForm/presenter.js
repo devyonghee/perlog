@@ -43,7 +43,7 @@ const presenter = (props) => {
         handleDoubleClickFile,
         files,
         selectedFile,
-        type,
+        newFileForm
     } = props;
 
     const classes = useStyles();
@@ -52,17 +52,17 @@ const presenter = (props) => {
         <Modal
             aria-labelledby="simple-modal-title"
             aria-describedby="simple-modal-description"
-            open
+            open={newFileForm.opened}
             onClose={handleCloseForm}
         >
             <Paper
-                className={classNames(classes.wrapPaper, (type === 'directory') ? classes.directoryWrap : classes.fileWrap)}
+                className={classNames(classes.wrapPaper, (newFileForm.type === 'directory') ? classes.directoryWrap : classes.fileWrap)}
                 elevation={0}
             >
                 <Typography variant="h6" className={classes.title}>
-                    New {type.charAt(0).toUpperCase() + type.slice(1)}
+                    New {newFileForm.type.charAt(0).toUpperCase() + newFileForm.type.slice(1)}
                 </Typography>
-                {(type === 'directory') ?
+                {(newFileForm.type === 'directory') ?
                     <TextField
                         margin="dense"
                         className={classes.textField}
@@ -77,7 +77,9 @@ const presenter = (props) => {
                     /> : <List dense className={classes.folderList}>
                         <FileList
                             {...props}
+                            dense
                             files={files}
+                            invisibleSwitch
                             selectedFile={selectedFile}
                             handleDoubleClickFile={handleDoubleClickFile}
                         />
