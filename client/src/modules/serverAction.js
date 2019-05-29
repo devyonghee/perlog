@@ -54,10 +54,10 @@ const setFiles = (path, files) => {
     };
 };
 
-const addMessage = (file, message) => {
+const addMessage = (path, message) => {
     return {
         type: ADD_MESSAGE,
-        file,
+        path,
         message
     };
 };

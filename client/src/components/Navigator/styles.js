@@ -1,10 +1,14 @@
 import {makeStyles} from '@material-ui/styles'
 
 const useStyles = makeStyles(theme => ({
+    drawerPaper: {
+        width: theme.navigationWidth,
+        float: 'left',
+        overflowX: 'hidden',
+    },
+
     title: {
-        width: '200px',
         display: 'flex',
-        flexGrow: 1,
         minHeight: '56px',
         alignItems: 'flex-start',
         paddingLeft: '24px',

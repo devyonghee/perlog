@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useLayoutEffect} from 'react';
 import Presenter from './presenter';
 import {createMuiTheme} from "@material-ui/core/styles";
 import {lightBlue, red} from "@material-ui/core/colors";
@@ -10,10 +10,23 @@ const defaultProps = {};
 
 const container = props => {
     const [themeType, setThemeType] = useState('light');
+    const [navigationWidth, setNavigationWidth] = useState(240);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         window.ipcRenderer.on('changeThemes', (e, type) => setThemeType(type));
-    }, []);
+    });
+
+    const handleDivider = e => {
+        e.preventDefault();
+        const mouseMoveEvent = e => setNavigationWidth(e.clientX);
+        const mouseUpEvent = () => {
+            document.getElementById('root').removeEventListener('mousemove', mouseMoveEvent);
+            document.getElementById('root').removeEventListener('mouseup', mouseUpEvent)
+        };
+
+        document.getElementById('root').addEventListener('mousemove', mouseMoveEvent);
+        document.getElementById('root').addEventListener('mouseup', mouseUpEvent);
+    };
 
 
     const theme = createMuiTheme({
@@ -45,9 +58,10 @@ const container = props => {
     });
 
     return (
-        <ThemeProvider theme={theme}>
-            <Presenter/>
-        </ThemeProvider>
+        <Presenter
+            handleDivider={handleDivider}
+            theme={{...theme, navigationWidth, footerHeight: 50}}
+        />
     );
 };
 

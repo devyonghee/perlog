@@ -32,7 +32,7 @@ const presenter = props => {
 
     const classes = useStyle();
     return (
-        <Drawer anchor="left" variant="persistent" open={true}>
+        <Drawer classes={{paper: classes.drawerPaper}} anchor="left" variant="persistent" open={true}>
             <div className={classes.toolbar}>
                 <Typography className={classes.title}>
                     pdev2

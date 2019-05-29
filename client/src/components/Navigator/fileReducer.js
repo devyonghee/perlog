@@ -1,14 +1,5 @@
-import colors from '../colors';
+import {colorsIndex} from '../colors';
 
-function* generatorColor() {
-    let index = 0;
-    while (true) {
-        if (colors.length - 1 < index) index = 0;
-        yield index++;
-    }
-}
-
-export const colorsIndex = generatorColor();
 
 const ADD_DIRECTORY = Symbol('ADD_DIRECTORY');
 const REMOVE_DIRECTORY = Symbol('REMOVE_DIRECTORY');
@@ -64,25 +55,22 @@ const addFile = (state, {file, parent = null}) => {
     return [...state];
 };
 
-// const removeFile = (state, {path}) => {
-//     const {[path]: _, ...rest} = state;
-//     return rest;
-// };
+const removeFile = (state, {file}) => {
+    const parent = (!!file.parent) ? file.parent.child : state;
+    parent.splice(parent.indexOf(file), 1);
+    return [...state];
+};
 
 export default (state, action) => {
     switch (action.type) {
         case types.ADD_DIRECTORY:
             return addDirectory(state, action);
 
-        case types.REMOVE_DIRECTORY:
-            // return removeDirectory(state, action);
-            return state;
-
         case types.ADD_FILE:
             return addFile(state, action);
 
         case types.REMOVE_FILE:
-            // return removeFile(state, action);
+            return removeFile(state, action);
 
         default:
             return state;

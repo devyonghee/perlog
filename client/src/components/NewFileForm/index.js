@@ -32,13 +32,13 @@ const container = (props) => {
     const [selectedFile, setSelectedTarget] = useState(null);
     const [extendedDirectories, setExtendDirectory] = useState([]);
 
-    const initState = () =>  closeNewFileForm() & setName('') & setSelectedTarget();
+    const initState = () =>  setName('') & setSelectedTarget();
     const handleClickFile = (e, file) => {
         e.preventDefault();
         selectedFile !== file && setSelectedTarget(file);
     };
 
-    const handleCloseForm = () => initState();
+    const handleCloseForm = () => closeNewFileForm() & initState();
     const handleNameChange = ({target: {value}}) => setName(value);
     const handleClickConfirm = e => {
         e.preventDefault();
@@ -55,7 +55,6 @@ const container = (props) => {
     const handleNameKeyPress = e => {
         if (e.key.toLowerCase() !== "enter" || !name) return;
         e.preventDefault();
-        closeNewFileForm();
         addFile({name});
         setName('');
     };

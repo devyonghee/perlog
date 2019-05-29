@@ -1,6 +1,7 @@
-import {colorsIndex} from './Navigator/fileReducer';
+import {colorsIndex} from './colors';
 
-const serializeFiles = file => {
+const serializeFiles = (file) => {
+    file.parent = null;
     file.parent = null;
     if (!!file.child && file.child.length) file.child.map(serializeFiles);
     return file;
@@ -9,7 +10,7 @@ const serializeFiles = file => {
 const connectParent = (file, parent = null) => {
     file.parent = parent;
     if (!file.isDirectory) file.color = colorsIndex.next().value;
-    if (!!file.child && file.child.length) file.child.map(childFile => connectParent(childFile, file))
+    if (!!file.child && file.child.length) file.child.map(childFile => connectParent(childFile, file));
     return file;
 };
 

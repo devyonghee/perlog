@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useReducer} from 'react';
+import React, {useState, useEffect, useReducer, useLayoutEffect} from 'react';
 import PropTypes from 'prop-types';
 import Presenter from './presenter';
 import fileReducer, {types as fileActionTypes} from './fileReducer';
@@ -17,20 +17,21 @@ const defaultProps = {
 };
 
 const container = props => {
-    const {connect, disconnect, watchFile, serverFiles, search} = props;
+    const {connect, disconnect, watchFile, serverFiles, search, watchedFiles} = props;
     const [newFileForm, setOpenNewFileForm] = useState({opened: false, type: ''});
     const [selectedFile, setSelectedTarget] = useState(null);
-    const [watchedFiles, setWatchedFiles] = useState([]);
     const [extendedDirectories, setExtendDirectory] = useState([]);
-    const [files, dispatchFiles] = useReducer(fileReducer, loadFiles()||[]);
+    const [files, dispatchFiles] = useReducer(fileReducer, loadFiles() || []);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         connect('http://127.0.0.1:50000');
     }, []);
 
     useEffect(() => {
         saveFiles(files)
     }, [files]);
+
+    const closeNewFileForm = () => setOpenNewFileForm({opened: false, type: ''});
 
     const addFile = target => {
         const currentDirectory = (!!selectedFile) ? selectedFile.child : files;
@@ -44,13 +45,12 @@ const container = props => {
         }
 
         (newFileForm.type === 'directory') ?
-            dispatchFiles({type: fileActionTypes.ADD_DIRECTORY, name: target.name, parent: parent}) :
-            dispatchFiles({type: fileActionTypes.ADD_FILE, file: target, parent: parent});
+            dispatchFiles({type: fileActionTypes.ADD_DIRECTORY, name: target.name, parent}) :
+            dispatchFiles({type: fileActionTypes.ADD_FILE, file: target, parent});
 
         !!parent && !extendedDirectories.includes(parent) && setExtendDirectory([...extendedDirectories, parent]);
+        closeNewFileForm();
     };
-
-    const closeNewFileForm = () => setOpenNewFileForm({opened: false, type: ''});
 
     const handleFileWatchSwitch = (e, file) => {
         e.preventDefault();
@@ -58,12 +58,6 @@ const container = props => {
         if (!!checked && watchedFiles.some(watchedFile => watchedFile.path === file.path))
             return window.remote.dialog.showErrorBox('File', '현재 관찰중인 파일입니다.');
 
-        if (!!checked) {
-            setWatchedFiles([...watchedFiles, file])
-        } else {
-            watchedFiles.splice(watchedFiles.indexOf(file), 1);
-            setWatchedFiles([...watchedFiles]);
-        }
         watchFile(file, !!checked);
     };
 
@@ -98,6 +92,24 @@ const container = props => {
         menu.append(new MenuItem({type: 'separator'}));
         menu.append(new MenuItem({
             label: 'Delete...', click: () => {
+                console.log(file);
+
+                const options = {
+                    type: 'question',
+                    title: 'Delete',
+                    message: `Delete ${file.isDirectory ? 'directory' : 'file'} "${file.name}"?`,
+                    buttons: ['Yes', 'No']
+                };
+                window.remote.dialog.showMessageBox(options, index => {
+                    if (index !== 0) return;
+                    const forgetFile = file => {
+                        console.log(file);
+                        !file.isDirectory && watchedFiles.includes(file) && watchFile(file, false);
+                        if (!!file.child && file.child.length) file.child.map(file => forgetFile(file));
+                    };
+                    forgetFile(file);
+                    dispatchFiles({type: fileActionTypes.REMOVE_FILE, file});
+                });
             }
         }));
         return menu.popup({window: window.remote.getCurrentWindow()})

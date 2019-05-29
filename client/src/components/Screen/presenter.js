@@ -8,7 +8,7 @@ const presenter = (props) => {
     const {messages} = props;
     const classes = useStyles();
     return (
-        <Paper className={classes.paper} square elevation={0}>
+        <Paper className={classes.paper} elevation={2}>
             {
                 messages.map(({file, message}, index) => (
                     <div className={classes.message} key={index}>

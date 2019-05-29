@@ -1,4 +1,5 @@
 const File = require('./File');
+const pathLib = require('path');
 
 const Server = class {
     constructor(config) {
@@ -32,10 +33,8 @@ const Server = class {
     }
 
     _search(searchPath, socket) {
-        const path = require('path');
-        searchPath = path.resolve(this.defaultDirectory, searchPath);
-
         try {
+            searchPath = (!searchPath) ? pathLib.resolve(this.defaultDirectory, searchPath) : this._replacePath(searchPath);
             const file = new File(searchPath);
             const files = file.search();
             console.log('searching... ', searchPath);
@@ -43,7 +42,7 @@ const Server = class {
                 searchPath,
                 files.map(file => ({
                     name: file.name,
-                    path: path.resolve(searchPath, file.name),
+                    path: pathLib.resolve(searchPath, file.name),
                     isDirectory: file.isDirectory()
                 }))
             );
@@ -54,17 +53,18 @@ const Server = class {
     }
 
     _watch(path, socket) {
-        socket.join(path, () => {
-            if (!!this.files[path]) return;
-            try {
+        try {
+            path = this._replacePath(path);
+            socket.join(path, () => {
+                if (!!this.files[path]) return;
                 this.files[path]
                     = (new File(path, message => this.io.sockets.to(path).emit('log', path, message))).watch();
-            } catch (e) {
-                console.log(e.message);
-                this.io.sockets.to(socket.id).emit('fileError', file, e.message);
-                socket.leave(path, () => null);
-            }
-        });
+            });
+        } catch (e) {
+            console.log(e.message);
+            this.io.sockets.to(socket.id).emit('fileError', file, e.message);
+            socket.leave(path, () => null);
+        }
     }
 
     _forget(path, socket) {
@@ -82,6 +82,16 @@ const Server = class {
             this.io.sockets.adapter.hasOwnProperty('rooms') &&
             this.io.sockets.adapter.rooms.hasOwnProperty(path) &&
             !!this.io.sockets.adapter.rooms[path].length);
+    }
+
+    _replacePath(path) {
+        const filteredPaths = path.split('/').filter(String);
+        if (filteredPaths.includes('..')) throw new Error(`${path} is bad route`);
+
+        const newPath = filteredPaths.join('/');
+        const replaceDefaultPath = this.defaultDirectory.split('/').filter(String).join('/');
+        if (newPath.slice(0, replaceDefaultPath.length) !== (replaceDefaultPath)) throw new Error(`${path} is bad route`);
+        return pathLib.resolve(newPath);
     }
 };
 

@@ -1,6 +1,8 @@
 import {types} from "./serverAction";
 
-const initialState = {socket: null, searching: null, files: [], messages: []};
+const initialState = {socket: null, searching: null, files: [], messages: [], watchedFiles: []};
+
+const replaceServerPath = path => path.replace(/(\\+|\/+)/g, '/').split('/').filter(String).join('/');
 
 const createWithSortFiles = (files, parent) => {
     return (files && files.length) ? files.map(file => ({
@@ -45,6 +47,29 @@ const applyFiles = (state, {path, files: newFiles}) => {
     }
 };
 
+const applyWatchingFile = (state, {file, watch}) => {
+    if (!state.socket || !file || file.isDirectory || !file.path) return state;
+
+    const {watchedFiles} = state;
+    if (!!watch) {
+        !watchedFiles.includes(file) && watchedFiles.push(file);
+        state.socket.emit('watch', file.path);
+    } else {
+        state.socket.emit('forget', file.path);
+        watchedFiles.includes(file) && watchedFiles.splice(watchedFiles.indexOf(file), 1);
+    }
+
+    return {...state, watchedFiles: [...watchedFiles]};
+};
+
+const applyAddMessage = (state, action) => {
+    if (!state.socket || !action.hasOwnProperty('message')) return state;
+    const {path, message} = action;
+    const watchedFile = state.watchedFiles.find(file => file.path === path);
+    if (!watchedFile) return state;
+
+    return {...state, messages: [...state.messages, {file: watchedFile, message}]};
+};
 
 export default (state = initialState, action) => {
     switch (action.type) {
@@ -64,13 +89,10 @@ export default (state = initialState, action) => {
             return applyFiles(state, action);
 
         case types.REQUEST_WATCH:
-            if (!state.socket || !action.hasOwnProperty('file') || action.file.isDirectory) return state;
-            (!!action.watch) ? state.socket.emit('watch', action.file.path) : state.socket.emit('forget', action.file.path);
-            return state;
+            return applyWatchingFile(state, action);
 
         case types.ADD_MESSAGE:
-            if (!state.socket || !action.hasOwnProperty('file') || !action.hasOwnProperty('message')) return state;
-            return {...state, messages:[...state.messages, {file:action.file, message:action.message}]};
+            return applyAddMessage(state, action);
 
         default:
             return state;

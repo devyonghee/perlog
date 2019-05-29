@@ -6,6 +6,7 @@ import serverAction from "../../modules/serverAction";
 const mapStateToProps = state => {
     return {
         serverFiles: state.server.files,
+        watchedFiles: state.server.watchedFiles,
     }
 };
 
