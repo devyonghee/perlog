@@ -16,6 +16,7 @@ const connectParent = (file, parent = null) => {
 
 export const saveFiles = files => {
     window.localStorage.setItem('files', JSON.stringify(files.map(serializeFiles)));
+    files.map(file => connectParent(file));
 };
 
 export const loadFiles = () => {

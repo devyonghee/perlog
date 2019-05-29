@@ -2,13 +2,11 @@ import {types} from "./serverAction";
 
 const initialState = {socket: null, searching: null, files: [], messages: [], watchedFiles: []};
 
-const replaceServerPath = path => path.replace(/(\\+|\/+)/g, '/').split('/').filter(String).join('/');
-
 const createWithSortFiles = (files, parent) => {
     return (files && files.length) ? files.map(file => ({
         name: file.name,
         isDirectory: file.isDirectory,
-        path: file.path.replace(/(\\+|\/+)/g, '/'),
+        path: file.path,
         parent: parent,
         child: []
     })).sort(file => file.isDirectory ? -1 : 1) : null;

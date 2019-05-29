@@ -42,7 +42,7 @@ const defaultProps = {
     handleDoubleClickFile: () => null,
     handleClickFile: () => null,
     handleContextMenuList: () => null,
-    handleFileWatchSwitch: null,
+    handleFileWatchSwitch: () => null,
 };
 
 

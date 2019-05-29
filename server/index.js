@@ -4,18 +4,20 @@ const pathLib = require('path');
 const Server = class {
     constructor(config) {
         this.config = config;
-        this.defaultDirectory = config.defaultDirectory || '/';
-
+        this._defaultDirectory = pathLib.resolve(config._defaultDirectory || '/');
         this.files = {};
     }
 
     run() {
         if (!this.config.host || !this.config.port) return console.log('client has not enough config');
 
+        if (!!this._defaultDirectory && !this._availableDefaultPath()) return;
         const app = require('express')();
         const server = require('http').createServer(app).listen(this.config.port, this.config.host);
         this.io = require('socket.io')(server);
         this._registerEvents();
+
+
     }
 
     _registerEvents() {
@@ -34,7 +36,7 @@ const Server = class {
 
     _search(searchPath, socket) {
         try {
-            searchPath = (!searchPath) ? pathLib.resolve(this.defaultDirectory, searchPath) : this._replacePath(searchPath);
+            searchPath = (!searchPath) ? this._defaultDirectory : this._replacePath(searchPath);
             const file = new File(searchPath);
             const files = file.search();
             console.log('searching... ', searchPath);
@@ -85,13 +87,25 @@ const Server = class {
     }
 
     _replacePath(path) {
-        const filteredPaths = path.split('/').filter(String);
+        const slicedPath = pathLib.resolve(path).slice(0, this._defaultDirectory.length);
+        if (slicedPath !== this._defaultDirectory) throw new Error(`${path} is bad route`);
+
+        const restPath = path.slice(this._defaultDirectory.length);
+        const filteredPaths = restPath.split('/').filter(String);
         if (filteredPaths.includes('..')) throw new Error(`${path} is bad route`);
 
         const newPath = filteredPaths.join('/');
-        const replaceDefaultPath = this.defaultDirectory.split('/').filter(String).join('/');
-        if (newPath.slice(0, replaceDefaultPath.length) !== (replaceDefaultPath)) throw new Error(`${path} is bad route`);
-        return pathLib.resolve(newPath);
+        return pathLib.resolve(this._defaultDirectory, newPath);
+    }
+
+    _availableDefaultPath() {
+        try {
+            (new File(pathLib.resolve(this._defaultDirectory))).search();
+            return true;
+        } catch (e) {
+            console.log(e.message);
+            return false;
+        }
     }
 };
 
