@@ -2,15 +2,15 @@ import {types} from "./serverAction";
 
 const initialState = {socket: null, searching: null, files: [], messages: [], watchedFiles: []};
 
-const createWithSortFiles = (files, parent) => {
-    return (files && files.length) ? files.map(file => ({
+const createWithSortFiles = (files, parent) =>
+    (files && files.length) ? files.map(file => ({
         name: file.name,
         isDirectory: file.isDirectory,
         path: file.path,
         parent: parent,
-        child: []
-    })).sort(file => file.isDirectory ? -1 : 1) : null;
-};
+        child: null
+    })).sort(file => file.isDirectory ? -1 : 1) : [];
+
 
 const applyFiles = (state, {path, files: newFiles}) => {
     const paths = path.replace(/(\\+|\/+)/g, '/').split('/').filter(String);
@@ -32,7 +32,7 @@ const applyFiles = (state, {path, files: newFiles}) => {
                 isDirectory: true,
                 path: currentPath,
                 parent: searchingDirectory,
-                child: []
+                child: null
             };
 
             if (!currentFiles.length) currentFiles.push(directory);

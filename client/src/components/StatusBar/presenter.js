@@ -1,6 +1,16 @@
 import React from 'react';
 import Paper from '@material-ui/core/Paper';
+import PropTypes from 'prop-types';
 import useStyles from './styles';
+
+const propTypes = {
+    time: PropTypes.string.isRequired,
+    messageSpeed: PropTypes.number.isRequired,
+    messages: PropTypes.number.isRequired,
+    files: PropTypes.number.isRequired,
+};
+
+const defaultProps = {};
 
 const presenter = ({time, messageSpeed, messages, files}) => {
     const classes = useStyles();
@@ -27,5 +37,7 @@ const presenter = ({time, messageSpeed, messages, files}) => {
     );
 };
 
+presenter.propTypes = propTypes;
+presenter.defaultProps = defaultProps;
 
 export default presenter;

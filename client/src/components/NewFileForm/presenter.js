@@ -11,26 +11,21 @@ import useStyles from './styles';
 import FileList from '../FileList';
 
 const propTypes = {
-    isFileType: PropTypes.bool,
-    handleCloseForm: PropTypes.func.isRequired,
-    handleNameChange: PropTypes.func.isRequired,
+    name: PropTypes.string,
+    handleNameChange: PropTypes.func,
+    handleNameKeyPress: PropTypes.func,
     handleClickConfirm: PropTypes.func.isRequired,
-    handleNameKeyPress: PropTypes.func.isRequired,
-    handleDoubleClickFile: PropTypes.func.isRequired,
-    selectedFile: PropTypes.object,
-    files: PropTypes.arrayOf(
-        PropTypes.shape({
-            child: PropTypes.array,
-            name: PropTypes.string,
-            path: PropTypes.string,
-            isDirectory: PropTypes.bool,
-            isExtended: PropTypes.bool,
-        })),
+    handleCloseForm: PropTypes.func.isRequired,
+    newFileForm: PropTypes.shape({
+        opened: PropTypes.bool.isRequired,
+        type: PropTypes.string.isRequired,
+    }).isRequired,
 };
 
 const defaultProps = {
-    isFileType: false,
-    files: [],
+    name: '',
+    handleNameChange: ()=>null,
+    handleNameKeyPress: () => null,
 };
 
 const presenter = (props) => {
@@ -40,9 +35,6 @@ const presenter = (props) => {
         handleNameChange,
         handleClickConfirm,
         handleNameKeyPress,
-        handleDoubleClickFile,
-        files,
-        selectedFile,
         newFileForm
     } = props;
 
@@ -78,10 +70,7 @@ const presenter = (props) => {
                         <FileList
                             {...props}
                             dense
-                            files={files}
                             invisibleSwitch
-                            selectedFile={selectedFile}
-                            handleDoubleClickFile={handleDoubleClickFile}
                         />
                     </List>
                 }

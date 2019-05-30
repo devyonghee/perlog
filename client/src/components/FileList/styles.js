@@ -13,8 +13,8 @@ const createSwitchColorsClass = (themeType) =>
                 },
             }
         },
-        [`colorSwitchChecked${index}`]: {                color: themeType === 'light' ? lightColor[500] : darkColor[500],},
-        [`colorSwitchBar${index}`]: {                backgroundColor: themeType === 'light' ? lightColor[500] : darkColor[500],},
+        [`colorSwitchChecked${index}`]: {},
+        [`colorSwitchBar${index}`]: {},
     }), {});
 
 

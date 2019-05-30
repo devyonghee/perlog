@@ -1,8 +1,26 @@
-import React from 'react';
+import React, {useRef, useEffect, useState} from 'react';
 import Presenter from './presenter';
 
 const container = (props) => {
-    return <Presenter {...props}/>;
+    const screen = useRef(null);
+    const [preScrollHeight, setPreScrollHeight] = useState(0);
+
+    useEffect(() => {
+        if (!screen.current ||
+            !screen.current.scrollHeight ||
+            screen.current.scrollHeight <= preScrollHeight ||
+            (screen.current.clientHeight + screen.current.scrollTop) < preScrollHeight) {
+            return;
+        }
+
+        screen.current.scrollTop = screen.current.scrollHeight - screen.current.clientHeight;
+        setPreScrollHeight(screen.current.scrollHeight)
+    });
+
+    return <Presenter
+        {...props}
+        screenRef={screen}
+    />;
 };
 
 export default container;

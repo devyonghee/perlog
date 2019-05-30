@@ -11,17 +11,20 @@ const createFileNameClass = (themeType) =>
 
 const useStyles = makeStyles(theme => ({
     paper: {
-        margin: theme.spacing.unit * 2,
-        height: `calc(100vh - ${theme.footerHeight}px - ${theme.spacing.unit * 6}px)`
+        padding:theme.spacing.unit * 2,
+        height: `calc(100vh - ${theme.footerHeight}px - 40px)`,
+        overflow:'auto'
     },
 
-    message: {},
+    message: {
+        overflowWrap: 'break-word',
+    },
 
     contents: {
         paddingLeft: '10px',
         h1: true,
     },
-    ...createFileNameClass(theme.type),
+    ...createFileNameClass(theme.palette.type),
 }));
 
 export default useStyles;

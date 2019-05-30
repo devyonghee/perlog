@@ -8,7 +8,8 @@ import Divider from '@material-ui/core/Divider';
 import {ThemeProvider} from '@material-ui/styles';
 
 const propTypes = {
-    theme: PropTypes.object.isRequired
+    theme: PropTypes.object.isRequired,
+    handleMouseDownDivider: PropTypes.func.isRequired
 };
 
 const defaultProps = {};
@@ -18,7 +19,7 @@ const presenter = props => {
         <ThemeProvider theme={props.theme}>
             <CssBaseline/>
             <Navigator/>
-            <Divider onMouseDown={props.handleDivider} style={{
+            <Divider onMouseDown={props.handleMouseDownDivider} style={{
                 position: 'absolute',
                 height: '100vh',
                 width: '2px',
@@ -29,7 +30,8 @@ const presenter = props => {
             <div style={{
                 float: 'right',
                 width: `calc(100vw - ${props.theme.navigationWidth}px)`,
-                height: `100vh`
+                height: '100vh',
+                padding: '16px'
             }}>
                 <Screen/>
                 <StatusBar/>
@@ -37,5 +39,8 @@ const presenter = props => {
         </ThemeProvider>
     );
 };
+
+presenter.propTypes = propTypes;
+presenter.defaultProps = defaultProps;
 
 export default presenter;

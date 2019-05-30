@@ -3,15 +3,17 @@ import {makeStyles} from '@material-ui/styles'
 
 const useStyles = makeStyles(theme => ({
     statusPaper: {
-        margin: theme.spacing.unit * 2,
+        marginTop: '16px',
         height: `${theme.footerHeight}px`,
-        backgroundColor: 'inherit'
+        backgroundColor: 'inherit',
+        textAlign: 'end',
+        overflowX: 'hidden',
+        overflowY: '-webkit-paged-x',
     },
 
     status: {
-        float: 'right',
         display: 'inline-block',
-        margin: '20px'
+        marginLeft: '20px'
     },
 }));
 

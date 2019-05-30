@@ -10,6 +10,14 @@ const propTypes = {
     disconnect: PropTypes.func.isRequired,
     search: PropTypes.func.isRequired,
     watchFile: PropTypes.func.isRequired,
+    watchedFiles: PropTypes.arrayOf(
+        PropTypes.shape({
+            child: PropTypes.array,
+            parent: PropTypes.object,
+            name: PropTypes.string,
+            path: PropTypes.string,
+            isDirectory: PropTypes.bool,
+        })),
 };
 
 const defaultProps = {
@@ -53,7 +61,7 @@ const container = props => {
     };
 
     const handleFileWatchSwitch = (e, file) => {
-        e.preventDefault();
+        e.stopPropagation();
         const {target: {checked}} = e;
         if (!!checked && watchedFiles.some(watchedFile => watchedFile.path === file.path))
             return window.remote.dialog.showErrorBox('File', '현재 관찰중인 파일입니다.');

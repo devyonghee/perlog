@@ -9,16 +9,13 @@ import NewFileForm from '../NewFileForm';
 import FileList from '../FileList';
 
 const propTypes = {
-    newFileForm: PropTypes.shape({
-        opened: PropTypes.bool,
-        type: PropTypes.string
-    }).isRequired,
+    serverFiles: PropTypes.array,
     handleClickList: PropTypes.func.isRequired,
     handleContextMenuList: PropTypes.func.isRequired,
 };
 
 const defaultProps = {
-    directories: {},
+    serverFiles: [],
     isOpenedNewForm: false,
 };
 
@@ -27,7 +24,6 @@ const presenter = props => {
         handleClickList,
         handleContextMenuList,
         serverFiles,
-        watchedFiles
     } = props;
 
     const classes = useStyle();
@@ -43,7 +39,6 @@ const presenter = props => {
                 <FileList
                     {...props}
                     invisibleLoading
-                    watchedFiles={watchedFiles}
                     handleClickFile={handleClickList}
                     handleContextMenuList={handleContextMenuList}
                 />

@@ -1,5 +1,12 @@
 import React, {useState, useLayoutEffect} from 'react';
 import Presenter from './presenter';
+import PropTypes from 'prop-types';
+
+const propTypes = {
+    messages: PropTypes.number.isRequired,
+};
+
+const defaultProps = {};
 
 const container = (props) => {
     const {messages} = props;
@@ -25,5 +32,8 @@ const container = (props) => {
         messages={messages}
     />;
 };
+
+container.propTypes = propTypes;
+container.defaultProps = defaultProps;
 
 export default container;

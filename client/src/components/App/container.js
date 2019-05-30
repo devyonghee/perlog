@@ -16,7 +16,7 @@ const container = props => {
         window.ipcRenderer.on('changeThemes', (e, type) => setThemeType(type));
     });
 
-    const handleDivider = e => {
+    const handleMouseDownDivider = e => {
         e.preventDefault();
         const mouseMoveEvent = e => setNavigationWidth(e.clientX);
         const mouseUpEvent = () => {
@@ -59,8 +59,8 @@ const container = props => {
 
     return (
         <Presenter
-            handleDivider={handleDivider}
-            theme={{...theme, navigationWidth, footerHeight: 50}}
+            theme={{...theme, navigationWidth, footerHeight: 30}}
+            handleMouseDownDivider={handleMouseDownDivider}
         />
     );
 };

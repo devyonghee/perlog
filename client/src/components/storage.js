@@ -1,9 +1,10 @@
 import {colorsIndex} from './colors';
 
-const serializeFiles = (file) => {
+const serializeFiles = ({...file}) => {
     file.parent = null;
-    file.parent = null;
-    if (!!file.child && file.child.length) file.child.map(serializeFiles);
+    if (!!file.child && file.child.length) {
+        file.child = file.child.map(serializeFiles);
+    }
     return file;
 };
 
@@ -16,7 +17,6 @@ const connectParent = (file, parent = null) => {
 
 export const saveFiles = files => {
     window.localStorage.setItem('files', JSON.stringify(files.map(serializeFiles)));
-    files.map(file => connectParent(file));
 };
 
 export const loadFiles = () => {

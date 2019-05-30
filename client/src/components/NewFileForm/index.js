@@ -3,27 +3,20 @@ import PropTypes from 'prop-types';
 import Presenter from './presenter';
 
 const propTypes = {
-    isFileType: PropTypes.bool,
     search: PropTypes.func.isRequired,
-    close: PropTypes.func.isRequired,
-    addDirectory : PropTypes.func.isRequired,
-    addFile : PropTypes.func.isRequired,
-    selectedFile : PropTypes.object,
-    setSelectTarget : PropTypes.func.isRequired,
-    files: PropTypes.arrayOf(
-        PropTypes.shape({
-            child: PropTypes.array,
-            name: PropTypes.string,
-            path: PropTypes.string,
-            isDirectory: PropTypes.bool,
-            isExtended: PropTypes.bool,
-        })),
+    closeNewFileForm: PropTypes.func.isRequired,
+    addFile: PropTypes.func.isRequired,
+    newFileForm: PropTypes.shape({
+        type: PropTypes.string,
+        opened: PropTypes.bool
+    }),
 };
 
 const defaultProps = {
-    isFileType: false,
-    selectedFile: null,
-    files: []
+    newFileForm: {
+        type: '',
+        opened: false
+    }
 };
 
 const container = (props) => {
@@ -70,7 +63,7 @@ const container = (props) => {
         }
 
         setExtendDirectory([...extendedDirectories, file]);
-        if (!!file.child && file.child.length < 1) search(file);
+        !file.child && search(file);
     };
 
     return (
