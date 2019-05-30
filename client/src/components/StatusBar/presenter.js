@@ -5,7 +5,7 @@ import useStyles from './styles';
 
 const propTypes = {
     time: PropTypes.string.isRequired,
-    messageSpeed: PropTypes.number.isRequired,
+    messageSpeed: PropTypes.string.isRequired,
     messages: PropTypes.number.isRequired,
     files: PropTypes.number.isRequired,
 };

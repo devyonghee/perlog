@@ -7,6 +7,11 @@ import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
 import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import useStyles from './styles';
 import FileList from '../FileList';
 
@@ -24,7 +29,7 @@ const propTypes = {
 
 const defaultProps = {
     name: '',
-    handleNameChange: ()=>null,
+    handleNameChange: () => null,
     handleNameKeyPress: () => null,
 };
 
@@ -41,19 +46,19 @@ const presenter = (props) => {
     const classes = useStyles();
 
     return (
-        <Modal
-            aria-labelledby="simple-modal-title"
+        <Dialog
+            aria-labelledby="alert-dialog-title"
             aria-describedby="simple-modal-description"
             open={newFileForm.opened}
             onClose={handleCloseForm}
+            transitionDuration={{exit: 0}}
+            fullWidth
+            maxWidth={(newFileForm.type === 'directory') ? 'xs' : 'sm'}
         >
-            <Paper
-                className={classNames(classes.wrapPaper, (newFileForm.type === 'directory') ? classes.directoryWrap : classes.fileWrap)}
-                elevation={0}
-            >
-                <Typography variant="h6" className={classes.title}>
-                    New {newFileForm.type.charAt(0).toUpperCase() + newFileForm.type.slice(1)}
-                </Typography>
+            <DialogTitle id="alert-dialog-title" onClose={handleCloseForm}>
+                {`New ${newFileForm.type.charAt(0).toUpperCase()}${newFileForm.type.slice(1)}`}
+            </DialogTitle>
+            <DialogContent dividers>
                 {(newFileForm.type === 'directory') ?
                     <TextField
                         margin="dense"
@@ -74,16 +79,17 @@ const presenter = (props) => {
                         />
                     </List>
                 }
-                <div className={classes.buttonsWrap}>
-                    <Button color="primary" size="small" onClick={handleClickConfirm}>
-                        OK
-                    </Button>
-                    <Button color="secondary" size="small" onClick={handleCloseForm}>
-                        Cancel
-                    </Button>
-                </div>
-            </Paper>
-        </Modal>
+            </DialogContent>
+            <DialogActions>
+                <Button color="primary" size="small" onClick={handleClickConfirm}>
+                    OK
+                </Button>
+                <Button color="secondary" size="small" onClick={handleCloseForm}>
+                    Cancel
+                </Button>
+            </DialogActions>
+
+        </Dialog>
     );
 };
 

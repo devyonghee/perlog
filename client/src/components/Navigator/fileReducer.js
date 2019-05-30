@@ -24,12 +24,13 @@ const addDirectory = (state, {name, parent = null}) => {
     };
 
     if (!parent) {
-        return [...state, newDirectory];
+        return [...state, newDirectory].sort(file => file.isDirectory ? -1 : 0);
     }
 
     newDirectory.parent = parent;
     newDirectory.route = [parent.route, newDirectory.name].join('/');
     parent.child.push(newDirectory);
+    parent.child.sort(file => file.isDirectory ? -1 : 0);
     return [...state];
 };
 
@@ -46,12 +47,13 @@ const addFile = (state, {file, parent = null}) => {
     };
 
     if (!parent) {
-        return [...state, newFile];
+        return [...state, newFile].sort(file => file.isDirectory ? -1 : 0);
     }
 
     newFile.parent = parent;
     newFile.route = [parent.route, newFile.name].join('/');
     parent.child.push(newFile);
+    parent.child.sort(file => file.isDirectory ? -1 : 0);
     return [...state];
 };
 

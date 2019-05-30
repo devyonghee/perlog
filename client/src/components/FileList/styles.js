@@ -20,6 +20,8 @@ const createSwitchColorsClass = (themeType) =>
 
 const useStyles = makeStyles(theme => ({
     listItem: {
+        overflowX: 'hidden',
+        overflowY: '-webkit-paged-x',
         padding: '2px',
         "&:hover": {
             backgroundColor: "rgba(0,0,0, 0.08)",

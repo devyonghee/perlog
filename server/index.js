@@ -64,7 +64,7 @@ const Server = class {
             });
         } catch (e) {
             console.log(e.message);
-            this.io.sockets.to(socket.id).emit('fileError', file, e.message);
+            this.io.sockets.to(socket.id).emit('fileError', path, e.message);
             socket.leave(path, () => null);
         }
     }
@@ -73,6 +73,7 @@ const Server = class {
         socket.leave(path, () =>
             this.files.hasOwnProperty(path) &&
             !this._isSomeoneWatching(path) &&
+            this.files[path].forget() &&
             this.files[path].forget() &&
             delete this.files[path] &&
             console.log(`${path} is forgotten`)
