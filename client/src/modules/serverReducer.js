@@ -1,6 +1,6 @@
 import {types} from "./serverAction";
 
-const initialState = {socket: null, searching: null, files: [], messages: [], watchedFiles: []};
+const initialState = {socket: null, searching: null, files: [], messages: [], watchedFiles: [], errorFiles: []};
 
 const createWithSortFiles = (files, parent) =>
     (files && files.length) ? files.map(file => ({
@@ -47,7 +47,6 @@ const applyFiles = (state, {path, files: newFiles}) => {
 
 const applyWatchingFile = (state, {file, watch}) => {
     if (!state.socket || !file || file.isDirectory || !file.path) return state;
-
     const {watchedFiles} = state;
     if (!!watch) {
         !watchedFiles.includes(file) && watchedFiles.push(file);
@@ -59,6 +58,17 @@ const applyWatchingFile = (state, {file, watch}) => {
 
     return {...state, watchedFiles: [...watchedFiles]};
 };
+
+
+const applyErrorFile = (state, {path: errorPath}) => {
+    if (!state.socket || !errorPath) return state;
+
+    const watchedFile = state.watchedFiles.find(({path}) => path === errorPath);
+    if (!watchedFile) return state;
+    state.watchedFiles.splice(state.watchedFiles.indexOf(watchedFile), 1);
+    return {...state, watchedFiles: [...state.watchedFiles], errorFiles: [...state.errorFiles, watchedFile]};
+};
+
 
 const applyAddMessage = (state, action) => {
     if (!state.socket || !action.hasOwnProperty('message')) return state;
@@ -91,6 +101,9 @@ export default (state = initialState, action) => {
 
         case types.ADD_MESSAGE:
             return applyAddMessage(state, action);
+
+        case types.SET_ERROR_FILE:
+            return applyErrorFile(state, action);
 
         default:
             return state;

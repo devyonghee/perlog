@@ -7,6 +7,7 @@ const mapStateToProps = state => {
     return {
         serverFiles: state.server.files,
         watchedFiles: state.server.watchedFiles,
+        errorFiles: state.server.errorFiles,
     }
 };
 

@@ -4,28 +4,32 @@ import Presenter from './presenter';
 import fileReducer, {types as fileActionTypes} from './fileReducer';
 import {saveFiles, loadFiles} from '../storage';
 
+const fileType = PropTypes.shape({
+    child: PropTypes.array,
+    parent: PropTypes.object,
+    name: PropTypes.string,
+    path: PropTypes.string,
+    isDirectory: PropTypes.bool,
+});
+
 const propTypes = {
     serverFiles: PropTypes.array,
     connect: PropTypes.func.isRequired,
     disconnect: PropTypes.func.isRequired,
     search: PropTypes.func.isRequired,
     watchFile: PropTypes.func.isRequired,
-    watchedFiles: PropTypes.arrayOf(
-        PropTypes.shape({
-            child: PropTypes.array,
-            parent: PropTypes.object,
-            name: PropTypes.string,
-            path: PropTypes.string,
-            isDirectory: PropTypes.bool,
-        })),
+    watchedFiles: PropTypes.arrayOf(fileType),
+    errorFiles: PropTypes.arrayOf(fileType),
 };
 
 const defaultProps = {
-    serverFiles: []
+    serverFiles: [],
+    watchedFiles: [],
+    errorFiles: [],
 };
 
 const container = props => {
-    const {connect, disconnect, watchFile, serverFiles, search, watchedFiles} = props;
+    const {connect, disconnect, watchFile, serverFiles, search, watchedFiles, errorFiles} = props;
     const [newFileForm, setOpenNewFileForm] = useState({opened: false, type: ''});
     const [selectedFile, setSelectedTarget] = useState(null);
     const [extendedDirectories, setExtendDirectory] = useState([]);
@@ -65,6 +69,10 @@ const container = props => {
         const {target: {checked}} = e;
         if (!!checked && watchedFiles.some(watchedFile => watchedFile.path === file.path))
             return window.remote.dialog.showErrorBox('File', '현재 관찰중인 파일입니다.');
+
+        if (!!checked && errorFiles.includes(file)) {
+            return window.remote.dialog.showErrorBox('File', '잘못된 경로입니다.');
+        }
 
         watchFile(file, !!checked);
     };

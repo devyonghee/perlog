@@ -7,6 +7,7 @@ const REQUEST_WATCH = Symbol('REQUEST_WATCH');
 const SEARCH = Symbol('SEARCH');
 const SET_FILES = Symbol('SET_FILES');
 const ADD_MESSAGE = Symbol('ADD_MESSAGE');
+const SET_ERROR_FILE = Symbol('SET_ERROR_FILE');
 
 export const types = {
     SET_SOCKET,
@@ -15,7 +16,8 @@ export const types = {
     REQUEST_WATCH,
     SEARCH,
     SET_FILES,
-    ADD_MESSAGE
+    ADD_MESSAGE,
+    SET_ERROR_FILE
 };
 
 const setSocket = socket => {
@@ -62,27 +64,35 @@ const addMessage = (path, message) => {
     };
 };
 
+const setErrorFile = path => {
+    return {
+        type: SET_ERROR_FILE,
+        path,
+    };
+};
+
 
 const connectServer = url => {
     return dispatch => {
         const socket = io.connect(url);
         socket.on('connect', () => dispatch(setSocket(socket)));
         socket.on('searched', (path, files) => dispatch(setFiles(path, files)));
-        socket.on('log', (file, message) => {
+        socket.on('log', (path, message) => {
             if(window.remote.getCurrentWindow().isMinimized()){
                 const notification = {
                     title: 'Basic Notification',
                     body: message,
                     icon: ''
                 };
-                new window.Notification(file.path, notification);
+                new window.Notification(path, notification);
             }
 
-            dispatch(addMessage(file, message))
+            dispatch(addMessage(path, message))
         });
 
-        socket.on('fileError', (file, message) => {
+        socket.on('fileError', (path, message) => {
             window.remote.dialog.showErrorBox('파일이 존재하지 않습니다.', message);
+            dispatch(setErrorFile(path))
         });
 
         socket.on('error', (path, message) => {

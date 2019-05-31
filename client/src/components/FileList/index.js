@@ -29,11 +29,13 @@ const propTypes = {
     selectedFile: fileShape,
     depth: PropTypes.number,
     dense: PropTypes.bool,
+    draggable: PropTypes.bool,
     invisibleSwitch: PropTypes.bool,
     invisibleLoading: PropTypes.bool,
     handleClickFile: PropTypes.func,
     handleFileWatchSwitch: PropTypes.func,
     handleContextMenuList: PropTypes.func,
+    handleDragStartList: PropTypes.func,
     handleDoubleClickFile: PropTypes.func.isRequired,
 };
 
@@ -42,8 +44,10 @@ const defaultProps = {
     depth: 0,
     indexes: [],
     dense: false,
+    draggable: false,
     invisibleWhenEmpty: false,
     handleClickFile: () => null,
+    handleDragStartList: () => null,
     handleContextMenuList: () => null,
     handleFileWatchSwitch: () => null,
 };
@@ -62,7 +66,9 @@ const FileList = props => {
         handleClickFile,
         handleDoubleClickFile,
         handleFileWatchSwitch,
-        handleContextMenuList
+        handleContextMenuList,
+        handleDragStartList,
+        draggable
     } = props;
 
     const classes = useStyles();
@@ -72,7 +78,8 @@ const FileList = props => {
         return (
             <Fragment key={index}>
                 <ListItem
-                    button={!dense && file.isDirectory}
+                    onDragStart={e => draggable && handleDragStartList(e, file)}
+                    draggable={draggable}
                     className={classes.listItem}
                     selected={!!selectedFile && file === selectedFile}
                     style={{paddingLeft: `${depth * 20}px`, height: dense ? '25px' : '45px'}}
@@ -114,6 +121,7 @@ const FileList = props => {
                     {(!file.child || !file.child.length) ? (
                             <ListItem className={classes.emptyText}>
                                 <ListItemText
+                                    className={classes.textList}
                                     style={{paddingLeft: `${(theme.spacing.unit * 3) * (depth + 1)}px`}}
                                     disableTypography
                                     primary={!file.child && !invisibleLoading ? '...loading' : '빈 폴더입니다.'}/>

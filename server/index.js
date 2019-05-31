@@ -16,8 +16,6 @@ const Server = class {
         const server = require('http').createServer(app).listen(this.config.port, this.config.host);
         this.io = require('socket.io')(server);
         this._registerEvents();
-
-
     }
 
     _registerEvents() {
@@ -36,15 +34,21 @@ const Server = class {
 
     _search(searchPath, socket) {
         try {
-            searchPath = (!searchPath) ? this._defaultDirectory : this._replacePath(searchPath);
-            const file = new File(searchPath);
+            const newSearchPath = (!searchPath) ? this._defaultDirectory : this._replacePath(searchPath);
+
+            if (!newSearchPath) {
+                console.log('path is not exist');
+                this.io.sockets.to(socket.id).emit('fileError', searchPath, ' 경로가 잘못 되었습니다.');
+            }
+
+            const file = new File(newSearchPath);
             const files = file.search();
-            console.log('searching... ', searchPath);
+            console.log('searching... ', newSearchPath);
             this.io.sockets.to(socket.id).emit('searched',
                 searchPath,
                 files.map(file => ({
                     name: file.name,
-                    path: pathLib.resolve(searchPath, file.name),
+                    path: pathLib.resolve(newSearchPath, file.name),
                     isDirectory: file.isDirectory()
                 }))
             );
@@ -55,18 +59,24 @@ const Server = class {
     }
 
     _watch(path, socket) {
-        try {
-            path = this._replacePath(path);
-            socket.join(path, () => {
-                if (!!this.files[path]) return;
-                this.files[path]
-                    = (new File(path, message => this.io.sockets.to(path).emit('log', path, message))).watch();
-            });
-        } catch (e) {
-            console.log(e.message);
-            this.io.sockets.to(socket.id).emit('fileError', path, e.message);
-            socket.leave(path, () => null);
-        }
+        const replacedPath = this._replacePath(path);
+
+        if (!replacedPath) return this.io.sockets.to(socket.id).emit('fileError', path, '경로가 잘못 되었습니다.');
+
+        socket.join(replacedPath, () => {
+            try {
+                if (!!this.files[replacedPath]) return;
+
+                this.files[replacedPath]
+                    = (new File(replacedPath, message => this.io.sockets.to(path).emit('log', replacedPath, message))).watch();
+
+            } catch (e) {
+                console.log(e.message);
+                this.io.sockets.to(socket.id).emit('fileError', path, e.message);
+                socket.leave(replacedPath, () => null);
+            }
+        });
+
     }
 
     _forget(path, socket) {
@@ -89,11 +99,17 @@ const Server = class {
 
     _replacePath(path) {
         const slicedPath = pathLib.resolve(path).slice(0, this._defaultDirectory.length);
-        if (slicedPath !== this._defaultDirectory) throw new Error(`${path} is bad route`);
+        if (slicedPath !== this._defaultDirectory) {
+            console.log(`${path} is bad path`);
+            return '';
+        }
 
         const restPath = path.slice(this._defaultDirectory.length);
         const filteredPaths = restPath.split('/').filter(String);
-        if (filteredPaths.includes('..')) throw new Error(`${path} is bad route`);
+        if (filteredPaths.includes('..')) {
+            console.log(`${path} is bad path`);
+            return '';
+        }
 
         const newPath = filteredPaths.join('/');
         return pathLib.resolve(this._defaultDirectory, newPath);
