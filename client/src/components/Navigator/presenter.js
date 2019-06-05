@@ -1,5 +1,5 @@
 import React from 'react';
-import Drawer from '@material-ui/core/Drawer';
+import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
@@ -9,18 +9,21 @@ import NewFileForm from '../NewFileForm';
 import FileList from '../FileList';
 
 const propTypes = {
+    serverName : PropTypes.string,
     serverFiles: PropTypes.array,
     handleClickList: PropTypes.func.isRequired,
     handleContextMenuList: PropTypes.func.isRequired,
 };
 
 const defaultProps = {
+    serverName: '',
     serverFiles: [],
     isOpenedNewForm: false,
 };
 
 const presenter = props => {
     const {
+        serverName,
         handleClickList,
         handleContextMenuList,
         serverFiles,
@@ -28,10 +31,10 @@ const presenter = props => {
 
     const classes = useStyle();
     return (
-        <Drawer classes={{paper: classes.drawerPaper}} anchor="left" variant="persistent" open={true}>
+        <Paper className={classes.drawerPaper} elevation={0}>
             <div className={classes.toolbar}>
-                <Typography className={classes.title}>
-                    pdev2
+                <Typography variant='subtitle1' className={classes.title}>
+                    {serverName}
                 </Typography>
             </div>
             <Divider/>
@@ -47,7 +50,7 @@ const presenter = props => {
                 {...props}
                 files={serverFiles}
             />
-        </Drawer>
+        </Paper>
     );
 };
 

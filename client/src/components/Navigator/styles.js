@@ -3,15 +3,15 @@ import {makeStyles} from '@material-ui/styles'
 const useStyles = makeStyles(theme => ({
     drawerPaper: {
         width: theme.navigationWidth,
+        height: '100vh',
         float: 'left',
         overflowX: 'hidden',
     },
 
     title: {
         display: 'flex',
-        minHeight: '56px',
-        alignItems: 'flex-start',
-        paddingLeft: '24px',
+        height: '56px',
+        alignItems: 'center',
         flexDirection: 'column',
         justifyContent: 'center',
     },
@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
     },
 
     list: {
-        height: '100vh',
+        height: 'calc(100vh - 64px)',
         backgroundColor: theme.palette.background.paper,
     }
 }));

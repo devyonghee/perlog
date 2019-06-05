@@ -38,14 +38,14 @@ const Server = class {
 
             if (!newSearchPath) {
                 console.log('path is not exist');
-                this.io.sockets.to(socket.id).emit('fileError', searchPath, ' 경로가 잘못 되었습니다.');
+                return this.io.sockets.to(socket.id).emit('fileError', searchPath, ' 경로가 잘못 되었습니다.');
             }
 
             const file = new File(newSearchPath);
             const files = file.search();
             console.log('searching... ', newSearchPath);
             this.io.sockets.to(socket.id).emit('searched',
-                searchPath,
+                newSearchPath,
                 files.map(file => ({
                     name: file.name,
                     path: pathLib.resolve(newSearchPath, file.name),

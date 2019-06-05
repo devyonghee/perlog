@@ -12,7 +12,7 @@ const createFileNameClass = (themeType) =>
 const useStyles = makeStyles(theme => ({
     paper: {
         padding:theme.spacing.unit * 2,
-        height: `calc(100vh - ${theme.footerHeight}px - 40px)`,
+        height: `calc(100vh - ${theme.footerHeight}px - 48px)`,
         overflow:'auto'
     },
 

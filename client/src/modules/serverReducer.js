@@ -1,6 +1,14 @@
 import {types} from "./serverAction";
 
-const initialState = {socket: null, searching: null, files: [], messages: [], watchedFiles: [], errorFiles: []};
+const initialState = {
+    name: '',
+    socket: null,
+    searching: null,
+    files: [],
+    messages: [],
+    watchedFiles: [],
+    errorFiles: []
+};
 
 const createWithSortFiles = (files, parent) =>
     (files && files.length) ? files.map(file => ({
@@ -82,11 +90,19 @@ const applyAddMessage = (state, action) => {
 export default (state = initialState, action) => {
     switch (action.type) {
         case types.SET_SOCKET:
-            return {...state, socket: action.socket};
+            return {...state, name: action.name, socket: action.socket};
 
         case types.RESET_SOCKET:
             if (!!state.socket) state.socket.disconnect();
-            return {...state, socket: null};
+            return {
+                name: '',
+                socket: null,
+                searching: null,
+                files: [],
+                watchedFiles: [],
+                errorFiles: [],
+                messages: state.messages
+            };
 
         case types.SEARCH:
             if (!state.socket) return state;

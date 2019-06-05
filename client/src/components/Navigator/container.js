@@ -14,8 +14,6 @@ const fileType = PropTypes.shape({
 
 const propTypes = {
     serverFiles: PropTypes.array,
-    connect: PropTypes.func.isRequired,
-    disconnect: PropTypes.func.isRequired,
     search: PropTypes.func.isRequired,
     watchFile: PropTypes.func.isRequired,
     watchedFiles: PropTypes.arrayOf(fileType),
@@ -29,15 +27,11 @@ const defaultProps = {
 };
 
 const container = props => {
-    const {connect, disconnect, watchFile, serverFiles, search, watchedFiles, errorFiles} = props;
+    const {watchFile, serverFiles, search, watchedFiles, errorFiles, serverName} = props;
     const [newFileForm, setOpenNewFileForm] = useState({opened: false, type: ''});
     const [selectedFile, setSelectedTarget] = useState(null);
     const [extendedDirectories, setExtendDirectory] = useState([]);
     const [files, dispatchFiles] = useReducer(fileReducer, loadFiles() || []);
-
-    useLayoutEffect(() => {
-        connect('http://127.0.0.1:50000');
-    }, []);
 
     useEffect(() => {
         saveFiles(files)
@@ -133,6 +127,7 @@ const container = props => {
 
 
     return <Presenter
+        serverName={serverName}
         files={files}
         addFile={addFile}
         search={search}

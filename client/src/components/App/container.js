@@ -2,7 +2,6 @@ import React, {useState, useLayoutEffect} from 'react';
 import Presenter from './presenter';
 import {createMuiTheme} from "@material-ui/core/styles";
 import {lightBlue, red} from "@material-ui/core/colors";
-import {ThemeProvider} from '@material-ui/styles';
 
 const propTypes = {};
 
@@ -59,6 +58,7 @@ const container = props => {
 
     return (
         <Presenter
+            {...props}
             theme={{...theme, navigationWidth, footerHeight: 30}}
             handleMouseDownDivider={handleMouseDownDivider}
         />

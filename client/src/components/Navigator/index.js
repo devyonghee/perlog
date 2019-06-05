@@ -5,6 +5,7 @@ import serverAction from "../../modules/serverAction";
 
 const mapStateToProps = state => {
     return {
+        serverName: state.server.name,
         serverFiles: state.server.files,
         watchedFiles: state.server.watchedFiles,
         errorFiles: state.server.errorFiles,
@@ -13,8 +14,6 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        connect: url => dispatch(serverAction.connectServer(url)),
-        disconnect: () => dispatch(serverAction.disconnectServer()),
         search: (directory = null) => dispatch(serverAction.search(directory)),
         watchFile: (file, watch) => dispatch(serverAction.requestWatch(file, watch)),
     };
