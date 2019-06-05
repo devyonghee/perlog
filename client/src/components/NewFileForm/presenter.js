@@ -53,7 +53,7 @@ const presenter = (props) => {
             <DialogTitle id="alert-dialog-title">
                 {`New ${newFileForm.type.charAt(0).toUpperCase()}${newFileForm.type.slice(1)}`}
             </DialogTitle>
-            <DialogContent dividers>
+            <DialogContent>
                 {(newFileForm.type === 'directory') ?
                     <TextField
                         margin="dense"

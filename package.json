@@ -1,7 +1,6 @@
 {
-  "name": "yonglog",
+  "name": "yonglog-server",
   "version": "1.0.0",
-  "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
   "scripts": {
     "server": "node server/index.js",
     "server-dev": "nodemon server/index.js"

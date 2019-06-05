@@ -14,7 +14,7 @@ const mapDispatchToProps = (dispatch) => {
         setSocket: (name, socket) => dispatch(serverAction.setSocket(name, socket)),
         reset: () => dispatch(serverAction.resetSocket()),
         setFiles: (path, files) => dispatch(serverAction.setFiles(path, files)),
-        addMessage: (file, watch) => dispatch(serverAction.addMessage(file, watch)),
+        addMessage: (path, watch) => dispatch(serverAction.addMessage(path, watch)),
         setErrorFile: path => dispatch(serverAction.setErrorFile(path)),
     };
 };

@@ -1,5 +1,8 @@
 {
   "name": "yonglog-client",
+  "productName": "Yong Log",
+  "author": "shiw111",
+  "description": "Yong Log",
   "version": "1.0.0",
   "main": "main.js",
   "private": true,
@@ -72,14 +75,19 @@
     "@types/jest": "^24.0.12",
     "electron": "^5.0.1",
     "electron-devtools-installer": "^2.2.4",
+    "electron-packager": "^13.1.1",
+    "electron-winstaller": "^3.0.4",
     "jest-dom": "^3.2.2",
-    "react-test-renderer": "^16.8.6"
+    "react-test-renderer": "^16.8.6",
+    "rimraf": "^2.6.3"
   },
   "scripts": {
     "start": "electron . --dev",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
-    "electron": "electron ."
+    "electron": "electron .",
+    "package:win": "electron-packager . --overwrite --platform=win32 --arch=ia32 --out=out",
+    "package:installer": "node scripts/installer.js"
   },
   "eslintConfig": {
     "extends": "react-app"

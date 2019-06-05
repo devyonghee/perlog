@@ -23,7 +23,7 @@ export const saveFiles = files => {
 
 export const loadFiles = () => {
     const files = JSON.parse(window.localStorage.getItem('files'));
-    if (typeof files !== 'object' || !files.hasOwnProperty('url') || !files.hasOwnProperty('files') || !Array.isArray(files.files)) {
+    if (!files || typeof files !== 'object' || !files.hasOwnProperty('url') || !files.hasOwnProperty('files') || !Array.isArray(files.files)) {
         window.localStorage.removeItem('files');
         return [];
     }

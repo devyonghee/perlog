@@ -12,7 +12,7 @@ const createWindow = (dev = true, devUrl = '') => {
     const windowOption = {
         width: 1100,
         height: 960,
-        icon: path.join(__dirname, './public/favicon.png'),
+        icon: path.join(__dirname, (dev) ? './public/favicon.png' : './build/favicon.png'),
         webPreferences: {
             nodeIntegration: true,
             preload: __dirname + '/preload.js'
@@ -27,19 +27,17 @@ const createWindow = (dev = true, devUrl = '') => {
         return mainWindow.loadURL(devUrl);
     }
 
-    mainWindow.loadFile(url.format({
-        pathname: path.join(__dirname, './build/index.html'),
-        protocol: 'file:',
-        slashes: true
-    }));
+    mainWindow.loadFile(path.join(__dirname, './build/index.html'));
 };
 
 
-const starter = (/--dev/.test(process.argv[2])) ? require('./scripts/start')(createWindow) : createWindow(false);
-app.on('ready', () => starter);
+app.on('ready', () => {
+    (/--dev/.test(process.argv[2])) ? require('./scripts/start')(createWindow) : createWindow(false);
+});
 app.on('window-all-closed', () => {
     app.quit()
 });
+
 app.on('activate', () => (mainWindow === null) && createWindow());
 
 if (!process.mas) {

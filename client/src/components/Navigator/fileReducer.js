@@ -40,6 +40,7 @@ const addFile = (state, {file, parent = null}) => {
 
     const newFile = {
         name: file.name.trim(),
+        route : file.name.trim(),
         path: file.path,
         isDirectory: false,
         parent: null,
