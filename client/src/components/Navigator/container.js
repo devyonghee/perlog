@@ -13,6 +13,7 @@ const fileType = PropTypes.shape({
 });
 
 const propTypes = {
+    serverName: PropTypes.string,
     serverFiles: PropTypes.array,
     search: PropTypes.func.isRequired,
     watchFile: PropTypes.func.isRequired,
@@ -21,6 +22,7 @@ const propTypes = {
 };
 
 const defaultProps = {
+    serverName: '',
     serverFiles: [],
     watchedFiles: [],
     errorFiles: [],

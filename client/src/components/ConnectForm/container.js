@@ -4,15 +4,21 @@ import Presenter from './presenter';
 import io from "socket.io-client";
 import {saveServer, getServer} from "../storage";
 
-const propTypes = {};
+const propTypes = {
+    setSocket: PropTypes.func.isRequired,
+    reset: PropTypes.func.isRequired,
+    setFiles: PropTypes.func.isRequired,
+    addMessage: PropTypes.func.isRequired,
+    setErrorFile: PropTypes.func.isRequired
+};
 
 const defaultProps = {};
 
 const container = (props) => {
     const {setSocket, reset, setFiles, addMessage, setErrorFile} = props;
 
-    const [loading, setLoading] = useState(false);
     const server = getServer();
+    const [loading, setLoading] = useState(false);
     const [name, setName] = useState(server.name || '');
     const [url, setUrl] = useState(server.url || 'http://127.0.0.1:50000');
 

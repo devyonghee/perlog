@@ -10,11 +10,17 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import useStyles from './styles';
 
 const propTypes = {
-    url: PropTypes.string
+    url: PropTypes.string,
+    name: PropTypes.string,
+    loading: PropTypes.bool.isRequired,
+    handleUrlChange: PropTypes.func.isRequired,
+    handleUrlKeyPress: PropTypes.func.isRequired,
+    handleConfirmClick: PropTypes.func.isRequired,
 };
 
 const defaultProps = {
     url: '',
+    name: '',
 };
 
 const presenter = (props) => {
