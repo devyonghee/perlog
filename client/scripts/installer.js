@@ -17,7 +17,7 @@ function getInstallerConfig() {
     const outPath = path.join(rootPath, 'out');
 
     return Promise.resolve({
-        appDirectory: path.join(outPath, 'Yong Log-win32-x64'),
+        appDirectory: path.join(outPath, 'yonglog-win32-x64'),
         exe: 'yonglog.exe',
         loadingGif: path.join(rootPath, 'build', 'loadingmozzi.gif'),
         noMsi: true,
