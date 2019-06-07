@@ -26,7 +26,6 @@ const useStyles = makeStyles(theme => ({
 
     list: {
         height: 'calc(100vh - 64px)',
-        backgroundColor: theme.palette.background.paper,
     }
 }));
 

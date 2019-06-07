@@ -1,6 +1,6 @@
 {
-  "short_name": "Yong Log",
-  "name": "Real Time Log Monitoring",
+  "short_name": "yonglog",
+  "name": "This is log monitoring desktop app",
   "icons": [
     {
       "src": "favicon.ico",

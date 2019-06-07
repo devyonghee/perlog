@@ -1,4 +1,4 @@
-const {app, Menu} = require('electron');
+const {app, Menu, ipcMain} = require('electron');
 
 const template = [
     {
@@ -52,5 +52,10 @@ const template = [
 
 app.on('ready', () => {
     const menu = Menu.buildFromTemplate(template);
-    Menu.setApplicationMenu(menu)
+    Menu.setApplicationMenu(menu);
+
+    ipcMain.on('initThemeType', e => {
+        e.sender.send('changeThemes', Menu.getApplicationMenu().items[1].submenu.items.find(item => item.checked).label);
+    })
 });
+

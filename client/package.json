@@ -1,9 +1,9 @@
 {
   "name": "yonglog-client",
-  "productName": "Yong Log",
+  "productName": "yonglog",
   "author": "shiw111",
-  "description": "Yong Log",
-  "version": "1.0.0",
+  "description": "This is log monitoring desktop app",
+  "version": "0.1.0",
   "main": "main.js",
   "private": true,
   "homepage": "./",
@@ -22,7 +22,6 @@
     "bfj": "6.1.1",
     "case-sensitive-paths-webpack-plugin": "2.2.0",
     "classnames": "^2.2.6",
-    "css-loader": "1.0.0",
     "dotenv": "6.0.0",
     "dotenv-expand": "4.2.0",
     "eslint": "5.12.0",
@@ -33,23 +32,13 @@
     "eslint-plugin-jsx-a11y": "6.1.2",
     "eslint-plugin-react": "7.12.4",
     "file-loader": "2.0.0",
-    "fork-ts-checker-webpack-plugin-alt": "0.4.14",
     "fs-extra": "7.0.1",
     "html-webpack-plugin": "4.0.0-alpha.2",
-    "identity-obj-proxy": "3.0.0",
-    "immer": "^2.1.5",
     "jest": "23.6.0",
     "jest-pnp-resolver": "1.0.2",
     "jest-resolve": "23.6.0",
     "jest-watch-typeahead": "^0.2.1",
-    "mini-css-extract-plugin": "0.5.0",
-    "node-sass": "^4.12.0",
-    "optimize-css-assets-webpack-plugin": "5.0.1",
     "pnp-webpack-plugin": "1.2.1",
-    "postcss-flexbugs-fixes": "4.1.0",
-    "postcss-loader": "3.0.0",
-    "postcss-preset-env": "6.5.0",
-    "postcss-safe-parser": "4.0.1",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-app-polyfill": "^0.2.2",
@@ -60,10 +49,7 @@
     "redux-devtools-extension": "^2.13.8",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
-    "resolve": "1.10.0",
-    "sass-loader": "7.1.0",
     "socket.io-client": "^2.2.0",
-    "style-loader": "0.23.1",
     "terser-webpack-plugin": "1.2.2",
     "url-loader": "1.1.2",
     "webpack": "4.28.3",
@@ -83,11 +69,10 @@
   },
   "scripts": {
     "start": "electron . --dev",
-    "build": "node scripts/build.js",
     "test": "node scripts/test.js",
     "electron": "electron .",
-    "package:win": "electron-packager . --overwrite --platform=win32 --arch=ia32 --out=out",
-    "package:installer": "node scripts/installer.js"
+    "build": "node scripts/build.js & node scripts/package.js",
+    "installer": "node scripts/installer.js"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -124,8 +109,7 @@
       "^.+\\.module\\.(css|sass|scss)$"
     ],
     "moduleNameMapper": {
-      "^react-native$": "react-native-web",
-      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
+      "^react-native$": "react-native-web"
     },
     "moduleFileExtensions": [
       "web.js",

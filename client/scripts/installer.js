@@ -17,13 +17,14 @@ function getInstallerConfig() {
     const outPath = path.join(rootPath, 'out');
 
     return Promise.resolve({
-        appDirectory: path.join(outPath, 'Yong Log-win32-ia32'),
-        exe: 'yongLog.exe',
-        loadingGif: path.join(rootPath, 'build', 'favicon.png'),
+        appDirectory: path.join(outPath, 'Yong Log-win32-x64'),
+        exe: 'yonglog.exe',
+        loadingGif: path.join(rootPath, 'build', 'loadingmozzi.gif'),
         noMsi: true,
         outputDirectory: path.join(outPath, 'windows-installer'),
-        setupExe: 'yongLogSetup.exe',
-        setupIcon: path.join(rootPath, 'build', 'mozzi.ico'),
+        setupExe: 'yonglogSetup.exe',
+        setupIcon: path.join(rootPath, 'build', 'favicon.ico'),
+        iconUrl: path.join(rootPath, 'build', 'favicon.ico'),
         skipUpdateIcon: true
     })
 }

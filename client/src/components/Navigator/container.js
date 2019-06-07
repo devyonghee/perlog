@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useReducer, useLayoutEffect} from 'react';
+import React, {useState, useEffect, useReducer} from 'react';
 import PropTypes from 'prop-types';
 import Presenter from './presenter';
 import fileReducer, {types as fileActionTypes} from './fileReducer';

@@ -1,7 +1,6 @@
 import React, {useState, useLayoutEffect} from 'react';
 import Presenter from './presenter';
 import {createMuiTheme} from "@material-ui/core/styles";
-import {lightBlue, red} from "@material-ui/core/colors";
 
 const propTypes = {};
 
@@ -12,8 +11,12 @@ const container = props => {
     const [navigationWidth, setNavigationWidth] = useState(240);
 
     useLayoutEffect(() => {
-        window.ipcRenderer.on('changeThemes', (e, type) => setThemeType(type));
-    });
+        window.ipcRenderer.send('initThemeType');
+        window.ipcRenderer.on('changeThemes', (e, type) => {
+            console.log(type);
+            setThemeType(type)
+        });
+    }, []);
 
     const handleMouseDownDivider = e => {
         e.preventDefault();
@@ -30,12 +33,18 @@ const container = props => {
 
     const theme = createMuiTheme({
         palette: {
-            primary: lightBlue,
-            secondary: red,
-            background: {
-                paper: 'white'
+            type: themeType,
+            background:{
+                paper: (themeType === 'dark') ? '#2B2B2B' : '#ffffff',
+                default: (themeType === 'dark') ? '#333333' : '#ffffff'
             },
-            type: themeType
+
+            text: {
+                primary: (themeType === 'dark') ? '#ffffff' : '#000000',
+                secondary: (themeType === 'dark') ? '#00cc00' : '#000000',
+                disabled: (themeType === 'dark') ? '#909090' : '#989898'
+            }
+
         },
 
         typography: {

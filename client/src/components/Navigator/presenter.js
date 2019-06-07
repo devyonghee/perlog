@@ -9,7 +9,7 @@ import NewFileForm from '../NewFileForm';
 import FileList from '../FileList';
 
 const propTypes = {
-    serverName : PropTypes.string,
+    serverName: PropTypes.string,
     serverFiles: PropTypes.array,
     handleClickList: PropTypes.func.isRequired,
     handleContextMenuList: PropTypes.func.isRequired,
