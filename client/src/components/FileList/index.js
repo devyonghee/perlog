@@ -13,6 +13,7 @@ import Switch from '@material-ui/core/Switch';
 import ListItemText from '@material-ui/core/ListItemText';
 import {useTheme} from '@material-ui/styles';
 import useStyles from './styles';
+import HighLighter from "../Highlighter";
 
 const fileShape = PropTypes.shape({
     child: PropTypes.array,
@@ -24,6 +25,7 @@ const fileShape = PropTypes.shape({
 
 const propTypes = {
     files: PropTypes.arrayOf(fileShape),
+    filterString: PropTypes.string,
     extendedDirectories: PropTypes.arrayOf(fileShape),
     watchedFiles: PropTypes.arrayOf(fileShape),
     selectedFile: fileShape,
@@ -41,6 +43,7 @@ const propTypes = {
 
 const defaultProps = {
     files: null,
+    filterString: '',
     depth: 0,
     indexes: [],
     dense: false,
@@ -56,6 +59,7 @@ const defaultProps = {
 const FileList = props => {
     const {
         files,
+        filterString,
         selectedFile,
         depth,
         watchedFiles,
@@ -75,6 +79,8 @@ const FileList = props => {
     const theme = useTheme();
 
     return files.map((file, index) => {
+        const regexp = new RegExp(filterString, 'gi');
+        if (!!filterString && !file.isDirectory && !regexp.test(file.name)) return null;
         return (
             <Fragment key={index}>
                 <ListItem
@@ -105,7 +111,10 @@ const FileList = props => {
                         }
                     </ListItemIcon>
                     <ListItemText className={classes.textList}
-                                  primary={<Typography className={classes.text}>{file.name}</Typography>}/>
+                                  primary={<Typography className={classes.text}>
+                                      {file.isDirectory ? file.name :
+                                          <HighLighter regexp={regexp}>{file.name}</HighLighter>}
+                                  </Typography>}/>
                     {!invisibleSwitch && !file.isDirectory ?
                         <Switch
                             classes={{

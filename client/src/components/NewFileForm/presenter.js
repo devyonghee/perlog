@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
@@ -12,10 +12,12 @@ import FileList from '../FileList';
 
 const propTypes = {
     name: PropTypes.string,
+    filterString: PropTypes.string,
     handleNameChange: PropTypes.func,
     handleNameKeyPress: PropTypes.func,
     handleClickConfirm: PropTypes.func.isRequired,
     handleCloseForm: PropTypes.func.isRequired,
+    handleFilterStringChange: PropTypes.func.isRequired,
     newFileForm: PropTypes.shape({
         opened: PropTypes.bool.isRequired,
         type: PropTypes.string.isRequired,
@@ -24,6 +26,7 @@ const propTypes = {
 
 const defaultProps = {
     name: '',
+    filterString: '',
     handleNameChange: () => null,
     handleNameKeyPress: () => null,
 };
@@ -31,11 +34,13 @@ const defaultProps = {
 const presenter = (props) => {
     const {
         name,
+        filterString,
+        newFileForm,
         handleCloseForm,
         handleNameChange,
         handleClickConfirm,
         handleNameKeyPress,
-        newFileForm
+        handleFilterStringChange,
     } = props;
 
     const classes = useStyles();
@@ -48,6 +53,7 @@ const presenter = (props) => {
             onClose={handleCloseForm}
             transitionDuration={{exit: 0}}
             fullWidth
+            classes={(newFileForm.type === 'directory') ? null : {paper: classes.wrapPaper}}
             maxWidth={(newFileForm.type === 'directory') ? 'xs' : 'sm'}
         >
             <DialogTitle id="alert-dialog-title">
@@ -66,13 +72,29 @@ const presenter = (props) => {
                             onKeyPress: handleNameKeyPress,
                             value: name
                         }}
-                    /> : <List dense className={classes.folderList}>
-                        <FileList
-                            {...props}
-                            dense
-                            invisibleSwitch
-                        />
-                    </List>
+                    /> :
+                    <Fragment>
+                        <div className={classes.wrapNewFileForm}>
+                            <TextField
+                                margin="dense"
+                                placeholder="search"
+                                fullWidth
+                                variant="outlined"
+                                inputProps={{
+                                    onChange: handleFilterStringChange,
+                                    value: filterString
+                                }}
+                                InputLabelProps={{shrink: true}}
+                            />
+                            <List dense className={classes.folderList}>
+                                <FileList
+                                    {...props}
+                                    dense
+                                    invisibleSwitch
+                                />
+                            </List>
+                        </div>
+                    </Fragment>
                 }
             </DialogContent>
             <DialogActions>

@@ -1,5 +1,7 @@
 import {types} from "./serverAction";
 
+const limitMessage = 1000;
+
 const initialState = {
     name: '',
     socket: null,
@@ -83,6 +85,8 @@ const applyAddMessage = (state, action) => {
     const {path, message} = action;
     const watchedFile = state.watchedFiles.find(file => file.path === path);
     if (!watchedFile) return state;
+
+    if (state.messages.length >= limitMessage) state.messages.shift();
 
     return {...state, messages: [...state.messages, {file: watchedFile, message}]};
 };

@@ -104,8 +104,6 @@ const container = props => {
         menu.append(new MenuItem({type: 'separator'}));
         menu.append(new MenuItem({
             label: 'Delete...', click: () => {
-                console.log(file);
-
                 const options = {
                     type: 'question',
                     title: 'Delete',
@@ -115,7 +113,6 @@ const container = props => {
                 window.remote.dialog.showMessageBox(options, index => {
                     if (index !== 0) return;
                     const forgetFile = file => {
-                        console.log(file);
                         !file.isDirectory && watchedFiles.includes(file) && watchFile(file, false);
                         if (!!file.child && file.child.length) file.child.map(file => forgetFile(file));
                     };

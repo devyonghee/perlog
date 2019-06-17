@@ -63,6 +63,7 @@ const presenter = (props) => {
                             autoFocus
                             placeholder="Enter a Name"
                             className={classes.textField}
+                            value={name}
                             inputProps={{
                                 classes: {root: classes.textFieldInput},
                                 onChange: e => handleUrlChange(e, 'name'),
@@ -76,6 +77,7 @@ const presenter = (props) => {
                             margin="normal"
                             placeholder="Enter a Url"
                             fullWidth
+                            value={url}
                             inputProps={{
                                 onChange: e => handleUrlChange(e, 'url'),
                                 onKeyPress: handleUrlKeyPress,

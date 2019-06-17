@@ -22,21 +22,23 @@ const defaultProps = {
 const container = (props) => {
     const {search, closeNewFileForm, addFile, newFileForm: {type}} = props;
     const [name, setName] = useState('');
+    const [filterString, setFilterString] = useState('');
     const [selectedFile, setSelectedTarget] = useState(null);
     const [extendedDirectories, setExtendDirectory] = useState([]);
 
-    const initState = () =>  setName('') & setSelectedTarget();
+    const initState = () => setName('') & setSelectedTarget();
     const handleClickFile = (e, file) => {
         e.preventDefault();
         selectedFile !== file && setSelectedTarget(file);
     };
 
     const handleCloseForm = () => closeNewFileForm() & initState();
-    const handleNameChange = ({target: {value}}) => setName(value);
+    const handleFilterStringChange = e => e.preventDefault() & setFilterString(e.target.value);
+    const handleNameChange = e => e.preventDefault() & setName(e.target.value);
+
     const handleClickConfirm = e => {
         e.preventDefault();
-        if(!type) return;
-
+        if (!type) return;
         if (type === 'directory') {
             if (!name) return window.remote.dialog.showErrorBox('New Directory', '폴더명을 입력해주세요.');
             return addFile({name}) & initState();
@@ -70,6 +72,7 @@ const container = (props) => {
         <Presenter
             {...props}
             name={name}
+            filterString={filterString}
             selectedFile={selectedFile}
             extendedDirectories={extendedDirectories}
             handleClickFile={handleClickFile}
@@ -78,6 +81,7 @@ const container = (props) => {
             handleClickConfirm={handleClickConfirm}
             handleNameKeyPress={handleNameKeyPress}
             handleDoubleClickFile={handleDoubleClickFile}
+            handleFilterStringChange={handleFilterStringChange}
         />
     )
 

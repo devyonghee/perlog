@@ -2,39 +2,38 @@ import {makeStyles} from '@material-ui/styles'
 
 const useStyles = makeStyles(theme => ({
     wrapPaper: {
-        position: 'absolute',
-        backgroundColor: theme.palette.background.paper,
-        boxShadow: theme.shadows[5],
-        padding: theme.spacing.unit * 2,
-        outline: 'none',
-        left: '50%',
-        top: '50%',
-        transform: 'translateX(-50%) translateY(-50%)',
-        alignItems : 'center',
-        verticalAlign : 'middle',
+        height: '80vh',
     },
-    title:{
+    title: {
         userSelect: 'none'
     },
 
-    directoryWrap : {
+    directoryWrap: {
         width: theme.spacing.unit * 30,
         height: theme.spacing.unit * 19,
     },
 
-    fileWrap : {
+    fileWrap: {
         width: theme.spacing.unit * 50,
         height: theme.spacing.unit * 80,
     },
 
-    buttonsWrap:{
+    buttonsWrap: {
         textAlign: 'right',
     },
 
+    wrapNewFileForm: {
+        height: '100%',
+    },
+
     folderList: {
+        borderStyle: 'solid',
+        borderWidth: '1px',
+        borderColor: 'rgba(0, 0, 0, 0.23)',
+        borderRadius: theme.shape.borderRadius,
         marginTop: theme.spacing.unit * 2,
         marginBottom: theme.spacing.unit * 3,
-        height: theme.spacing.unit * 60,
+        height: 'calc(100% - 80px)',
         overflow: 'auto',
     }
 }));

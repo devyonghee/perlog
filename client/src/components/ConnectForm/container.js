@@ -20,7 +20,7 @@ const container = (props) => {
     const server = getServer();
     const [loading, setLoading] = useState(false);
     const [name, setName] = useState(server.name || '');
-    const [url, setUrl] = useState(server.url || 'http://127.0.0.1:50000');
+    const [url, setUrl] = useState(server.url || '');
 
     const connect = () => {
         setLoading(true);

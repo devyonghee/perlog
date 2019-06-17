@@ -2,14 +2,14 @@ import {makeStyles} from '@material-ui/styles'
 import colors from '../colors';
 
 const createSwitchColorsClass = (themeType) =>
-    colors.reduce((colorClasses, [lightColor, darkColor], index) => ({
+    colors.reduce((colorClasses, color, index) => ({
         ...colorClasses,
         [`colorSwitchBase${index}`]: {
-            color: themeType === 'light' ? lightColor[300] : darkColor[300],
+            color: color[300],
             [`&$colorSwitchChecked${index}`]: {
-                color: themeType === 'light' ? lightColor[500] : darkColor[500],
+                color: color[500],
                 [`& + $colorSwitchBar${index}`]: {
-                    backgroundColor: themeType === 'light' ? lightColor[300] : darkColor[300],
+                    backgroundColor: color[300],
                 },
             }
         },

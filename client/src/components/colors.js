@@ -21,7 +21,7 @@ import {
     common
 } from "@material-ui/core/colors";
 
-const colors = [[red, red], [green, amber], [cyan, orange], [yellow, blueGrey], [brown, indigo]];
+const colors = [red, green, blue, cyan, indigo, amber, blueGrey, brown, yellow, orange, deepOrange, grey, deepPurple, lightBlue, lightGreen, lime, pink, purple, teal, common];
 export default colors;
 
 function* generatorColor() {

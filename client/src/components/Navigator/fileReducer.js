@@ -13,6 +13,17 @@ export const types = {
     REMOVE_FILE,
 };
 
+const sortCompare = (preFile, curFile) => {
+    if (preFile.isDirectory !== curFile.isDirectory) {
+        return (preFile.isDirectory && !curFile.isDirectory) ? -1 : 1;
+    }
+    const icmp = preFile.name.toLowerCase().localeCompare(curFile.name.toLowerCase());
+    if (icmp !== 0) return icmp;
+    if (preFile.name > curFile.name) return 1;
+    else if (preFile.name < curFile.name) return -1;
+    else return 0;
+};
+
 
 const addDirectory = (state, {name, parent = null}) => {
     const newDirectory = {
@@ -24,13 +35,13 @@ const addDirectory = (state, {name, parent = null}) => {
     };
 
     if (!parent) {
-        return [...state, newDirectory].sort(file => file.isDirectory ? -1 : 0);
+        return [...state, newDirectory].sort(sortCompare);
     }
 
     newDirectory.parent = parent;
     newDirectory.route = [parent.route, newDirectory.name].join('/');
     parent.child.push(newDirectory);
-    parent.child.sort(file => file.isDirectory ? -1 : 0);
+    parent.child.sort(sortCompare);
     return [...state];
 };
 
@@ -48,13 +59,13 @@ const addFile = (state, {file, parent = null}) => {
     };
 
     if (!parent) {
-        return [...state, newFile].sort(file => file.isDirectory ? -1 : 0);
+        return [...state, newFile].sort(sortCompare);
     }
 
     newFile.parent = parent;
     newFile.route = [parent.route, newFile.name].join('/');
     parent.child.push(newFile);
-    parent.child.sort(file => file.isDirectory ? -1 : 0);
+    parent.child.sort(sortCompare);
     return [...state];
 };
 

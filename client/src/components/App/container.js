@@ -13,7 +13,6 @@ const container = props => {
     useLayoutEffect(() => {
         window.ipcRenderer.send('initThemeType');
         window.ipcRenderer.on('changeThemes', (e, type) => {
-            console.log(type);
             setThemeType(type)
         });
     }, []);
