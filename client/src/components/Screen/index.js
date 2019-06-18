@@ -1,9 +1,9 @@
 import {connect} from "react-redux";
 import container from "./container";
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
     return {
-        messages: state.server.messages
+        messages: state.server.messages,
     }
 };
 

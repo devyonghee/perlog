@@ -32,19 +32,7 @@ const container = (props) => {
         });
 
         socket.on('searched', (path, files) => setFiles(path, files));
-        socket.on('log', (path, message) => {
-            if (window.remote.getCurrentWindow().isMinimized()) {
-                const notification = {
-                    title: 'Basic Notification',
-                    body: message,
-                    icon: ''
-                };
-                new window.Notification(path, notification);
-            }
-
-            addMessage(path, message)
-        });
-
+        socket.on('log', (path, message) => addMessage(path, message));
         socket.on('fileError', (path, message) => {
             window.remote.dialog.showErrorBox('파일이 존재하지 않습니다.', message);
             setErrorFile(path)
