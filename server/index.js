@@ -121,7 +121,7 @@ const Server = class {
     }
 };
 
-const config = require('../config/server');
+const config = require('./config/server');
 File.availableExt = config.extensions;
 const logServer = new Server(config);
 logServer.run();

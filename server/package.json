@@ -1,0 +1,26 @@
+{
+  "name": "perlog-server",
+  "version": "0.1.0",
+  "scripts": {
+    "server": "node index.js",
+    "server-dev": "../node_modules/.bin/nodemon server/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shiw122333/yonglog.git"
+  },
+  "author": "shiw111",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shiw122333/yonglog/issues"
+  },
+  "homepage": "https://github.com/shiw122333/yonglog#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "glob": "^7.1.4",
+    "socket.io": "^2.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.0"
+  }
+}

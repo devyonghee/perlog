@@ -53,10 +53,8 @@ const File = class {
     _readLogs(curr, prev) {
         if (curr < prev) return;
         const readStream = fs.createReadStream(this._path, {encoding: 'utf8', start: prev, end: curr});
-        readStream.on('data', data => {
-            console.log(data);
-            data.split('\n').map(line => (!!line && typeof this.onChangeCallback === 'function' && this.onChangeCallback(line)));
-        });
+        readStream.on('data', data =>
+            (!!data && typeof this.onChangeCallback === 'function' && this.onChangeCallback(data.replace(/\n{2,}/g, '\n'))));
     }
 
     onChange(onChangeCallback) {
