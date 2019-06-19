@@ -79,7 +79,6 @@
     "start": "electron . --dev",
     "test": "node scripts/test.js",
     "electron": "electron .",
-    "a": "node scripts/build.js",
     "build": "node scripts/build.js & node scripts/package.js",
     "installer": "node scripts/installer.js"
   },
