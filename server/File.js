@@ -1,18 +1,27 @@
 const fs = require('fs');
+const pathLib = require('path');
 
 const File = class {
-    constructor(path, notify = null) {
-        this._path = path;
-        this._notify = notify;
+    constructor(path) {
+        this._path = path.replace(/\/*$/, '');
     }
 
     search() {
         if (!fs.existsSync(this._path)) throw new Error(`${this._path} file is not exist`);
-        return fs.readdirSync(this._path, {encoding: 'utf8', withFileTypes: true});
+        const files = fs.readdirSync(this._path, {encoding: 'utf8', withFileTypes: true});
+        return files.map(file => {
+            if (!file.isDirectory() && !File._isAvailableExt(file.name)) return null;
+
+            return {
+                name: file.name,
+                path: pathLib.join(this._path, file.name),
+                isDirectory: file.isDirectory()
+            }
+        }).filter(Boolean);
     }
 
     watch() {
-        if (!fs.existsSync(this._path)) throw new Error(`${this._path} file is not exist`);
+        if (!fs.existsSync(this._path) || !File._isAvailableExt(this._path)) throw new Error(`${this._path} file can not watch`);
 
         this.preSize = fs.statSync(this._path).size;
         this.watching = fs.watch(this._path, event => this._registerWatchEvents(event));
@@ -46,10 +55,27 @@ const File = class {
         const readStream = fs.createReadStream(this._path, {encoding: 'utf8', start: prev, end: curr});
         readStream.on('data', data => {
             console.log(data);
-            data.split('\n').map(line => (!!line && this._notify(line)))
+            data.split('\n').map(line => (!!line && typeof this.onChangeCallback === 'function' && this.onChangeCallback(line)))
         });
     }
 
+    onChange(onChangeCallback) {
+        this.onChangeCallback = onChangeCallback;
+        return this;
+    }
+
+    static set availableExt(extensions) {
+        this._availableExt = extensions
+    }
+
+    static _isAvailableExt(name) {
+        if (!this._availableExt) return true;
+
+        const index = name.lastIndexOf('.');
+        if (index < 0) return false;
+        const ext = name.slice(index + 1).toLowerCase();
+        return this._availableExt.includes(ext);
+    }
 };
 
 module.exports = File;

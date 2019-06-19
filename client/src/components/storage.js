@@ -32,6 +32,11 @@ export const loadFiles = () => {
 
 export const saveServer = (name, url) => {
     if (!name || !url) return;
+    const server = JSON.parse(window.localStorage.getItem('server'));
+    if (!server || !server.url || server.url.replace('\/$', '') !== url.replace('\/$', '')) {
+        window.localStorage.removeItem('files');
+    }
+
     window.localStorage.setItem('server', JSON.stringify({url, name}));
 };
 

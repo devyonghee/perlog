@@ -23,36 +23,25 @@ const createWithSortFiles = (files, parent) =>
 
 
 const applyFiles = (state, {path, files: newFiles}) => {
-    const paths = path.replace(/(\\+|\/+)/g, '/').split('/').filter(String);
-    if (!paths.length) return state;
+    const trimPath = path.replace(/(\\+|\/+)/g, '/').replace(/\/$/g, '');
+    if (!trimPath) return state;
 
-    const {files: stateFiles, searching: searchingDirectory} = state;
+    const {searching: searchingDirectory} = state;
 
-    if (!!searchingDirectory) {
-        searchingDirectory.child = createWithSortFiles(newFiles, searchingDirectory);
-        return {...state, searching: null, files: [...state.files]};
+    if (!searchingDirectory) {
+        const directory = {
+            name: trimPath,
+            isDirectory: true,
+            path: trimPath,
+            parent: searchingDirectory,
+        };
+
+        directory.child = createWithSortFiles(newFiles, directory);
+        return {...state, files: [directory]};
     }
 
-    return {
-        ...state,
-        files: paths.reduce((currentFiles, path, currentIndex, paths) => {
-            const currentPath = paths.slice(0, currentIndex + 1).join('/');
-            const directory = {
-                name: path,
-                isDirectory: true,
-                path: currentPath,
-                parent: searchingDirectory,
-                child: null
-            };
-
-            if (!currentFiles.length) currentFiles.push(directory);
-            if (paths.length !== (currentIndex + 1)) return directory.child;
-
-            if (!newFiles || !newFiles.length) directory.child = null;
-            directory.child = createWithSortFiles(newFiles, directory);
-            return [...stateFiles];
-        }, stateFiles)
-    }
+    searchingDirectory.child = createWithSortFiles(newFiles, searchingDirectory);
+    return {...state, searching: null, files: [...state.files]};
 };
 
 const applyWatchingFile = (state, {file, watch}) => {

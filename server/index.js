@@ -4,8 +4,8 @@ const pathLib = require('path');
 const Server = class {
     constructor(config) {
         this.config = config;
-        this._defaultDirectory = pathLib.resolve(config._defaultDirectory || '/');
-        this.files = {};
+        this._defaultDirectory = pathLib.resolve(this.config.defaultDirectory || '/');
+        this.files = {}
     }
 
     run() {
@@ -15,6 +15,8 @@ const Server = class {
         const app = require('express')();
         const server = require('http').createServer(app).listen(this.config.port, this.config.host);
         this.io = require('socket.io')(server);
+
+        console.log(`listening... ${this.config.host}:${this.config.port}`);
         this._registerEvents();
     }
 
@@ -35,23 +37,15 @@ const Server = class {
     _search(searchPath, socket) {
         try {
             const newSearchPath = (!searchPath) ? this._defaultDirectory : this._replacePath(searchPath);
-
             if (!newSearchPath) {
                 console.log('path is not exist');
                 return this.io.sockets.to(socket.id).emit('fileError', searchPath, ' 경로가 잘못 되었습니다.');
             }
 
+            console.log('searching... ', newSearchPath);
             const file = new File(newSearchPath);
             const files = file.search();
-            console.log('searching... ', newSearchPath);
-            this.io.sockets.to(socket.id).emit('searched',
-                newSearchPath,
-                files.map(file => ({
-                    name: file.name,
-                    path: pathLib.resolve(newSearchPath, file.name),
-                    isDirectory: file.isDirectory()
-                }))
-            );
+            this.io.sockets.to(socket.id).emit('searched', newSearchPath, files);
         } catch (e) {
             console.log(e.message);
             this.io.sockets.to(socket.id).emit('fileError', searchPath, ' 경로가 잘못 되었습니다.');
@@ -67,9 +61,10 @@ const Server = class {
             try {
                 if (!!this.files[replacedPath]) return;
 
-                this.files[replacedPath]
-                    = (new File(replacedPath, message => this.io.sockets.to(path).emit('log', replacedPath, message))).watch();
+                const file = new File(replacedPath);
+                file.watch().onChange(message => this.io.sockets.to(path).emit('log', replacedPath, message));
 
+                this.files[replacedPath] =file;
             } catch (e) {
                 console.log(e.message);
                 this.io.sockets.to(socket.id).emit('fileError', path, e.message);
@@ -112,7 +107,7 @@ const Server = class {
         }
 
         const newPath = filteredPaths.join('/');
-        return pathLib.resolve(this._defaultDirectory, newPath);
+        return pathLib.join(this._defaultDirectory, newPath);
     }
 
     _availableDefaultPath() {
@@ -127,5 +122,6 @@ const Server = class {
 };
 
 const config = require('../config/server');
+File.availableExt = config.extensions;
 const logServer = new Server(config);
 logServer.run();
