@@ -7,14 +7,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shiw122333/yonglog.git"
+    "url": "git+https://github.com/shiw122333/perlog.git"
   },
   "author": "shiw111",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/shiw122333/yonglog/issues"
+    "url": "https://github.com/shiw122333/perlog/issues"
   },
-  "homepage": "https://github.com/shiw122333/yonglog#readme",
+  "homepage": "https://github.com/shiw122333/perlog#readme",
   "dependencies": {
     "express": "^4.16.4",
     "glob": "^7.1.4",

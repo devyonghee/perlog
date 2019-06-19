@@ -17,12 +17,12 @@ function getInstallerConfig() {
     const outPath = path.join(rootPath, 'out');
 
     return Promise.resolve({
-        appDirectory: path.join(outPath, 'yonglog-win32-x64'),
-        exe: 'yonglog.exe',
+        appDirectory: path.join(outPath, 'perlog-win32-x64'),
+        exe: 'perlog.exe',
         loadingGif: path.join(rootPath, 'build', 'loadingmozzi.gif'),
         noMsi: true,
         outputDirectory: path.join(outPath, 'windows-installer'),
-        setupExe: 'yonglogSetup.exe',
+        setupExe: 'perlogSetup.exe',
         setupIcon: path.join(rootPath, 'build', 'favicon.ico'),
         iconUrl: path.join(rootPath, 'build', 'favicon.ico'),
         skipUpdateIcon: true
