@@ -5,7 +5,7 @@ const Server = class {
     constructor(config) {
         this.config = config;
         this._defaultDirectory = pathLib.resolve(this.config.defaultDirectory || '/');
-        this.files = {}
+        this.files = {};
     }
 
     run() {
@@ -29,7 +29,7 @@ const Server = class {
             socket.on('search', path => this._search(path, socket));
             socket.on('disconnecting', () => {
                 console.log(`${socket.id} is disconnected`);
-                Object.keys(socket.rooms).map(path => this._forget(path, socket))
+                Object.keys(socket.rooms).map(path => this._forget(path, socket));
             });
         });
     }
@@ -64,7 +64,7 @@ const Server = class {
                 const file = new File(replacedPath);
                 file.watch().onChange(message => this.io.sockets.to(path).emit('log', replacedPath, message));
 
-                this.files[replacedPath] =file;
+                this.files[replacedPath] = file;
             } catch (e) {
                 console.log(e.message);
                 this.io.sockets.to(socket.id).emit('fileError', path, e.message);
@@ -112,10 +112,10 @@ const Server = class {
 
     _availableDefaultPath() {
         try {
-            (new File(pathLib.resolve(this._defaultDirectory))).search();
-            return true;
+            const files = (new File(pathLib.resolve(this._defaultDirectory))).search();
+            return !!files;
         } catch (e) {
-            console.log(e.message);
+            console.log(`${this._defaultDirectory} is not available default directory`, e.message);
             return false;
         }
     }

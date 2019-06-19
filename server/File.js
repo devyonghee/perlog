@@ -16,7 +16,7 @@ const File = class {
                 name: file.name,
                 path: pathLib.join(this._path, file.name),
                 isDirectory: file.isDirectory()
-            }
+            };
         }).filter(Boolean);
     }
 
@@ -55,7 +55,7 @@ const File = class {
         const readStream = fs.createReadStream(this._path, {encoding: 'utf8', start: prev, end: curr});
         readStream.on('data', data => {
             console.log(data);
-            data.split('\n').map(line => (!!line && typeof this.onChangeCallback === 'function' && this.onChangeCallback(line)))
+            data.split('\n').map(line => (!!line && typeof this.onChangeCallback === 'function' && this.onChangeCallback(line)));
         });
     }
 
@@ -65,7 +65,7 @@ const File = class {
     }
 
     static set availableExt(extensions) {
-        this._availableExt = extensions
+        this._availableExt = extensions;
     }
 
     static _isAvailableExt(name) {
