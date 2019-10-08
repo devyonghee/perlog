@@ -19,7 +19,6 @@ function getInstallerConfig() {
     return Promise.resolve({
         appDirectory: path.join(outPath, 'perlog-win32-x64'),
         exe: 'perlog.exe',
-        loadingGif: path.join(rootPath, 'build', 'loadingmozzi.gif'),
         noMsi: true,
         outputDirectory: path.join(outPath, 'windows-installer'),
         setupExe: 'perlogSetup.exe',
