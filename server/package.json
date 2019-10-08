@@ -2,6 +2,7 @@
   "name": "perlog-server",
   "version": "0.1.0",
   "scripts": {
+    "start": "node index.js",
     "server": "node index.js",
     "server-dev": "../node_modules/.bin/nodemon server/index.js"
   },
@@ -9,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/shiw122333/perlog.git"
   },
-  "author": "shiw111",
+  "author": "devyonghee",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/shiw122333/perlog/issues"
