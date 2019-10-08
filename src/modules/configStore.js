@@ -1,6 +1,8 @@
 import {createStore, combineReducers, applyMiddleware} from "redux";
 import thunk from "redux-thunk";
-import server from "./serverReducer";
+import { loadFiles } from './storage';
+import serverReducer from "./server/reducer";
+import fileReducer from "./file/reducer";
 
 const env = process.env.NODE_ENV;
 const middle = [thunk];
@@ -12,7 +14,6 @@ if (env === "development") {
 
 const applyMiddle = applyMiddleware(...middle);
 
-const reducer = combineReducers({server});
+const reducer = combineReducers({ server: serverReducer, file: fileReducer });
 
-const store = (initialState = {server: {}}) => createStore(reducer, applyMiddle);
-export default store();
+export default  createStore(reducer, applyMiddle);

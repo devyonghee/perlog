@@ -1,5 +1,5 @@
 import {makeStyles} from '@material-ui/styles'
-import colors from '../colors';
+import colors from 'src/modules/file/colors';
 
 const createFileNameClass = (themeType) =>
     colors.reduce((colorClasses, color, index) => ({

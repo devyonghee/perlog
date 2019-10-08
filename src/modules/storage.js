@@ -1,4 +1,4 @@
-import {colorsIndex} from './colors';
+import {colorsIndex} from './file/colors';
 
 const serializeFiles = ({...file}) => {
     file.parent = null;

@@ -1,8 +1,6 @@
-import React, {useState, useEffect, useReducer} from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import PropTypes from 'prop-types';
 import Presenter from './presenter';
-import fileReducer, {types as fileActionTypes} from './fileReducer';
-import {saveFiles, loadFiles} from '../storage';
 
 const fileType = PropTypes.shape({
     child: PropTypes.array,
@@ -15,36 +13,36 @@ const fileType = PropTypes.shape({
 const propTypes = {
     serverName: PropTypes.string,
     serverFiles: PropTypes.array,
+    files: PropTypes.array,
     search: PropTypes.func.isRequired,
     watchFile: PropTypes.func.isRequired,
+    addFile: PropTypes.func.isRequired,
+    addDirectory: PropTypes.func.isRequired,
+    removeFile: PropTypes.func.isRequired,
     watchedFiles: PropTypes.arrayOf(fileType),
     errorFiles: PropTypes.arrayOf(fileType),
 };
 
 const defaultProps = {
     serverName: '',
+    files: [],
     serverFiles: [],
     watchedFiles: [],
     errorFiles: [],
 };
 
 const container = props => {
-    const {watchFile, serverFiles, search, watchedFiles, errorFiles, serverName} = props;
-    const [newFileForm, setOpenNewFileForm] = useState({opened: false, type: ''});
+    const { watchFile, serverFiles, search, watchedFiles, errorFiles, serverName, files, addDirectory, addFile, removeFile } = props;
+    const [newFileForm, setOpenNewFileForm] = useState({ opened: false, type: '' });
     const [selectedFile, setSelectedTarget] = useState(null);
     const [extendedDirectories, setExtendDirectory] = useState([]);
-    const [files, dispatchFiles] = useReducer(fileReducer, loadFiles() || []);
 
-    useEffect(() => {
-        saveFiles(files)
-    }, [files]);
+    const closeNewFileForm = () => setOpenNewFileForm({ opened: false, type: '' });
 
-    const closeNewFileForm = () => setOpenNewFileForm({opened: false, type: ''});
-
-    const addFile = target => {
+    const handleAddFile = target => {
         const currentDirectory = (!!selectedFile) ? selectedFile.child : files;
         if (!!currentDirectory && currentDirectory.some(file => file.name === target.name && file.isDirectory === (newFileForm.type === 'directory'))) {
-            return window.remote.dialog.showErrorBox(newFileForm.type, `이미 존재하는 ${newFileForm.type}입니다.`)
+            return window.remote.dialog.showErrorBox(newFileForm.type, `이미 존재하는 ${newFileForm.type}입니다.`);
         }
 
         let parent = null;
@@ -53,8 +51,8 @@ const container = props => {
         }
 
         (newFileForm.type === 'directory') ?
-            dispatchFiles({type: fileActionTypes.ADD_DIRECTORY, name: target.name, parent}) :
-            dispatchFiles({type: fileActionTypes.ADD_FILE, file: target, parent});
+            addDirectory(target.name, parent) :
+            addFile(target, parent);
 
         !!parent && !extendedDirectories.includes(parent) && setExtendDirectory([...extendedDirectories, parent]);
         closeNewFileForm();
@@ -62,7 +60,7 @@ const container = props => {
 
     const handleFileWatchSwitch = (e, file) => {
         e.stopPropagation();
-        const {target: {checked}} = e;
+        const { target: { checked } } = e;
         if (!!checked && watchedFiles.some(watchedFile => watchedFile.path === file.path))
             return window.remote.dialog.showErrorBox('File', '현재 관찰중인 파일입니다.');
 
@@ -90,18 +88,18 @@ const container = props => {
     const handleContextMenuList = (e, file = null) => {
         e.stopPropagation();
         selectedFile !== file && setSelectedTarget(file);
-        const {Menu, MenuItem} = window.remote;
+        const { Menu, MenuItem } = window.remote;
         const menu = new Menu();
         menu.append(new MenuItem({
             label: 'New File',
-            click: () => setOpenNewFileForm({opened: true, type: 'file'}) | (!serverFiles.length && search())
+            click: () => setOpenNewFileForm({ opened: true, type: 'file' }) | (!serverFiles.length && search())
         }));
         menu.append(new MenuItem({
             label: 'New Directory',
-            click: () => setOpenNewFileForm({opened: true, type: 'directory'})
+            click: () => setOpenNewFileForm({ opened: true, type: 'directory' })
         }));
-        if (!file) return menu.popup({window: window.remote.getCurrentWindow()});
-        menu.append(new MenuItem({type: 'separator'}));
+        if (!file) return menu.popup({ window: window.remote.getCurrentWindow() });
+        menu.append(new MenuItem({ type: 'separator' }));
         menu.append(new MenuItem({
             label: 'Delete...', click: () => {
                 const options = {
@@ -117,18 +115,17 @@ const container = props => {
                         if (!!file.child && file.child.length) file.child.map(file => forgetFile(file));
                     };
                     forgetFile(file);
-                    dispatchFiles({type: fileActionTypes.REMOVE_FILE, file});
+                    removeFile(file);
                 });
             }
         }));
-        return menu.popup({window: window.remote.getCurrentWindow()})
+        return menu.popup({ window: window.remote.getCurrentWindow() });
     };
-
 
     return <Presenter
         serverName={serverName}
         files={files}
-        addFile={addFile}
+        handleAddFile={handleAddFile}
         search={search}
         serverFiles={serverFiles}
         newFileForm={newFileForm}

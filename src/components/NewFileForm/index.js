@@ -5,7 +5,7 @@ import Presenter from './presenter';
 const propTypes = {
     search: PropTypes.func.isRequired,
     closeNewFileForm: PropTypes.func.isRequired,
-    addFile: PropTypes.func.isRequired,
+    handleAddFile: PropTypes.func.isRequired,
     newFileForm: PropTypes.shape({
         type: PropTypes.string,
         opened: PropTypes.bool
@@ -20,7 +20,7 @@ const defaultProps = {
 };
 
 const container = (props) => {
-    const {search, closeNewFileForm, addFile, newFileForm: {type}} = props;
+    const {search, closeNewFileForm, handleAddFile, newFileForm: {type}} = props;
     const [name, setName] = useState('');
     const [filterString, setFilterString] = useState('');
     const [selectedFile, setSelectedTarget] = useState(null);
@@ -41,23 +41,23 @@ const container = (props) => {
         if (!type) return;
         if (type === 'directory') {
             if (!name) return window.remote.dialog.showErrorBox('New Directory', '폴더명을 입력해주세요.');
-            return addFile({name}) & initState();
+            return handleAddFile({name}) & initState();
         }
         if (!selectedFile) return window.remote.dialog.showErrorBox('New File', '파일을 선택해주세요.');
-        return addFile(selectedFile) & initState();
+        return handleAddFile(selectedFile) & initState();
     };
 
     const handleNameKeyPress = e => {
         if (e.key.toLowerCase() !== "enter" || !name) return;
         e.preventDefault();
-        addFile({name});
+        handleAddFile({name});
         setName('');
     };
 
     const handleDoubleClickFile = (e, file) => {
         e.preventDefault();
         selectedFile !== file && setSelectedTarget(file);
-        if (!file.isDirectory) return addFile(file) & initState();
+        if (!file.isDirectory) return handleAddFile(file) & initState();
 
         if (extendedDirectories.includes(file)) {
             extendedDirectories.splice(extendedDirectories.indexOf(file), 1);

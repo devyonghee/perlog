@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import Presenter from './presenter';
 import io from "socket.io-client";
-import {saveServer, getServer} from "../storage";
+import {saveServer, getServer} from "src/modules/storage";
 
 const propTypes = {
     setSocket: PropTypes.func.isRequired,

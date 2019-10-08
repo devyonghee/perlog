@@ -1,6 +1,6 @@
 import {connect} from "react-redux";
 import container from "./container";
-import serverAction from "../../modules/serverAction";
+import serverAction from "src/modules/server/actions";
 
 
 const mapStateToProps = state => {
