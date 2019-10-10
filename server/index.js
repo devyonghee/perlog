@@ -1,7 +1,9 @@
+const Server = require('./Server');
 const File = require('./File');
 const pathLib = require('path');
+const jwt = require('jsonwebtoken');
 
-const Server = class {
+const App = class {
     constructor(config) {
         this.config = config;
         this._defaultDirectory = pathLib.resolve(this.config.defaultDirectory || '/');
@@ -12,23 +14,29 @@ const Server = class {
         if (!this.config.host || !this.config.port) return console.log('client has not enough config');
 
         if (!!this._defaultDirectory && !this._availableDefaultPath()) return;
-        const app = require('express')();
-        const server = require('http').createServer(app).listen(this.config.port, this.config.host);
-        this.io = require('socket.io')(server);
 
-        console.log(`listening... ${this.config.host}:${this.config.port}`);
+        const server = new Server(this.config.authUrl, this.config.secretKey);
+        this.io = server.openSocket(this.config.host, this.config.port);
+        this.io.use((socket, next) => {
+            try {
+                const { token } = socket.handshake.query;
+                const decoded = jwt.verify(token, this.config.secretKey);
+                console.log(decoded.id);
+                next();
+            } catch (e) {
+
+            }
+        });
         this._registerEvents();
     }
 
     _registerEvents() {
         this.io.sockets.on('connection', socket => {
-            console.log(`${socket.id} is connected`);
-
             socket.on('watch', path => this._watch(path, socket));
             socket.on('forget', path => this._forget(path, socket));
             socket.on('search', path => this._search(path, socket));
             socket.on('disconnecting', () => {
-                console.log(`${socket.id} is disconnected`);
+                console.log(`${socket._id} is disconnected`);
                 Object.keys(socket.rooms).map(path => this._forget(path, socket));
             });
         });
@@ -39,23 +47,23 @@ const Server = class {
             const newSearchPath = (!searchPath) ? this._defaultDirectory : this._replacePath(searchPath);
             if (!newSearchPath) {
                 console.log('path is not exist');
-                return this.io.sockets.to(socket.id).emit('fileError', searchPath, ' 경로가 잘못 되었습니다.');
+                return socket.emit('fileError', searchPath, ' 경로가 잘못 되었습니다.');
             }
 
             console.log('searching... ', newSearchPath);
             const file = new File(newSearchPath);
             const files = file.search();
-            this.io.sockets.to(socket.id).emit('searched', newSearchPath, files);
+            socket.emit('searched', newSearchPath, files);
         } catch (e) {
             console.log(e.message);
-            this.io.sockets.to(socket.id).emit('fileError', searchPath, ' 경로가 잘못 되었습니다.');
+            socket.emit('fileError', searchPath, ' 경로가 잘못 되었습니다.');
         }
     }
 
     _watch(path, socket) {
         const replacedPath = this._replacePath(path);
 
-        if (!replacedPath) return this.io.sockets.to(socket.id).emit('fileError', path, '경로가 잘못 되었습니다.');
+        if (!replacedPath) return socket.emit('fileError', path, '경로가 잘못 되었습니다.');
 
         socket.join(replacedPath, () => {
             try {
@@ -67,7 +75,7 @@ const Server = class {
                 this.files[replacedPath] = file;
             } catch (e) {
                 console.log(e.message);
-                this.io.sockets.to(socket.id).emit('fileError', path, e.message);
+                socket.emit('fileError', path, e.message);
                 socket.leave(replacedPath, () => null);
             }
         });
@@ -123,5 +131,5 @@ const Server = class {
 
 const config = require('./config/server');
 File.availableExt = config.extensions;
-const logServer = new Server(config);
+const logServer = new App(config);
 logServer.run();

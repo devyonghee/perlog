@@ -3,13 +3,13 @@ import { types } from './actions';
 const limitMessage = 200;
 
 const initialState = {
-    name: '',
     socket: null,
     searching: null,
     files: [],
     messages: [],
     watchedFiles: [],
-    errorFiles: []
+    errorFiles: [],
+    loading: false,
 };
 
 const createWithSortFiles = (files, parent) =>
@@ -80,7 +80,7 @@ const applyAddMessage = (state, action) => {
 export default (state = initialState, action) => {
     switch (action.type) {
         case types.SET_SOCKET:
-            return { ...state, name: action.name, socket: action.socket };
+            return { ...state, socket: action.socket };
 
         case types.RESET_SOCKET:
             if (!!state.socket) state.socket.disconnect();

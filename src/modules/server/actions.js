@@ -1,3 +1,6 @@
+import axios from 'axios';
+import io from 'socket.io-client';
+
 const SET_SOCKET = Symbol('SET_SOCKET');
 const RESET_SOCKET = Symbol('RESET_SOCKET');
 const REQUEST_WATCH = Symbol('REQUEST_WATCH');
@@ -16,10 +19,9 @@ export const types = {
     SET_ERROR_FILE
 };
 
-const setSocket = (name, socket) => {
+const setSocket = (socket) => {
     return {
         type: SET_SOCKET,
-        name,
         socket
     };
 };
@@ -68,6 +70,52 @@ const setErrorFile = path => {
     };
 };
 
+const registerEvent = (socket, dispatch) => {
+    socket.on('connect', () => {
+        // saveServer(url);
+        dispatch(setSocket(socket));
+    });
+
+    socket.on('searched', (path, files) => setFiles(path, files));
+    socket.on('log', (path, message) => addMessage(path, message));
+    socket.on('fileError', (path, message) => {
+        window.ipcRenderer.send('notice', message);
+        setErrorFile(path);
+    });
+
+    socket.on('reconnect_failed', () => {
+        window.ipcRenderer.send('notice', '서버와의 연결이 끊겼습니다.');
+        dispatch(resetSocket());
+    });
+
+    socket.on('error', (path, message) => {
+        window.ipcRenderer.send('notice', message, '서버와의 연결이 끊겼습니다.');
+        dispatch(resetSocket());
+    });
+};
+
+const connect = (url, id, password) => {
+    return async dispatch => {
+        try {
+            const response = await axios.post(url + '/login', { id, password });
+            if (response.status !== 200) {
+                return window.ipcRenderer.send('notice', '서버 오류');
+            }
+
+            const socket = io.connect(`${url}?token=${response.data}`, {
+                transports: ['websocket'],
+                reconnection: true,
+                reconnectionAttempts: 3,
+            });
+
+            registerEvent(socket, dispatch);
+        } catch (e) {
+            const message = e.response && e.response.status === 401 ? '그룹웨어 계정을 확인해주세요' : e.message;
+            window.ipcRenderer.send('notice', message);
+        }
+    };
+};
+
 export default {
     setSocket,
     resetSocket,
@@ -75,5 +123,6 @@ export default {
     requestWatch,
     search,
     addMessage,
-    setErrorFile
-}
+    setErrorFile,
+    connect
+};

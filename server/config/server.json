@@ -1,6 +1,8 @@
 {
   "host": "127.0.0.1",
   "port": 50000,
+  "authUrl" : "https://ipa-api-proxy.saraminhr.co.kr:5000",
+  "secretKey" : "roqkfwksmsgksdydgmldlqslek",
   "defaultDirectory": "D://",
   "extensions": [
     "log",

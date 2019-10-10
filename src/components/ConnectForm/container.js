@@ -1,98 +1,75 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Presenter from './presenter';
-import io from "socket.io-client";
-import {saveServer, getServer} from "src/modules/storage";
+import axios from 'axios';
+import io from 'socket.io-client';
+
+import { saveServer, getServer } from 'src/modules/storage';
 
 const propTypes = {
     setSocket: PropTypes.func.isRequired,
     reset: PropTypes.func.isRequired,
     setFiles: PropTypes.func.isRequired,
     addMessage: PropTypes.func.isRequired,
-    setErrorFile: PropTypes.func.isRequired
+    setErrorFile: PropTypes.func.isRequired,
+    connectServer: PropTypes.func.isRequired,
 };
 
 const defaultProps = {};
 
 const container = (props) => {
-    const {setSocket, reset, setFiles, addMessage, setErrorFile} = props;
+    const { connectServer } = props;
 
     const server = getServer();
     const [loading, setLoading] = useState(false);
-    const [name, setName] = useState(server.name || '');
-    const [url, setUrl] = useState(server.url || '');
+    const [values, setValues] = useState({
+        url: server.url || '',
+        id: 'shiw111',
+        password: '1!a1024726',
+        showPassword: false,
+    });
 
-    const connect = () => {
+    const fixValuesAndConnect = async () => {
         setLoading(true);
-        const socket = io.connect(url, {'reconnection': true, 'reconnectionAttempts': 3});
-        socket.on('connect', () => {
-            saveServer(name, url);
-            setLoading(false);
-            setSocket(name, socket)
-        });
+        const id = values.id.trim();
+        const withHttp = url => !/^https?:\/\//i.test(url) ? `http://${url}` : url;
+        const url = withHttp(values.url.trim());
 
-        socket.on('searched', (path, files) => setFiles(path, files));
-        socket.on('log', (path, message) => addMessage(path, message));
-        socket.on('fileError', (path, message) => {
-            window.remote.dialog.showErrorBox('파일이 존재하지 않습니다.', message);
-            setErrorFile(path)
-        });
-
-        socket.on('reconnect_failed', () => {
-            window.remote.dialog.showErrorBox('Error', (loading) ? '주소가 잘못 되었습니다.' : '서버와의 연결이 끊겼습니다.');
-            setLoading(false);
-            reset();
-        });
-
-        socket.on('error', (path, message) => {
-            window.remote.dialog.showErrorBox('서버와의 연결이 끊겼습니다.', message);
-            setLoading(false);
-            reset();
-        });
-    };
-
-    const handleUrlKeyPress = e => {
-        if (e.key.toLowerCase() !== "enter") return;
-        e.preventDefault();
-        const trimName = name.trim();
-        const trimUrl = url.trim();
-        if (!trimName || !trimUrl) {
-            setName(trimName);
-            setUrl(trimUrl);
-            return window.remote.dialog.showErrorBox(`${!trimName ? 'Name' : 'Url'} Error`, `${!trimName ? '이름을' : '주소를'} 입력하지 않았습니다.`);
+        if (!url || !id || !values.password) {
+            return window.ipcRenderer.send('notice', '값을 입력해주세요.');
         }
-        connect();
-        setName('');
-        setUrl('');
+        setValues({ ...values, id, url });
+        await connectServer(url, id, values.password);
+        setLoading(false);
     };
 
-    const handleTextChange = (e, target) => {
-        e.preventDefault();
-        (target === 'name') ? setName(e.target.value) : setUrl(e.target.value);
+    const handleKeyPress = async e => {
+        if (e.key.toLowerCase() !== 'enter') return;
+        await fixValuesAndConnect();
     };
-    const handleConfirmClick = e => {
-        e.preventDefault();
-        const trimName = name.trim();
-        const trimUrl = url.trim();
-        if (!trimName || !trimUrl) {
-            setName(trimName);
-            setUrl(trimUrl);
-            return window.remote.dialog.showErrorBox(`${!trimName ? 'Name' : 'Url'} Error`, `${!trimName ? '이름을' : '주소를'} 입력하지 않았습니다.`);
+
+    const handleTextChange = (prop) => (
+        (e) => {
+            e.preventDefault();
+            if (values.hasOwnProperty(prop)) setValues({ ...values, [prop]: e.target.value });
         }
-        connect();
-    };
+    );
 
+    const handleClickShowPassword = e => {
+        e.preventDefault();
+        setValues({ ...values, showPassword: !values.showPassword });
+    };
 
     return (
         <Presenter
-            name={name}
-            url={url}
+            values={values}
             loading={loading}
-            handleUrlChange={handleTextChange}
-            handleUrlKeyPress={handleUrlKeyPress}
-            handleConfirmClick={handleConfirmClick}
+            handleKeyPress={handleKeyPress}
+            handleTextChange={handleTextChange}
+            handleConfirmClick={fixValuesAndConnect}
+            handleClickShowPassword={handleClickShowPassword}
         />
-    )
+    );
 
 };
 

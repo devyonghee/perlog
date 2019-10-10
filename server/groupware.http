@@ -1,0 +1,31 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection) or
+# paste cURL into the file and request will be converted to HTTP Request format.
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+POST https://ipa-api-proxy.saraminhr.co.kr:5000/api/auth/login
+content-type: application/json
+
+{
+  "username": "shiw111",
+  "password": "asdf"
+}
+
+###
+
+POST https://ipa-api-private.saraminhr.co.kr:3000/api/auth/login
+content-type: application/json
+
+{
+  "username": "shiw111",
+  "password": "1!asdf"
+}
+
+###
+
+GET https://www.naver.com
+
+###

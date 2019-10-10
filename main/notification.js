@@ -1,5 +1,9 @@
-const {ipcMain, BrowserWindow, Notification} = require('electron');
+const {ipcMain, BrowserWindow, Notification, dialog} = require('electron');
 const path = require('path');
+
+ipcMain.on('notice', (event, message, title = '오류') => {
+    dialog.showErrorBox(title, message);
+});
 
 ipcMain.on('alert-message', (event, title, message) => {
     const win = BrowserWindow.fromWebContents(event.sender);

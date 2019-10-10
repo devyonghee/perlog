@@ -62,10 +62,10 @@ const container = props => {
         e.stopPropagation();
         const { target: { checked } } = e;
         if (!!checked && watchedFiles.some(watchedFile => watchedFile.path === file.path))
-            return window.remote.dialog.showErrorBox('File', '현재 관찰중인 파일입니다.');
+            return window.ipcRenderer.send('notice', '현재 관찰중인 파일입니다.', 'File');
 
         if (!!checked && errorFiles.includes(file)) {
-            return window.remote.dialog.showErrorBox('File', '잘못된 경로입니다.');
+            return window.ipcRenderer.send('notice', '잘못된 경로입니다.', 'File')
         }
 
         watchFile(file, !!checked);
