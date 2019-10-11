@@ -46,7 +46,7 @@ const applyFiles = (state, { path, files: newFiles }) => {
 const applyWatchingFile = (state, { file, watch }) => {
     if (!state.socket || !file || file.isDirectory || !file.path) return state;
     const { watchedFiles } = state;
-    if (!!watch) {
+    if (watch) {
         !watchedFiles.includes(file) && watchedFiles.push(file);
         state.socket.emit('watch', file.path);
     } else {

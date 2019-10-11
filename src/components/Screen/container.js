@@ -1,6 +1,8 @@
 import React, {useRef, useEffect, useState} from 'react';
 import Presenter from './presenter';
 
+const { ipcRenderer } = window.require('electron');
+
 const container = (props) => {
     const {messages} = props;
     const screen = useRef(null);
@@ -19,7 +21,7 @@ const container = (props) => {
         const addedMessage = messages[messages.length - 1];
         const regexp = new RegExp(filterString, 'gi');
         if (!!filterString && !!addedMessage && regexp.test(addedMessage.message)) {
-            window.ipcRenderer.send('alert-message', addedMessage.file.name, addedMessage.message.slice(0, 200));
+            ipcRenderer.send('alert-message', addedMessage.file.name, addedMessage.message.slice(0, 200));
         }
 
         if (!screen.current ||

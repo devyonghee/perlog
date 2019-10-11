@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Presenter from './presenter';
-import axios from 'axios';
-import io from 'socket.io-client';
+import { getServer } from 'src/modules/storage';
 
-import { saveServer, getServer } from 'src/modules/storage';
+const ipcRenderer = window.require('electron').ipcRenderer;
 
 const propTypes = {
     setSocket: PropTypes.func.isRequired,
@@ -36,7 +35,7 @@ const container = (props) => {
         const url = withHttp(values.url.trim());
 
         if (!url || !id || !values.password) {
-            return window.ipcRenderer.send('notice', '값을 입력해주세요.');
+            return ipcRenderer.send('notice', '값을 입력해주세요.');
         }
         setValues({ ...values, id, url });
         await connectServer(url, id, values.password);

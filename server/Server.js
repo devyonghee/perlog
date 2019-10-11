@@ -31,31 +31,45 @@ const Server = class {
 
         this.app.post('/login', async (request, response) => {
             try {
+                let { id } = request.body;
+                const { password, token } = request.body;
 
-                const { id, password } = request.body;
-
-                if (!id || !password) {
-                    return response.status(400).send('bad request');
+                if (token) {
+                    id = this.getIdFromToken(token);
+                } else {
+                    await this.checkAuth(id)(password);
                 }
 
-                const loginResponse = await axios.post(`${this.authUrl}/api/auth/login`, querystring.stringify({
-                    username: id,
-                    password
-                }), { headers: { 'content-type': 'application/x-www-form-urlencoded' } });
-
-                if (loginResponse.status !== 200) {
-                    response.status(401).send('Unauthorized');
-                }
-
-                const token = jwt.sign({ id }, this.secretKey, { expiresIn: '1h' });
-                response.status(200).send(token);
+                const newToken = jwt.sign({ id }, this.secretKey, { expiresIn: '1h' });
+                response.status(200).send(newToken);
 
             } catch (e) {
-                response.status(401).send(e.message);
+                return response.status(401).send(e.message);
             }
 
         });
     }
+
+    getIdFromToken(token) {
+        const decoded = jwt.verify(token, this.secretKey);
+        return decoded.id;
+    }
+
+    checkAuth(id) {
+        return async (password) => {
+            if (!id || !password) throw new Error('undefined data');
+
+            const loginResponse = await axios.post(`${this.authUrl}/api/auth/login`, querystring.stringify({
+                username: id,
+                password
+            }), { headers: { 'content-type': 'application/x-www-form-urlencoded' } });
+
+            if (loginResponse.status !== 200) {
+                throw new Error('Unauthorized');
+            }
+        }
+    }
+
 };
 
 module.exports = Server;

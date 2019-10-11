@@ -28,7 +28,7 @@ const addFile = (file, parent = null) => {
 
 const remove = file => {
     return {
-        type: ADD_FILE,
+        type: REMOVE_FILE,
         file,
     };
 };

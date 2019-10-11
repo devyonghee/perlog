@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Presenter from './presenter';
+
+const { ipcRenderer, remote } = window.require('electron');
 
 const fileType = PropTypes.shape({
     child: PropTypes.array,
@@ -42,7 +44,7 @@ const container = props => {
     const handleAddFile = target => {
         const currentDirectory = (!!selectedFile) ? selectedFile.child : files;
         if (!!currentDirectory && currentDirectory.some(file => file.name === target.name && file.isDirectory === (newFileForm.type === 'directory'))) {
-            return window.remote.dialog.showErrorBox(newFileForm.type, `이미 존재하는 ${newFileForm.type}입니다.`);
+            return ipcRenderer.send('notice', `이미 존재하는 ${newFileForm.type}입니다.`, newFileForm.type);
         }
 
         let parent = null;
@@ -62,10 +64,10 @@ const container = props => {
         e.stopPropagation();
         const { target: { checked } } = e;
         if (!!checked && watchedFiles.some(watchedFile => watchedFile.path === file.path))
-            return window.ipcRenderer.send('notice', '현재 관찰중인 파일입니다.', 'File');
+            return ipcRenderer.send('notice', '현재 관찰중인 파일입니다.', 'File');
 
         if (!!checked && errorFiles.includes(file)) {
-            return window.ipcRenderer.send('notice', '잘못된 경로입니다.', 'File')
+            return ipcRenderer.send('notice', '잘못된 경로입니다.', 'File');
         }
 
         watchFile(file, !!checked);
@@ -88,50 +90,54 @@ const container = props => {
     const handleContextMenuList = (e, file = null) => {
         e.stopPropagation();
         selectedFile !== file && setSelectedTarget(file);
-        const { Menu, MenuItem } = window.remote;
-        const menu = new Menu();
-        menu.append(new MenuItem({
-            label: 'New File',
-            click: () => setOpenNewFileForm({ opened: true, type: 'file' }) | (!serverFiles.length && search())
-        }));
-        menu.append(new MenuItem({
-            label: 'New Directory',
-            click: () => setOpenNewFileForm({ opened: true, type: 'directory' })
-        }));
-        if (!file) return menu.popup({ window: window.remote.getCurrentWindow() });
-        menu.append(new MenuItem({ type: 'separator' }));
-        menu.append(new MenuItem({
-            label: 'Delete...', click: () => {
-                const options = {
-                    type: 'question',
-                    title: 'Delete',
-                    message: `Delete ${file.isDirectory ? 'directory' : 'file'} "${file.name}"?`,
-                    buttons: ['Yes', 'No']
-                };
-                window.remote.dialog.showMessageBox(options, index => {
-                    if (index !== 0) return;
-                    const forgetFile = file => {
-                        !file.isDirectory && watchedFiles.includes(file) && watchFile(file, false);
-                        if (!!file.child && file.child.length) file.child.map(file => forgetFile(file));
-                    };
-                    forgetFile(file);
-                    removeFile(file);
-                });
-            }
-        }));
-        return menu.popup({ window: window.remote.getCurrentWindow() });
+        const { Menu } = remote;
+
+        const contextMenu = [
+            {
+                label: 'New File',
+                click: () => setOpenNewFileForm({ opened: true, type: 'file' }) | (!serverFiles.length && search())
+            },
+            {
+                label: 'New Directory',
+                click: () => setOpenNewFileForm({ opened: true, type: 'directory' })
+            },
+        ];
+
+        if (file) {
+            contextMenu.push({ type: 'separator' }, {
+                    label: 'Delete...', click: async () => {
+                        const options = {
+                            type: 'question',
+                            title: 'Delete',
+                            message: `Delete ${file.isDirectory ? 'directory' : 'file'} "${file.name}"?`,
+                            buttons: ['Yes', 'No']
+                        };
+                        const returnValue = await remote.dialog.showMessageBox(options);
+                        if (returnValue.response !== 0) return;
+                        const forgetFile = file => {
+                            if(!file.isDirectory) watchFile(file, false);
+                            if (!!file.child && file.child.length) file.child.map(forgetFile);
+                        };
+                        forgetFile(file);
+                        removeFile(file);
+                    }
+                }
+            );
+        }
+        const menu = new Menu.buildFromTemplate(contextMenu);
+        return menu.popup();
     };
 
     return <Presenter
         serverName={serverName}
         files={files}
-        handleAddFile={handleAddFile}
         search={search}
         serverFiles={serverFiles}
         newFileForm={newFileForm}
         selectedFile={selectedFile}
         watchedFiles={watchedFiles}
         extendedDirectories={extendedDirectories}
+        handleAddFile={handleAddFile}
         closeNewFileForm={closeNewFileForm}
         handleClickList={handleClickList}
         handleDoubleClickFile={handleDoubleClickFile}

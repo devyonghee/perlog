@@ -1,6 +1,8 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Presenter from './presenter';
+
+const ipcRenderer = window.require('electron').ipcRenderer;
 
 const propTypes = {
     search: PropTypes.func.isRequired,
@@ -20,7 +22,7 @@ const defaultProps = {
 };
 
 const container = (props) => {
-    const {search, closeNewFileForm, handleAddFile, newFileForm: {type}} = props;
+    const { search, closeNewFileForm, handleAddFile, newFileForm: { type } } = props;
     const [name, setName] = useState('');
     const [filterString, setFilterString] = useState('');
     const [selectedFile, setSelectedTarget] = useState(null);
@@ -29,7 +31,7 @@ const container = (props) => {
     const initState = () => setName('') & setSelectedTarget();
     const handleClickFile = (e, file) => {
         e.preventDefault();
-        selectedFile !== file && setSelectedTarget(file);
+        if (selectedFile !== file) setSelectedTarget(file);
     };
 
     const handleCloseForm = () => closeNewFileForm() & initState();
@@ -40,17 +42,17 @@ const container = (props) => {
         e.preventDefault();
         if (!type) return;
         if (type === 'directory') {
-            if (!name) return window.remote.dialog.showErrorBox('New Directory', '폴더명을 입력해주세요.');
-            return handleAddFile({name}) & initState();
+            if (!name) return ipcRenderer.send('notice', '폴더명을 입력해주세요.', 'New Directory');
+            return handleAddFile({ name }) & initState();
         }
-        if (!selectedFile) return window.remote.dialog.showErrorBox('New File', '파일을 선택해주세요.');
+        if (!selectedFile || selectedFile.isDirectory) return ipcRenderer.send('notice', '파일을 선택해주세요.', 'New File');
         return handleAddFile(selectedFile) & initState();
     };
 
     const handleNameKeyPress = e => {
-        if (e.key.toLowerCase() !== "enter" || !name) return;
+        if (e.key.toLowerCase() !== 'enter' || !name) return;
         e.preventDefault();
-        handleAddFile({name});
+        handleAddFile({ name });
         setName('');
     };
 
@@ -83,7 +85,7 @@ const container = (props) => {
             handleDoubleClickFile={handleDoubleClickFile}
             handleFilterStringChange={handleFilterStringChange}
         />
-    )
+    );
 
 };
 

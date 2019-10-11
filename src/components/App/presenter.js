@@ -37,6 +37,8 @@ const presenter = props => {
                             width: `calc(100vw - ${props.theme.navigationWidth}px)`,
                             padding: '16px',
                             float: 'right',
+                            marginLeft: props.theme.navigationWidth,
+                            position: 'absolute',
                         }}>
                             <Screen/>
                             <StatusBar/>

@@ -23,7 +23,6 @@ const defaultProps = {
 
 const presenter = props => {
     const {
-        serverName,
         handleClickList,
         handleContextMenuList,
         serverFiles,
@@ -34,7 +33,7 @@ const presenter = props => {
         <Paper className={classes.drawerPaper} elevation={0}>
             <div className={classes.toolbar}>
                 <Typography variant='subtitle1' className={classes.title}>
-                    {serverName}
+                    Personal log
                 </Typography>
             </div>
             <Divider/>

@@ -125,7 +125,7 @@ const FileList = props => {
                             onChange={e => handleFileWatchSwitch(e, file)}
                             checked={watchedFiles.includes(file)}/> : null}
                 </ListItem>
-                <Collapse in={extendedDirectories.includes(file)} timeout='auto'>
+                <Collapse in={extendedDirectories.includes(file)} timeout={0}>
                     {(!file.child || !file.child.length) ? (
                             <ListItem className={classes.emptyText}>
                                 <ListItemText

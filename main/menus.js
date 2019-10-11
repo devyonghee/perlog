@@ -38,6 +38,7 @@ const template = [
     {
         label: 'Window',
         submenu: [
+            { role: 'reload' },
             {
                 label: 'minimize',
                 role: 'minimize',

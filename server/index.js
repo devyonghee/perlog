@@ -11,7 +11,7 @@ const App = class {
     }
 
     run() {
-        if (!this.config.host || !this.config.port) return console.log('client has not enough config');
+        if (!this.config.host || !this.config.port) return console.log('not enough config');
 
         if (!!this._defaultDirectory && !this._availableDefaultPath()) return;
 
@@ -21,10 +21,11 @@ const App = class {
             try {
                 const { token } = socket.handshake.query;
                 const decoded = jwt.verify(token, this.config.secretKey);
-                console.log(decoded.id);
+                console.log(`${decoded.id} log in`);
+                socket._id = decoded.id;
                 next();
             } catch (e) {
-
+                next(new Error(e.message));
             }
         });
         this._registerEvents();
@@ -33,7 +34,10 @@ const App = class {
     _registerEvents() {
         this.io.sockets.on('connection', socket => {
             socket.on('watch', path => this._watch(path, socket));
-            socket.on('forget', path => this._forget(path, socket));
+            socket.on('forget', path => {
+                console.log(`${socket._id} request forgetting ${path}`);
+                this._forget(path, socket)
+            });
             socket.on('search', path => this._search(path, socket));
             socket.on('disconnecting', () => {
                 console.log(`${socket._id} is disconnected`);
@@ -50,7 +54,7 @@ const App = class {
                 return socket.emit('fileError', searchPath, ' 경로가 잘못 되었습니다.');
             }
 
-            console.log('searching... ', newSearchPath);
+            console.log(`${socket._id} searching... `, newSearchPath);
             const file = new File(newSearchPath);
             const files = file.search();
             socket.emit('searched', newSearchPath, files);
@@ -61,6 +65,7 @@ const App = class {
     }
 
     _watch(path, socket) {
+        console.log(`${socket._id} request watching ${path}`);
         const replacedPath = this._replacePath(path);
 
         if (!replacedPath) return socket.emit('fileError', path, '경로가 잘못 되었습니다.');

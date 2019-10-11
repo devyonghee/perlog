@@ -30,14 +30,23 @@ export const loadFiles = () => {
     return files.files.map(file => connectParent(file))
 };
 
-export const saveServer = (url) => {
-    if (!url) return;
+export const saveServer = (url, token) => {
+    if (!url || !token) return;
     const server = JSON.parse(window.localStorage.getItem('server'));
     if (!server || !server.url || server.url.replace(/\/$/g, '') !== url.replace(/\/$/g, '')) {
         window.localStorage.removeItem('files');
     }
 
-    window.localStorage.setItem('server', JSON.stringify({ url }));
+    window.localStorage.setItem('server', JSON.stringify({ url, token }));
+};
+
+export const removeServerToken = (url) => {
+    if (!url) return;
+    const server = JSON.parse(window.localStorage.getItem('server'));
+    if (server && server.url && server.url.replace(/\/$/g, '') === url.replace(/\/$/g, '')) {
+        window.localStorage.setItem('server', JSON.stringify({ url }))
+    }
+
 };
 
 export const getServer = () => {

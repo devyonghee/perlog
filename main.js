@@ -63,7 +63,6 @@ const createWindow = (dev = true, devUrl = '') => {
         icon: path.join(__dirname, (dev) ? './public/favicon.ico' : './build/favicon.ico'),
         webPreferences: {
             nodeIntegration: true,
-            preload: __dirname + '/preload.js'
         }
     };
     const mainWindow = new BrowserWindow(windowOption);

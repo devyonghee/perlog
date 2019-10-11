@@ -1,11 +1,18 @@
 import container from './container';
-import {connect} from "react-redux";
-
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import serverActions from 'src/modules/server/actions';
 
 const mapStateToProps = state => {
     return {
         hasSocket: !!state.server.socket,
-    }
+    };
 };
 
-export default connect(mapStateToProps)(container);
+const mapDispatchToProps = (dispatch) => {
+    return bindActionCreators({
+        connect: serverActions.connectByToken
+    }, dispatch);
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(container);
