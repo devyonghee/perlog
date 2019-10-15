@@ -1,16 +1,11 @@
 import React, {Fragment} from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import Collapse from '@material-ui/core/Collapse';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import Typography from '@material-ui/core/Typography';
+import {Collapse, ListItem, ListItemIcon, ListItemText, Switch, Typography} from '@material-ui/core';
 import FolderIcon from '@material-ui/icons/Folder';
 import FileIcon from '@material-ui/icons/InsertDriveFile';
 import ArrowRightIcon from '@material-ui/icons/ArrowRightRounded';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDownRounded';
-import Switch from '@material-ui/core/Switch';
-import ListItemText from '@material-ui/core/ListItemText';
 import {useTheme} from '@material-ui/styles';
 import useStyles from './styles';
 import HighLighter from "../Highlighter";
@@ -103,10 +98,10 @@ const FileList = props => {
                                         className={classes.arrowIcon}
                                         onClick={e => handleDoubleClickFile(e, file)}/>}
                                 <FolderIcon className={classes.iconMargin}
-                                            style={dense ? {height: theme.spacing.unit * 2} : null}/>
+                                            style={dense ? {height: theme.spacing(2)} : null}/>
                             </Fragment>) :
                             <FileIcon className={classNames(classes.arrowMargin, classes.iconMargin)}
-                                      style={dense ? {height: theme.spacing.unit * 2} : null}/>
+                                      style={dense ? {height: theme.spacing(2)} : null}/>
                         }
                     </ListItemIcon>
                     <ListItemText className={classes.textList}
@@ -120,7 +115,7 @@ const FileList = props => {
                                 root: classes.switchRoot,
                                 switchBase: classes[`colorSwitchBase${file.color}`],
                                 checked: classes[`colorSwitchChecked${file.color}`],
-                                bar: classes[`colorSwitchBar${file.color}`],
+                                track: classes[`colorSwitchBar${file.color}`],
                             }}
                             onChange={e => handleFileWatchSwitch(e, file)}
                             checked={watchedFiles.includes(file)}/> : null}
@@ -130,7 +125,7 @@ const FileList = props => {
                             <ListItem className={classes.emptyText}>
                                 <ListItemText
                                     className={classes.textList}
-                                    style={{paddingLeft: `${(theme.spacing.unit * 3) * (depth + 1)}px`}}
+                                    style={{paddingLeft: `${(theme.spacing(3)) * (depth + 1)}px`}}
                                     disableTypography
                                     primary={!file.child && !invisibleLoading ? '...loading' : '빈 폴더입니다.'}/>
                             </ListItem>) :

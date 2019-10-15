@@ -1,11 +1,20 @@
 import {makeStyles} from '@material-ui/styles'
 
 const useStyles = makeStyles(theme => ({
-    drawerPaper: {
-        width: theme.navigationWidth,
-        height: '100vh',
-        float: 'left',
-        overflowX: 'hidden',
+    root: {
+        flexBasis: theme.spacing(30),//theme.navigationWidth,
+        flexShrink: 0,
+        overflowX: 'hidden'
+    },
+
+    divider:{
+        position: 'absolute',
+        top: 0,
+        height: '100%',
+        width: '2px',
+        left: theme.spacing(30),
+        cursor: 'w-resize',
+        zIndex: '1',
     },
 
     title: {
@@ -16,17 +25,13 @@ const useStyles = makeStyles(theme => ({
         justifyContent: 'center',
     },
     textField: {
-        marginLeft: theme.spacing.unit,
-        marginRight: theme.spacing.unit,
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1),
         width: 200,
     },
     dense: {
         marginTop: 19,
     },
-
-    list: {
-        height: 'calc(100vh - 64px)',
-    }
 }));
 
 export default useStyles;

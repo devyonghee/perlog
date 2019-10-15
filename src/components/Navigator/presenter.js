@@ -2,9 +2,8 @@ import React from 'react';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
-import useStyle from "./styles";
-import PropTypes from "prop-types";
+import useStyle from './styles';
+import PropTypes from 'prop-types';
 import NewFileForm from '../NewFileForm';
 import FileList from '../FileList';
 
@@ -30,13 +29,7 @@ const presenter = props => {
 
     const classes = useStyle();
     return (
-        <Paper className={classes.drawerPaper} elevation={0}>
-            <div className={classes.toolbar}>
-                <Typography variant='subtitle1' className={classes.title}>
-                    Personal log
-                </Typography>
-            </div>
-            <Divider/>
+        <Paper className={classes.root} elevation={0}>
             <List className={classes.list} onContextMenu={handleContextMenuList} onClick={handleClickList}>
                 <FileList
                     {...props}
@@ -45,6 +38,7 @@ const presenter = props => {
                     handleContextMenuList={handleContextMenuList}
                 />
             </List>
+            <Divider className={classes.divider}/>
             <NewFileForm
                 {...props}
                 files={serverFiles}

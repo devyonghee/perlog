@@ -24,11 +24,12 @@ const Server = class {
         this.app.use(express.json());
         this.app.use('*', function (req, res, next) {
             res.header('Access-Control-Allow-Origin', '*');
-            res.header('Access-Control-Allow-Methods', 'POST');
+            res.header('Access-Control-Allow-Methods', 'POST, HEAD');
             res.header('Access-Control-Allow-Headers', 'Content-Type');
             next();
         });
 
+        this.app.head('/', (request, response) => response.status(200).send());
         this.app.post('/login', async (request, response) => {
             try {
                 let { id } = request.body;

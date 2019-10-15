@@ -5,28 +5,34 @@ import userActions from '../user/actions';
 
 const ipcRenderer = window.require('electron').ipcRenderer;
 
-const SET_SOCKET = Symbol('SET_SOCKET');
-const RESET_SOCKET = Symbol('RESET_SOCKET');
-const REQUEST_WATCH = Symbol('REQUEST_WATCH');
-const SEARCH = Symbol('SEARCH');
-const SET_FILES = Symbol('SET_FILES');
-const ADD_MESSAGE = Symbol('ADD_MESSAGE');
-const SET_ERROR_FILE = Symbol('SET_ERROR_FILE');
-
-export const types = {
-    SET_SOCKET,
-    RESET_SOCKET,
-    REQUEST_WATCH,
-    SEARCH,
-    SET_FILES,
-    ADD_MESSAGE,
-    SET_ERROR_FILE
-};
+export const SET_SOCKET = Symbol('SET_SOCKET');
+export const SET_SERVER_INFO = Symbol('SET_SERVER_INFO');
+export const SET_OPEN_FORM = Symbol('SET_OPEN_FORM');
+export const RESET_SOCKET = Symbol('RESET_SOCKET');
+export const REQUEST_WATCH = Symbol('REQUEST_WATCH');
+export const SEARCH = Symbol('SEARCH');
+export const SET_FILES = Symbol('SET_FILES');
+export const ADD_MESSAGE = Symbol('ADD_MESSAGE');
+export const SET_ERROR_FILE = Symbol('SET_ERROR_FILE');
 
 const setSocket = (socket) => {
     return {
         type: SET_SOCKET,
         socket
+    };
+};
+
+const setServerInfo = (values) => {
+    return {
+        type: SET_SERVER_INFO,
+        values
+    };
+};
+
+const setOpenForm = (open) => {
+    return {
+        type: SET_OPEN_FORM,
+        open
     };
 };
 
@@ -102,7 +108,7 @@ const registerEvent = (socket, dispatch) => {
     });
 };
 
-const connectWithRRegisterEvent = (url, token) => {
+const connectAndRegister = (url, token) => {
     return (dispatch) => {
         const socket = io.connect(`${url}?token=${token}`, {
             transports: ['websocket'],
@@ -115,22 +121,6 @@ const connectWithRRegisterEvent = (url, token) => {
     };
 };
 
-const connect = (url, id, password) => {
-    return async dispatch => {
-        try {
-            const response = await axios.post(url + '/login', { id, password });
-            if (response.status !== 200) {
-                return ipcRenderer.send('notice', '서버 오류');
-            }
-            connectWithRRegisterEvent(url, response.data)(dispatch);
-            dispatch(userActions.setLoginInfo(id, password));
-        } catch (e) {
-            const message = e.response && e.response.status === 401 ? '그룹웨어 계정을 확인해주세요' : e.message;
-            ipcRenderer.send('notice', message);
-        }
-    };
-};
-
 const connectByToken = (url, token) => {
     return async (dispatch) => {
         try {
@@ -138,7 +128,8 @@ const connectByToken = (url, token) => {
             if (response.status !== 200) {
                 return ipcRenderer.send('notice', '서버 오류');
             }
-            connectWithRRegisterEvent(url, response.data)(dispatch);
+            dispatch(connectAndRegister(url, response.data));
+            dispatch(setServerInfo({ token }));
         } catch (e) {
             removeServerToken(url);
             ipcRenderer.send('notice', '토큰이 만료되었습니다.');
@@ -146,8 +137,33 @@ const connectByToken = (url, token) => {
     };
 };
 
+const connect = (url, name) => {
+    return async (dispatch, getState) => {
+        const { id, password } = getState().user;
+        dispatch(setServerInfo({ loading: true}));
+
+        try {
+            const response = await axios({ url, method: 'HEAD' });
+            if (response.status !== 200) return ipcRenderer.send('notice', '연결할 수 없습니다.');
+
+            if (!id || !password) {
+                dispatch(setServerInfo({ openNewServer: false, url, name }));
+                return dispatch(userActions.setUserInfo({ openLogin: true }));
+            }
+
+            await dispatch(userActions.login(id, password, url));
+            dispatch(setServerInfo({ openNewServer: false }));
+        } catch {
+            ipcRenderer.send('notice', '연결할 수 없습니다.');
+        } finally {
+            dispatch(setServerInfo({ loading: false }));
+        }
+    };
+};
+
 export default {
     setSocket,
+    setOpenForm,
     resetSocket,
     setFiles,
     requestWatch,
@@ -155,5 +171,6 @@ export default {
     addMessage,
     setErrorFile,
     connect,
+    connectAndRegister,
     connectByToken
 };

@@ -39,21 +39,6 @@ const presenter = (props) => {
     return (
         <RootRef rootRef={screenRef}>
             <Paper className={classes.paper} elevation={2}>
-                <div className={classes.search} style={!!filterString ? {display: 'block'} : null}>
-                    <div className={classes.searchIcon} children={<SearchIcon/>}/>
-                    <InputBase
-                        placeholder="Search…"
-                        classes={{
-                            root: classes.inputRoot,
-                            input: classes.inputInput,
-                        }}
-                        inputProps={{
-                            'aria-label': 'Search',
-                            onChange: handleFilterStringChange,
-                            value: filterString
-                        }}
-                    />
-                </div>
                 {
                     messages.map(({file, message}, index) => {
                         if (!!regexp && !regexp.test(message)) return null;

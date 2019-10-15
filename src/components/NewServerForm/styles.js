@@ -1,14 +1,12 @@
-import {makeStyles} from '@material-ui/styles'
+import { makeStyles } from '@material-ui/styles';
 
 const useStyles = makeStyles(theme => ({
     title: {
-        '& h2': {
-            color: theme.palette.text.primary
-        }
+        '& h2': {}
     },
 
     dialogPaper: {
-        backgroundColor: theme.palette.background.paper
+        width: '400px'
     },
 
     content: {
@@ -20,26 +18,16 @@ const useStyles = makeStyles(theme => ({
             color: theme.palette.text.disabled,
         },
 
-        '& label.Mui-focused': {
-            color: 'green',
-        },
-        '& label.MuiFormLabel-focused': {
-            color: 'green',
-        },
+        '& label.Mui-focused': {},
+        '& label.MuiFormLabel-focused': {},
 
         '& .MuiInput-underline:after': {
             borderBottomColor: theme.palette.text.disabled,
         },
         '& .MuiOutlinedInput-root': {
-            '& fieldset': {
-                borderColor: 'red',
-            },
-            '&:hover fieldset': {
-                borderColor: 'yellow',
-            },
-            '&.Mui-focused fieldset': {
-                borderColor: 'green',
-            },
+            '& fieldset': {},
+            '&:hover fieldset': {},
+            '&.Mui-focused fieldset': {},
         }
     },
 

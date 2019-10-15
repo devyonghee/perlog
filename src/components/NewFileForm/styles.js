@@ -9,13 +9,13 @@ const useStyles = makeStyles(theme => ({
     },
 
     directoryWrap: {
-        width: theme.spacing.unit * 30,
-        height: theme.spacing.unit * 19,
+        width: theme.spacing(30),
+        height: theme.spacing(19),
     },
 
     fileWrap: {
-        width: theme.spacing.unit * 50,
-        height: theme.spacing.unit * 80,
+        width: theme.spacing(50),
+        height: theme.spacing(80),
     },
 
     buttonsWrap: {
@@ -31,8 +31,8 @@ const useStyles = makeStyles(theme => ({
         borderWidth: '1px',
         borderColor: 'rgba(0, 0, 0, 0.23)',
         borderRadius: theme.shape.borderRadius,
-        marginTop: theme.spacing.unit * 2,
-        marginBottom: theme.spacing.unit * 3,
+        marginTop: theme.spacing(2),
+        marginBottom: theme.spacing(3),
         height: 'calc(100% - 80px)',
         overflow: 'auto',
     }

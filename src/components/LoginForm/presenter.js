@@ -17,11 +17,12 @@ const propTypes = {
     values: PropTypes.shape({
         id: PropTypes.string,
         password: PropTypes.string,
-        url: PropTypes.string,
         showPassword: PropTypes.boolean,
     }),
+    open: PropTypes.bool,
     name: PropTypes.string,
     loading: PropTypes.bool.isRequired,
+    closeForm: PropTypes.func.isRequired,
     handleKeyPress: PropTypes.func.isRequired,
     handleTextChange: PropTypes.func.isRequired,
     handleConfirmClick: PropTypes.func.isRequired,
@@ -29,14 +30,15 @@ const propTypes = {
 };
 
 const defaultProps = {
-    url: '',
-    name: '',
+    open: false,
 };
 
 const presenter = (props) => {
     const {
+        open,
         values,
         loading,
+        closeForm,
         handleKeyPress,
         handleTextChange,
         handleConfirmClick,
@@ -48,17 +50,14 @@ const presenter = (props) => {
     return (
         <Dialog
             classes={{paper: classes.dialogPaper}}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="simple-modal-description"
-            open={true}
-            disableEscapeKeyDown
+            open={open}
             disableBackdropClick
             transitionDuration={{exit: 0}}
-            fullWidth
             maxWidth='xs'
+            onClose={closeForm}
         >
-            <DialogTitle className={classes.title} id="alert-dialog-title">
-                    Server
+            <DialogTitle className={classes.title}>
+                    Login
             </DialogTitle>
 
             <DialogContent className={classes.content}>
@@ -92,7 +91,7 @@ const presenter = (props) => {
                             value={values.password}
                             InputProps={{
                                 classes: {root: classes.textFieldInput},
-                                onKeyPress: handleKeyPress,
+                                onKeyUp: handleKeyPress,
                                 endAdornment: (
                                     <InputAdornment position="end">
                                         <IconButton
@@ -108,27 +107,16 @@ const presenter = (props) => {
                             }}
                             type={values.showPassword ? 'text' : 'password'}
                             />
-                        <TextField
-                            label="Url"
-                            margin="normal"
-                            fullWidth
-                            autoFocus
-                            placeholder="Enter a Url"
-                            className={classes.textField}
-                            value={values.url}
-                            onChange={handleTextChange('url')}
-                            inputProps={{
-                                classes: {root: classes.textFieldInput},
-                                onKeyPress: handleKeyPress,
-                            }}
-                        />
                     </>
                 }
             </DialogContent>
             {!loading ?
                 < DialogActions>
-                    < Button color="primary" size="large" onClick={handleConfirmClick}>
+                    <Button color="primary" size="large" onClick={handleConfirmClick}>
                         CONNECT
+                    </Button>
+                    <Button color="secondary" size="large" onClick={closeForm}>
+                        CANCLE
                     </Button>
                 </DialogActions> : null}
         </Dialog>

@@ -1,4 +1,14 @@
-import { types } from './actions';
+import {
+    ADD_MESSAGE,
+    REQUEST_WATCH,
+    RESET_SOCKET,
+    SEARCH,
+    SET_ERROR_FILE,
+    SET_FILES,
+    SET_OPEN_FORM,
+    SET_SERVER_INFO,
+    SET_SOCKET
+} from './actions';
 
 const limitMessage = 200;
 
@@ -9,6 +19,10 @@ const initialState = {
     messages: [],
     watchedFiles: [],
     errorFiles: [],
+    url: '',
+    name: '',
+    token: '',
+    openNewServer: false,
     loading: false,
 };
 
@@ -79,10 +93,13 @@ const applyAddMessage = (state, action) => {
 
 export default (state = initialState, action) => {
     switch (action.type) {
-        case types.SET_SOCKET:
+        case SET_SOCKET:
             return { ...state, socket: action.socket };
 
-        case types.RESET_SOCKET:
+        case SET_OPEN_FORM:
+            return { ...state, openNewServer: action.open };
+
+        case RESET_SOCKET:
             if (!!state.socket) state.socket.disconnect();
             return {
                 name: '',
@@ -94,22 +111,31 @@ export default (state = initialState, action) => {
                 messages: state.messages
             };
 
-        case types.SEARCH:
+        case SEARCH:
             if (!state.socket) return state;
             state.socket.emit('search', (!!action.directory) ? action.directory.path : '');
             return { ...state, searching: action.directory };
 
-        case types.SET_FILES:
+        case SET_FILES:
             return applyFiles(state, action);
 
-        case types.REQUEST_WATCH:
+        case REQUEST_WATCH:
             return applyWatchingFile(state, action);
 
-        case types.ADD_MESSAGE:
+        case ADD_MESSAGE:
             return applyAddMessage(state, action);
 
-        case types.SET_ERROR_FILE:
+        case SET_ERROR_FILE:
             return applyErrorFile(state, action);
+
+        case SET_SERVER_INFO:
+            return {
+                ...state,
+                ...Object.entries(action.values).reduce((newInfos, [key, value]) => {
+                    if (state.hasOwnProperty(key)) newInfos[key] = value;
+                    return newInfos;
+                }, {})
+            };
 
         default:
             return state;

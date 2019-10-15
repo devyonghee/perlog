@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from 'components/App';
-import {Provider} from "react-redux";
+import App from './App';
+import { Provider } from 'react-redux';
 import store from './modules/configStore';
 
 const render = Component => {
@@ -16,8 +16,8 @@ const render = Component => {
 render(App);
 
 if (module.hot) {
-    module.hot.accept('./components/App', () => {
-        const NextApp = require('components/App').default;
+    module.hot.accept('./App', () => {
+        const NextApp = require('./App').default;
         render(NextApp);
     });
 }

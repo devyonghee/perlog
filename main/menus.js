@@ -4,37 +4,37 @@ const template = [
     {
         label: 'File',
         submenu: [
-            {
-                label: 'New Window',
-                role: 'newWindow',
-            },
+            // {
+            //     label: 'New Window',
+            //     role: 'newWindow',
+            // },
             {
                 label: 'Exit',
                 role: 'quit',
             }
         ]
     },
-    {
-        label: 'Themes',
-        submenu: [
-            {
-                label: 'light',
-                type: 'radio',
-                checked: true,
-                click: (item, focusedWindow) => {
-                    if (item.checked) focusedWindow.send('changeThemes', 'light');
-                }
-            },
-            {
-                label: 'dark',
-                type: 'radio',
-                checked: false,
-                click: (item, focusedWindow) => {
-                    if (item.checked) focusedWindow.send('changeThemes', 'dark');
-                }
-            }
-        ]
-    },
+    // {
+    //     label: 'Themes',
+    //     submenu: [
+    //         {
+    //             label: 'light',
+    //             type: 'radio',
+    //             checked: true,
+    //             click: (item, focusedWindow) => {
+    //                 if (item.checked) focusedWindow.send('changeThemes', 'light');
+    //             }
+    //         },
+    //         {
+    //             label: 'dark',
+    //             type: 'radio',
+    //             checked: false,
+    //             click: (item, focusedWindow) => {
+    //                 if (item.checked) focusedWindow.send('changeThemes', 'dark');
+    //             }
+    //         }
+    //     ]
+    // },
     {
         label: 'Window',
         submenu: [
@@ -55,8 +55,8 @@ app.on('ready', () => {
     const menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
 
-    ipcMain.on('initThemeType', e => {
-        e.sender.send('changeThemes', Menu.getApplicationMenu().items[1].submenu.items.find(item => item.checked).label);
-    })
+    // ipcMain.on('initThemeType', e => {
+    //     e.sender.send('changeThemes', Menu.getApplicationMenu().items[1].submenu.items.find(item => item.checked).label);
+    // })
 });
 

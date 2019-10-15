@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Presenter from './presenter';
 import { getServer } from 'src/modules/storage';
@@ -6,40 +6,34 @@ import { getServer } from 'src/modules/storage';
 const ipcRenderer = window.require('electron').ipcRenderer;
 
 const propTypes = {
-    setSocket: PropTypes.func.isRequired,
-    reset: PropTypes.func.isRequired,
-    setFiles: PropTypes.func.isRequired,
-    addMessage: PropTypes.func.isRequired,
-    setErrorFile: PropTypes.func.isRequired,
+    loading: PropTypes.bool,
     connectServer: PropTypes.func.isRequired,
+    closeForm: PropTypes.func.isRequired,
 };
 
-const defaultProps = {};
+const defaultProps = {
+    loading: false,
+};
 
 const container = (props) => {
-    const { connectServer } = props;
+    const { connectServer, loading, open, closeForm } = props;
 
-    const server = getServer();
-    const [loading, setLoading] = useState(false);
     const [values, setValues] = useState({
-        url: server.url || '',
-        id: 'shiw111',
-        password: '1!a1024726',
-        showPassword: false,
+        name: 'local',
+        url: 'localhost:50000',
     });
 
+    // useEffect(() => setValues({ url: '', name: '' }), [open]);
+
     const fixValuesAndConnect = async () => {
-        setLoading(true);
-        const id = values.id.trim();
         const withHttp = url => !/^https?:\/\//i.test(url) ? `http://${url}` : url;
         const url = withHttp(values.url.trim());
-
-        if (!url || !id || !values.password) {
+        const name = values.name.trim();
+        if (!url || !name) {
             return ipcRenderer.send('notice', '값을 입력해주세요.');
         }
-        setValues({ ...values, id, url });
-        await connectServer(url, id, values.password);
-        setLoading(false);
+        setValues({ ...values, url, name });
+        connectServer(url, name);
     };
 
     const handleKeyPress = async e => {
@@ -54,19 +48,15 @@ const container = (props) => {
         }
     );
 
-    const handleClickShowPassword = e => {
-        e.preventDefault();
-        setValues({ ...values, showPassword: !values.showPassword });
-    };
-
     return (
         <Presenter
+            open={open}
             values={values}
             loading={loading}
+            closeForm={closeForm}
             handleKeyPress={handleKeyPress}
             handleTextChange={handleTextChange}
             handleConfirmClick={fixValuesAndConnect}
-            handleClickShowPassword={handleClickShowPassword}
         />
     );
 

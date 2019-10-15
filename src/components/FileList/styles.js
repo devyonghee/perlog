@@ -54,7 +54,7 @@ const useStyles = makeStyles(theme => ({
 
     switchRoot: {
         padding: 0,
-        margin: theme.spacing.unit,
+        margin: 0,
     },
 
     ...createSwitchColorsClass(theme.palette.type),

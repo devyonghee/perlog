@@ -1,14 +1,24 @@
-import { SET_LOGIN_INFO } from './actions';
+import { SET_USER_INFO } from './actions';
 
 const initialState = {
     id: '',
     password: '',
+    token: '',
+    url: '',
+    openLogin: false,
+    loading: false,
 };
 
 export default (state = initialState, action) => {
     switch (action.type) {
-        case SET_LOGIN_INFO:
-            return { ...state, id: action.id, password: action.password };
+        case SET_USER_INFO:
+            return {
+                ...state,
+                ...Object.entries(action.values).reduce((newInfos, [key, value]) => {
+                    if (state.hasOwnProperty(key)) newInfos[key] = value;
+                    return newInfos;
+                }, {})
+            };
         default:
             return state;
     }

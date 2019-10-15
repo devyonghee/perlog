@@ -14,6 +14,10 @@ if (env === "development") {
 
 const applyMiddle = applyMiddleware(...middle);
 
-const reducer = combineReducers({ server: serverReducer, file: fileReducer, user: userReducer });
+const reducer = combineReducers({
+    server: serverReducer,
+    file: fileReducer,
+    user: userReducer,
+});
 
-export default  createStore(reducer, applyMiddle);
+export default createStore(reducer, applyMiddle);
