@@ -1,29 +1,64 @@
 import {
+    ADD_SERVER,
     ADD_MESSAGE,
     REQUEST_WATCH,
-    RESET_SOCKET,
     SEARCH,
     SET_ERROR_FILE,
     SET_FILES,
-    SET_OPEN_FORM,
     SET_SERVER_INFO,
-    SET_SOCKET
+    SET_SOCKET, REMOVE_SOCKET
 } from './actions';
 
 const limitMessage = 200;
 
+
 const initialState = {
-    socket: null,
-    searching: null,
-    files: [],
-    messages: [],
+    servers: [],
     watchedFiles: [],
-    errorFiles: [],
-    url: '',
-    name: '',
-    token: '',
+    selecting: null,
+    tempUrl: '',
     openNewServer: false,
     loading: false,
+};
+
+const changeMiddleValue =
+    index => values => array => [
+        ...array.slice(0, index),
+        { ...array[index], ...values },
+        ...array.slice(index + 1)
+    ];
+
+const setSocket = (state, { url, socket }) => {
+    const replaceUrl = url => url.trim().toLowerCase().replace('\/', '');
+    const serverIndex = state.servers.findIndex(server => replaceUrl(server.url) === replaceUrl(url));
+    if (serverIndex < 0) return state;
+
+    return {
+        ...state,
+        servers: changeMiddleValue(serverIndex)({ socket })(state.servers)
+    };
+};
+
+const removeSocket = (state, {index, socket}) => {
+    if (index < 0 && !socket) return state;
+
+    if (index >= 0 && state.servers[index]) {
+        return {
+            ...state,
+            servers: changeMiddleValue(index)({ socket:null })(state.servers)
+        };
+    }
+
+    const serverIndex = state.servers.findIndex(server => server.socket === socket);
+    if (serverIndex < 0) return state;
+
+    const server = state.servers[serverIndex];
+    if (server.socket) server.socket.disconnect();
+
+    return {
+        ...state,
+        servers: changeMiddleValue(serverIndex)({ socket:null })(state.servers)
+    };
 };
 
 const createWithSortFiles = (files, parent) =>
@@ -93,23 +128,26 @@ const applyAddMessage = (state, action) => {
 
 export default (state = initialState, action) => {
     switch (action.type) {
-        case SET_SOCKET:
-            return { ...state, socket: action.socket };
-
-        case SET_OPEN_FORM:
-            return { ...state, openNewServer: action.open };
-
-        case RESET_SOCKET:
-            if (!!state.socket) state.socket.disconnect();
+        case ADD_SERVER:
             return {
-                name: '',
-                socket: null,
-                searching: null,
-                files: [],
-                watchedFiles: [],
-                errorFiles: [],
-                messages: state.messages
+                ...state,
+                servers: [
+                    ...state.servers,
+                    {
+                        url: action.url,
+                        name: action.name,
+                        socket: null,
+                        token: '',
+                        files: [],
+                        searching: null,
+                    }]
             };
+
+        case SET_SOCKET:
+            return setSocket(state, action);
+
+        case REMOVE_SOCKET:
+            return removeSocket(state, action);
 
         case SEARCH:
             if (!state.socket) return state;
@@ -124,9 +162,6 @@ export default (state = initialState, action) => {
 
         case ADD_MESSAGE:
             return applyAddMessage(state, action);
-
-        case SET_ERROR_FILE:
-            return applyErrorFile(state, action);
 
         case SET_SERVER_INFO:
             return {

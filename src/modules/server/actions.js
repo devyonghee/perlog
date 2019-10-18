@@ -2,12 +2,14 @@ import axios from 'axios';
 import io from 'socket.io-client';
 import { removeServerToken, saveServer } from '../storage';
 import userActions from '../user/actions';
+import fileActions from '../file/actions';
 
 const ipcRenderer = window.require('electron').ipcRenderer;
 
+export const ADD_SERVER = Symbol('ADD_SERVER');
 export const SET_SOCKET = Symbol('SET_SOCKET');
+export const REMOVE_SOCKET = Symbol('REMOVE_SOCKET');
 export const SET_SERVER_INFO = Symbol('SET_SERVER_INFO');
-export const SET_OPEN_FORM = Symbol('SET_OPEN_FORM');
 export const RESET_SOCKET = Symbol('RESET_SOCKET');
 export const REQUEST_WATCH = Symbol('REQUEST_WATCH');
 export const SEARCH = Symbol('SEARCH');
@@ -15,10 +17,24 @@ export const SET_FILES = Symbol('SET_FILES');
 export const ADD_MESSAGE = Symbol('ADD_MESSAGE');
 export const SET_ERROR_FILE = Symbol('SET_ERROR_FILE');
 
-const setSocket = (socket) => {
+const addServer = (name, url) => {
+    return {
+        type: ADD_SERVER,
+        url, name
+    };
+};
+
+const setSocket = (url, socket) => {
     return {
         type: SET_SOCKET,
-        socket
+        url, socket
+    };
+};
+
+const removeSocket = (socket = null, index = -1) => {
+    return {
+        type: REMOVE_SOCKET,
+        socket, index
     };
 };
 
@@ -26,13 +42,6 @@ const setServerInfo = (values) => {
     return {
         type: SET_SERVER_INFO,
         values
-    };
-};
-
-const setOpenForm = (open) => {
-    return {
-        type: SET_OPEN_FORM,
-        open
     };
 };
 
@@ -50,16 +59,18 @@ const requestWatch = (file, watch) => {
     };
 };
 
-const search = (directory = null) => {
+const search = (index, directory = null) => {
     return {
         type: SEARCH,
+        index,
         directory
     };
 };
 
-const setFiles = (path, files) => {
+const setFiles = (index, path, files) => {
     return {
         type: SET_FILES,
+        index,
         path,
         files,
     };
@@ -73,13 +84,6 @@ const addMessage = (path, message) => {
     };
 };
 
-const setErrorFile = path => {
-    return {
-        type: SET_ERROR_FILE,
-        path,
-    };
-};
-
 const registerEvent = (socket, dispatch) => {
     socket.on('connect', () => {
         dispatch(setSocket(socket));
@@ -87,10 +91,7 @@ const registerEvent = (socket, dispatch) => {
 
     socket.on('searched', (path, files) => dispatch(setFiles(path, files)));
     socket.on('log', (path, message) => dispatch(addMessage(path, message)));
-    socket.on('fileError', (path, message) => {
-        ipcRenderer.send('notice', message);
-        setErrorFile(path);
-    });
+    socket.on('fileError', (path, message) => ipcRenderer.send('notice', message));
 
     socket.on('disconnect', reason => {
         ipcRenderer.send('notice', reason);
@@ -140,14 +141,16 @@ const connectByToken = (url, token) => {
 const connect = (url, name) => {
     return async (dispatch, getState) => {
         const { id, password } = getState().user;
-        dispatch(setServerInfo({ loading: true}));
+        dispatch(setServerInfo({ loading: true }));
 
         try {
             const response = await axios({ url, method: 'HEAD' });
             if (response.status !== 200) return ipcRenderer.send('notice', '연결할 수 없습니다.');
 
             if (!id || !password) {
-                dispatch(setServerInfo({ openNewServer: false, url, name }));
+                dispatch(addServer(name, url));
+                dispatch(setServerInfo({ openNewServer: false, tempUrl: url }));
+                dispatch(fileActions.addServer(name, url));
                 return dispatch(userActions.setUserInfo({ openLogin: true }));
             }
 
@@ -163,13 +166,12 @@ const connect = (url, name) => {
 
 export default {
     setSocket,
-    setOpenForm,
+    setServerInfo,
     resetSocket,
     setFiles,
     requestWatch,
     search,
     addMessage,
-    setErrorFile,
     connect,
     connectAndRegister,
     connectByToken

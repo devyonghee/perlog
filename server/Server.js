@@ -59,7 +59,7 @@ const Server = class {
     checkAuth(id) {
         return async (password) => {
             if (!id || !password) throw new Error('undefined data');
-
+            return;
             const loginResponse = await axios.post(`${this.authUrl}/api/auth/login`, querystring.stringify({
                 username: id,
                 password

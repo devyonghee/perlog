@@ -1,28 +1,35 @@
+const ADD_SERVER = Symbol('ADD_SERVER');
 const ADD_DIRECTORY = Symbol('ADD_DIRECTORY');
 const REMOVE_DIRECTORY = Symbol('REMOVE_DIRECTORY');
 const ADD_FILE = Symbol('ADD_FILE');
 const REMOVE_FILE = Symbol('REMOVE_FILE');
 
-export const types = {
+export {
+    ADD_SERVER,
     ADD_DIRECTORY,
     REMOVE_DIRECTORY,
     ADD_FILE,
     REMOVE_FILE,
 };
 
-const addDirectory = (name, parent = null) => {
+const addServer = (name, url) => {
     return {
-        type: ADD_DIRECTORY,
-        name,
-        parent
+        type: ADD_SERVER,
+        name, url
     };
 };
 
-const addFile = (file, parent = null) => {
+const addDirectory = (name, target) => {
+    return {
+        type: ADD_DIRECTORY,
+        name, target
+    };
+};
+
+const addFile = (file, target) => {
     return {
         type: ADD_FILE,
-        file,
-        parent
+        file, target
     };
 };
 
@@ -34,6 +41,7 @@ const remove = file => {
 };
 
 export default {
+    addServer,
     addDirectory,
     addFile,
     remove

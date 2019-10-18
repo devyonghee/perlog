@@ -9,7 +9,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = (dispatch) => {
     return bindActionCreators({
-        openNewServer: () => serverActions.setOpenForm(true)
+        openNewServer: () => serverActions.setServerInfo({ openNewServer: true })
     }, dispatch);
 };
 

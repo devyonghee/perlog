@@ -13,7 +13,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch, ownProps) => {
     return bindActionCreators({
         connectServer: serverActions.connect,
-        closeForm: () => serverActions.setOpenForm(false),
+        closeForm: () => serverActions.setServerInfo({ openNewServer: false }),
     }, dispatch);
 };
 

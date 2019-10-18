@@ -6,11 +6,7 @@ import fileActions from 'src/modules/file/actions';
 
 const mapStateToProps = state => {
     return {
-        serverName: state.server.name,
-        serverFiles: state.server.files,
-        watchedFiles: state.server.watchedFiles,
-        errorFiles: state.server.errorFiles,
-        files: state.file
+        files: state.file,
     };
 };
 
@@ -21,6 +17,7 @@ const mapDispatchToProps = (dispatch) => {
         addFile: fileActions.addFile,
         addDirectory: fileActions.addDirectory,
         removeFile: fileActions.remove,
+        select: fileActions.select,
     }, dispatch);
 };
 

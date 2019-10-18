@@ -30,7 +30,7 @@ const login = (id, password, url = '') => {
         dispatch(setUserInfo({ loading: true }));
 
         try {
-            const loginUrl = url || getState().server.url;
+            const loginUrl = url || getState().server.tempUrl;
             const token = await checkLogin(id, password)(loginUrl);
             dispatch(setUserInfo({ id, password, openLogin: false }));
             dispatch(serverActions.connectAndRegister(loginUrl, token));

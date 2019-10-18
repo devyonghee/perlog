@@ -3,6 +3,7 @@ import thunk from "redux-thunk";
 import serverReducer from "./server/reducer";
 import fileReducer from "./file/reducer";
 import userReducer from "./user/reducer";
+import messageReducer from "./message/reducer";
 
 const env = process.env.NODE_ENV;
 const middle = [thunk];
@@ -18,6 +19,7 @@ const reducer = combineReducers({
     server: serverReducer,
     file: fileReducer,
     user: userReducer,
+    message: messageReducer,
 });
 
 export default createStore(reducer, applyMiddle);
