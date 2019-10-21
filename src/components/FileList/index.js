@@ -1,15 +1,16 @@
-import React, {Fragment} from 'react';
-import classNames from 'classnames';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import {ListItem, ListItemIcon, ListItemText, Switch, Typography} from '@material-ui/core';
-import FolderIcon from '@material-ui/icons/Folder';
-import FileIcon from '@material-ui/icons/InsertDriveFile';
-import ArrowRightIcon from '@material-ui/icons/ArrowRightRounded';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDownRounded';
-import {useTheme} from '@material-ui/styles';
+import { ListItem, ListItemIcon, ListItemText, Switch, Typography } from '@material-ui/core';
+import {
+    ArrowDropDown as ArrowDropDownIcon,
+    ArrowRight as ArrowRightIcon,
+    Computer as ComputerIcon,
+    Folder as FolderIcon,
+    InsertDriveFile as FileIcon
+} from '@material-ui/icons';
 import useStyles from './styles';
-import HighLighter from "../Highlighter";
-import { DIRECTORY } from 'src/modules/file/reducer';
+import HighLighter from '../Highlighter';
+import { DIRECTORY, FILE, SERVER } from 'src/modules/utils';
 
 const fileShape = PropTypes.shape({
     child: PropTypes.array,
@@ -22,7 +23,8 @@ const fileShape = PropTypes.shape({
 const propTypes = {
     files: PropTypes.arrayOf(fileShape),
     regexp: PropTypes.instanceOf(RegExp),
-    selectedFile: fileShape,
+    parent: PropTypes.object,
+    selectedTarget: PropTypes.object,
     depth: PropTypes.number,
     dense: PropTypes.bool,
     draggable: PropTypes.bool,
@@ -31,12 +33,11 @@ const propTypes = {
     handleClickFile: PropTypes.func,
     handleFileWatchSwitch: PropTypes.func,
     handleContextMenuList: PropTypes.func,
-    handleDragStartList: PropTypes.func,
-    handleDoubleClickFile: PropTypes.func.isRequired,
 };
 
 const defaultProps = {
     files: null,
+    parent: null,
     regexp: null,
     depth: 0,
     indexes: [],
@@ -44,17 +45,37 @@ const defaultProps = {
     draggable: false,
     invisibleWhenEmpty: false,
     handleClickFile: () => null,
-    handleDragStartList: () => null,
     handleContextMenuList: () => null,
     handleFileWatchSwitch: () => null,
+};
+
+const ArrowIcon = (props) => {
+    const Icon = (props.extended) ? ArrowDropDownIcon : ArrowRightIcon;
+    return (<Icon {...props}/>);
+};
+
+const IconByType = (props) => {
+    let Icon;
+    switch (props.type) {
+        case SERVER:
+            Icon = ComputerIcon;
+            break;
+        case DIRECTORY:
+            Icon = FolderIcon;
+            break;
+        default:
+            Icon = FileIcon;
+    }
+    return <Icon {...props}/>;
 };
 
 
 const FileList = props => {
     const {
         files,
+        parent,
         regexp,
-        selectedFile,
+        selectedTarget,
         depth,
         dense,
         switchable,
@@ -63,69 +84,56 @@ const FileList = props => {
         handleDoubleClickFile,
         handleFileWatchSwitch,
         handleContextMenuList,
-        handleDragStartList,
-        draggable
     } = props;
 
-    const classes = useStyles();
-    const theme = useTheme();
+    const classes = useStyles({ depth, dense });
 
-    return files.map((file, index) => {
-        if (!!regexp && !file.isDirectory && !file.name.match(regexp)) return null;
+    return files.filter(file => !parent ? !file.parent : file.parent && file.parent === parent).map((curFile, index) => {
+        if (regexp && !curFile.isDirectory && !curFile.name.match(regexp)) return null;
         return (
             <Fragment key={index}>
                 <ListItem
-                    onDragStart={e => draggable && handleDragStartList(e, file)}
-                    draggable={draggable}
                     className={classes.listItem}
-                    selected={!!selectedFile && file === selectedFile}
-                    style={{paddingLeft: `${depth * 20}px`, height: dense ? '25px' : '45px'}}
-                    onClick={e => (!dense && file.isDirectory) ? handleDoubleClickFile(e, file) : handleClickFile(e, file)}
-                    onDoubleClick={e => dense && handleDoubleClickFile(e, file)}
-                    onContextMenu={e => !dense && handleContextMenuList(e, file)}
+                    selected={curFile === selectedTarget}
+                    onClick={handleClickFile(curFile)}
+                    onDoubleClick={handleDoubleClickFile(curFile)}
+                    onContextMenu={handleContextMenuList(curFile)}
                 >
                     <ListItemIcon className={classes.iconWrap}>
-                        {file.type === DIRECTORY ?
-                            (<Fragment>
-                                {file.extended ?
-                                    <ArrowDropDownIcon
-                                        className={classes.arrowIcon}
-                                        onClick={e => handleDoubleClickFile(e, file)}/> :
-                                    <ArrowRightIcon
-                                        className={classes.arrowIcon}
-                                        onClick={e => handleDoubleClickFile(e, file)}/>}
-                                <FolderIcon className={classes.iconMargin}
-                                            style={dense ? {height: theme.spacing(2)} : null}/>
-                            </Fragment>) :
-                            <FileIcon className={classNames(classes.arrowMargin, classes.iconMargin)}
-                                      style={dense ? {height: theme.spacing(2)} : null}/>
-                        }
+                        {curFile.type !== FILE &&
+                        <ArrowIcon
+                            onClick={handleDoubleClickFile(curFile)}
+                            className={classes.arrowIcon}
+                            extended={curFile.extended}/>}
+                        <IconByType type={curFile.type} className={classes.iconMargin}/>
                     </ListItemIcon>
-                    <ListItemText className={classes.textList}
-                                  primary={<Typography className={classes.text}>
-                                      {file.isDirectory ? file.name :
-                                          <HighLighter regexp={regexp}>{file.name}</HighLighter>}
-                                  </Typography>}/>
-                    {switchable && !file.isDirectory ?
+                    <ListItemText primary={
+                                      <Typography>
+                                          {regexp && curFile.type === FILE ? curFile.name :
+                                              <HighLighter regexp={regexp}>{curFile.name}</HighLighter>}
+                                      </Typography>
+                                  }
+                    />
+                    {switchable && curFile.type === FILE ?
                         <Switch
                             classes={{
                                 root: classes.switchRoot,
-                                switchBase: classes[`colorSwitchBase${file.color}`],
-                                checked: classes[`colorSwitchChecked${file.color}`],
-                                track: classes[`colorSwitchBar${file.color}`],
+                                switchBase: classes[`colorSwitchBase${curFile.color}`],
+                                checked: classes[`colorSwitchChecked${curFile.color}`],
+                                track: classes[`colorSwitchBar${curFile.color}`],
                             }}
-                            onChange={e => handleFileWatchSwitch(e, file)}
+                            onChange={handleFileWatchSwitch(curFile)}
                             checked={false}/> : null}
                 </ListItem>
-                {(!file.child || !file.child.length) ? (
+                {!curFile.extended ? null :
+                    (files.filter(file => file.parent === curFile)).length ?
+                        <FileList {...props} parent={curFile} depth={depth + 1}/> : (
                         <ListItem className={classes.emptyText}>
                             <ListItemText
                                 className={classes.textList}
-                                style={{ paddingLeft: `${(theme.spacing(3)) * (depth + 1)}px` }}
                                 disableTypography
-                                primary={!file.child && lazyLoading ? '...loading' : '빈 폴더입니다.'}/>
-                        </ListItem>) :
-                    <FileList {...props} depth={depth + 1} files={file.child}/>
+                                primary={!curFile.child && lazyLoading ? '...loading' : '빈 폴더입니다.'}/>
+                        </ListItem>)
                 }
             </Fragment>
         )

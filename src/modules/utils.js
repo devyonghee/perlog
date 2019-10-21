@@ -1,3 +1,8 @@
+export const SERVER = 'SERVER';
+export const DIRECTORY = 'DIRECTORY';
+export const FILE = 'FILE';
+
+
 export const changeMiddleValue = index => values => array => {
     if (!array.hasOwnProperty(index)) return array;
     return [

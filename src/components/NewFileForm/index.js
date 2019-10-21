@@ -1,95 +1,37 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import Presenter from './presenter';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import container from './container';
+import fileActions from 'src/modules/file/actions';
+import { SERVER } from 'src/modules/utils';
 
-const ipcRenderer = window.require('electron').ipcRenderer;
-
-const propTypes = {
-    search: PropTypes.func.isRequired,
-    closeNewFileForm: PropTypes.func.isRequired,
-    handleAddFile: PropTypes.func.isRequired,
-    newFileForm: PropTypes.shape({
-        type: PropTypes.string,
-        opened: PropTypes.bool
-    }),
+const getSelectedFile = fileState => {
+    if (!fileState.selected || !fileState.list.hasOwnProperty(fileState.selected)) return null;
+    return fileState.list[fileState.selected];
 };
 
-const defaultProps = {
-    newFileForm: {
-        type: '',
-        opened: false
+const getSelectedServer = (file, serverState) => {
+    if (!file) return null;
+
+    if (file.type === SERVER) {
+        return serverState.servers.find(server => server.url === file.url);
     }
+
+    return file.parent ? getSelectedServer(file.parent, serverState) : null;
 };
 
-const container = (props) => {
-    const { search, closeNewFileForm, handleAddFile, newFileForm: { type } } = props;
-    const [name, setName] = useState('');
-    const [filterString, setFilterString] = useState('');
-    const [selectedFile, setSelectedTarget] = useState(null);
-    const [extendedDirectories, setExtendDirectory] = useState([]);
-
-    const initState = () => setName('') & setSelectedTarget();
-    const handleClickFile = (e, file) => {
-        e.preventDefault();
-        if (selectedFile !== file) setSelectedTarget(file);
+const mapStateToProps = state => {
+    return {
+        opened: state.file.newForm.open,
+        type: state.file.newForm.type,
+        target: getSelectedFile(state.file),
+        server: getSelectedServer(getSelectedFile(state.file), state.server),
     };
-
-    const handleCloseForm = () => closeNewFileForm() & initState();
-    const handleFilterStringChange = e => e.preventDefault() & setFilterString(e.target.value.replace(/\\/g, ''));
-    const handleNameChange = e => e.preventDefault() & setName(e.target.value);
-
-    const handleClickConfirm = e => {
-        e.preventDefault();
-        if (!type) return;
-        if (type === 'directory') {
-            if (!name) return ipcRenderer.send('notice', '폴더명을 입력해주세요.', 'New Directory');
-            return handleAddFile({ name }) & initState();
-        }
-        if (!selectedFile || selectedFile.isDirectory) return ipcRenderer.send('notice', '파일을 선택해주세요.', 'New File');
-        return handleAddFile(selectedFile) & initState();
-    };
-
-    const handleNameKeyPress = e => {
-        if (e.key.toLowerCase() !== 'enter' || !name) return;
-        e.preventDefault();
-        handleAddFile({ name });
-        setName('');
-    };
-
-    const handleDoubleClickFile = (e, file) => {
-        e.preventDefault();
-        selectedFile !== file && setSelectedTarget(file);
-        if (!file.isDirectory) return handleAddFile(file) & initState();
-
-        if (extendedDirectories.includes(file)) {
-            extendedDirectories.splice(extendedDirectories.indexOf(file), 1);
-            return setExtendDirectory([...extendedDirectories]);
-        }
-
-        setExtendDirectory([...extendedDirectories, file]);
-        !file.child && search(file);
-    };
-
-    return (
-        <Presenter
-            {...props}
-            name={name}
-            filterString={filterString}
-            selectedFile={selectedFile}
-            extendedDirectories={extendedDirectories}
-            handleClickFile={handleClickFile}
-            handleCloseForm={handleCloseForm}
-            handleNameChange={handleNameChange}
-            handleClickConfirm={handleClickConfirm}
-            handleNameKeyPress={handleNameKeyPress}
-            handleDoubleClickFile={handleDoubleClickFile}
-            handleFilterStringChange={handleFilterStringChange}
-        />
-    );
-
 };
 
-container.propTypes = propTypes;
-container.defaultProps = defaultProps;
+const mapDispatchToProps = (dispatch) => {
+    return bindActionCreators({
+        close: () => fileActions.setNewForm(false),
+    }, dispatch);
+};
 
-export default container;
+export default connect(mapStateToProps, mapDispatchToProps)(container);

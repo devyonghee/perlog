@@ -1,4 +1,4 @@
-import {makeStyles} from '@material-ui/styles'
+import { makeStyles } from '@material-ui/styles';
 import colors from 'src/modules/file/colors';
 
 const createSwitchColorsClass = (themeType) =>
@@ -23,7 +23,9 @@ const useStyles = makeStyles(theme => ({
         padding: '2px',
         "&:hover": {
             backgroundColor: "rgba(0,0,0, 0.08)",
-        }
+        },
+        paddingLeft: ({ depth }) => `${depth * 20}px`,
+        height: ({ dense }) => dense ? '25px' : '45px',
     },
     iconWrap: {
         alignItems: 'center',
@@ -35,7 +37,8 @@ const useStyles = makeStyles(theme => ({
     },
 
     iconMargin:{
-        marginRight: '0px'
+        margin: 'auto 0px',
+        height: ({ dense }) => dense ? theme.spacing(2) : 'auto',
     },
 
     arrowMargin: {
@@ -45,8 +48,8 @@ const useStyles = makeStyles(theme => ({
     textList: {
         overflow: 'hidden',
         width: '100px',
-        paddingLeft: '5px',
-        userSelect: 'none'
+        userSelect: 'none',
+        paddingLeft: ({ depth }) => `${(theme.spacing(3)) * (depth + 1)}px`,
     },
     emptyText : {
         height: '10px'

@@ -1,14 +1,14 @@
-import { ADD_SERVER, ADD_FILE, ADD_DIRECTORY, REMOVE_FILE, EXTEND_TARGET } from './actions';
+import { ADD_DIRECTORY, ADD_FILE, ADD_SERVER, REMOVE_FILE, SET_NEW_FORM, SET_SELECTED, TOGGLE_EXTEND } from './actions';
 import { colorsIndex } from './colors';
-import { changeMiddleValue } from '../utils';
-
-export const SERVER = 'SERVER';
-export const DIRECTORY = 'DIRECTORY';
-export const FILE = 'FILE';
+import { changeMiddleValue, DIRECTORY, FILE, SERVER } from '../utils';
 
 const initialState = {
     list: [],
-    selectedIndex: -1,
+    selected: -1,
+    newForm: {
+        open: false,
+        type: '',
+    },
 };
 
 const sortCompare = (preFile, curFile) => {
@@ -68,13 +68,6 @@ const addDirectory = (state, { name, target }) => {
     }
 };
 
-const extend = (state, { index }) => {
-    return {
-        ...state,
-        list: changeMiddleValue(index)({ extended: true })(state.list)
-    };
-};
-
 const addFile = (state, { name, path, target }) => {
     try {
         checkAdding(name, target)(state);
@@ -100,6 +93,13 @@ const removeFile = (state, { file }) => {
     return state;
 };
 
+const toggleExtend = (state, { index }) => {
+    return {
+        ...state,
+        list: changeMiddleValue(index)({ extended: !state.list[index].extended })(state.list)
+    };
+};
+
 export default (state = initialState || [], action) => {
     switch (action.type) {
         case ADD_SERVER:
@@ -114,8 +114,23 @@ export default (state = initialState || [], action) => {
         case REMOVE_FILE:
             return removeFile(state, action);
 
-        case EXTEND_TARGET:
-            return extend(state, action);
+        case TOGGLE_EXTEND:
+            return toggleExtend(state, action);
+
+        case SET_SELECTED:
+            return {
+                ...state,
+                selected: action.index
+            };
+
+        case SET_NEW_FORM:
+            return {
+                ...state,
+                newForm: {
+                    open: action.open,
+                    type: action.newType,
+                }
+            };
 
         default:
             return state;

@@ -1,4 +1,4 @@
-import React, {Fragment} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
@@ -9,19 +9,18 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import useStyles from './styles';
 import FileList from '../FileList';
+import { DIRECTORY } from 'src/modules/utils';
 
 const propTypes = {
+    opened: PropTypes.bool,
+    type: PropTypes.type,
     name: PropTypes.string,
     filterString: PropTypes.string,
     handleNameChange: PropTypes.func,
     handleNameKeyPress: PropTypes.func,
     handleClickConfirm: PropTypes.func.isRequired,
-    handleCloseForm: PropTypes.func.isRequired,
+    handleClose: PropTypes.func.isRequired,
     handleFilterStringChange: PropTypes.func.isRequired,
-    newFileForm: PropTypes.shape({
-        opened: PropTypes.bool.isRequired,
-        type: PropTypes.string.isRequired,
-    }).isRequired,
 };
 
 const defaultProps = {
@@ -33,10 +32,12 @@ const defaultProps = {
 
 const presenter = (props) => {
     const {
+        type,
         name,
+        files,
+        opened,
         filterString,
-        newFileForm,
-        handleCloseForm,
+        handleClose,
         handleNameChange,
         handleClickConfirm,
         handleNameKeyPress,
@@ -49,18 +50,18 @@ const presenter = (props) => {
         <Dialog
             aria-labelledby="alert-dialog-title"
             aria-describedby="simple-modal-description"
-            open={newFileForm.opened}
-            onClose={handleCloseForm}
+            open={opened}
+            onClose={handleClose}
             transitionDuration={{exit: 0}}
             fullWidth
-            classes={(newFileForm.type === 'directory') ? null : {paper: classes.wrapPaper}}
-            maxWidth={(newFileForm.type === 'directory') ? 'xs' : 'sm'}
+            classes={(type === DIRECTORY) ? null : {paper: classes.wrapPaper}}
+            maxWidth={(type === DIRECTORY) ? 'xs' : 'sm'}
         >
             <DialogTitle id="alert-dialog-title">
-                {`New ${newFileForm.type.charAt(0).toUpperCase()}${newFileForm.type.slice(1)}`}
+                {`New ${type.charAt(0).toUpperCase()}${type.slice(1)}`}
             </DialogTitle>
             <DialogContent>
-                {(newFileForm.type === 'directory') ?
+                {(type === DIRECTORY) ?
                     <TextField
                         margin="dense"
                         className={classes.textField}
@@ -73,7 +74,7 @@ const presenter = (props) => {
                             value: name
                         }}
                     /> :
-                    <Fragment>
+                    <>
                         <div className={classes.wrapNewFileForm}>
                             <TextField
                                 margin="dense"
@@ -88,21 +89,22 @@ const presenter = (props) => {
                             />
                             <List dense className={classes.folderList}>
                                 <FileList
+                                    files={[]}
+                                    dense
                                     {...props}
                                     regexp={!!filterString ? new RegExp(filterString, 'gi') : null}
-                                    dense
                                     invisibleSwitch
                                 />
                             </List>
                         </div>
-                    </Fragment>
+                    </>
                 }
             </DialogContent>
             <DialogActions>
                 <Button color="primary" size="small" onClick={handleClickConfirm}>
                     OK
                 </Button>
-                <Button color="secondary" size="small" onClick={handleCloseForm}>
+                <Button color="secondary" size="small" onClick={handleClose}>
                     Cancel
                 </Button>
             </DialogActions>
