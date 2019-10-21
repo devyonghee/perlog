@@ -2,7 +2,7 @@ import {makeStyles} from '@material-ui/styles'
 
 const useStyles = makeStyles(theme => ({
     root: {
-        flexBasis: theme.spacing(30),//theme.navigationWidth,
+        flexBasis: theme.spacing(30),
         flexShrink: 0,
         overflowX: 'hidden'
     },
@@ -24,11 +24,17 @@ const useStyles = makeStyles(theme => ({
         flexDirection: 'column',
         justifyContent: 'center',
     },
+
     textField: {
         marginLeft: theme.spacing(1),
         marginRight: theme.spacing(1),
         width: 200,
     },
+
+    arrowIcon: {
+        cursor: 'pointer',
+    },
+
     dense: {
         marginTop: 19,
     },

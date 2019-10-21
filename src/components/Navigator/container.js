@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Presenter from './presenter';
 
@@ -21,7 +21,8 @@ const Server = PropTypes.shape({
 
 
 const propTypes = {
-    files: PropTypes.func.isRequired,
+    files: PropTypes.array.isRequired,
+    extend: PropTypes.func.isRequired,
 };
 
 const defaultProps = {
@@ -29,11 +30,11 @@ const defaultProps = {
 };
 
 const container = props => {
-    const { servers, watchFile, serverFiles, search, serverName, files, addDirectory, addFile, removeFile } = props;
+    const { search, files, extend, addDirectory, addFile, removeFile } = props;
     const [newFileForm, setOpenNewFileForm] = useState({ opened: false, type: '' });
-    const [selectedFile, setSelectedTarget] = useState(null);
-    const [extendedDirectories, setExtendDirectory] = useState([]);
+    const [selectedTargetIndex, setSelectedTargetIndex] = useState(-1);
 
+    const selectedTarget = useMemo(() => files[selectedTargetIndex], [files, selectedTargetIndex]);
     // const closeNewFileForm = () => setOpenNewFileForm({ opened: false, type: '' });
 
     // const handleAddFile = target => {
@@ -68,75 +69,78 @@ const container = props => {
     //     watchFile(file, !!checked);
     // };
     //
-    // const handleClickList = (e, file = null) => e.stopPropagation() | (selectedFile !== file && setSelectedTarget(file));
-    //
-    // const handleDoubleClickFile = (e, file) => {
-    //     e.preventDefault();
-    //     selectedFile !== file && setSelectedTarget(file);
-    //     if (!file.isDirectory) return;
-    //
-    //     if (extendedDirectories.includes(file)) {
-    //         extendedDirectories.splice(extendedDirectories.indexOf(file), 1);
-    //         return setExtendDirectory([...extendedDirectories]);
-    //     }
-    //     setExtendDirectory([...extendedDirectories, file]);
-    // };
-    //
-    // const handleContextMenuList = (e, file = null) => {
-    //     e.stopPropagation();
-    //     selectedFile !== file && setSelectedTarget(file);
-    //     const { Menu } = remote;
-    //
-    //     const contextMenu = [
-    //         {
-    //             label: 'New File',
-    //             click: () => setOpenNewFileForm({ opened: true, type: 'file' }) | (!serverFiles.length && search())
-    //         },
-    //         {
-    //             label: 'New Directory',
-    //             click: () => setOpenNewFileForm({ opened: true, type: 'directory' })
-    //         },
-    //     ];
-    //
-    //     if (file) {
-    //         contextMenu.push({ type: 'separator' }, {
-    //                 label: 'Delete...', click: async () => {
-    //                     const options = {
-    //                         type: 'question',
-    //                         title: 'Delete',
-    //                         message: `Delete ${file.isDirectory ? 'directory' : 'file'} "${file.name}"?`,
-    //                         buttons: ['Yes', 'No']
-    //                     };
-    //                     const returnValue = await remote.dialog.showMessageBox(options);
-    //                     if (returnValue.response !== 0) return;
-    //                     const forgetFile = file => {
-    //                         if(!file.isDirectory) watchFile(file, false);
-    //                         if (!!file.child && file.child.length) file.child.map(forgetFile);
-    //                     };
-    //                     forgetFile(file);
-    //                     removeFile(file);
-    //                 }
-    //             }
-    //         );
-    //     }
-    //     const menu = new Menu.buildFromTemplate(contextMenu);
-    //     return menu.popup();
-    // };
+
+    const handleClickList = (target) => e => {
+        e.stopPropagation();
+        setSelectedTargetIndex(files.findIndex(file => file === target));
+    };
+
+    const handleDoubleClickFile = (target) => e => {
+        e.preventDefault();
+        const findIndex = files.findIndex(file => file === target);
+        setSelectedTargetIndex(findIndex);
+        if (findIndex < 0) return;
+
+        extend(findIndex);
+        // if (extendedDirectories.includes(file)) {
+        //     extendedDirectories.splice(extendedDirectories.indexOf(file), 1);
+        //     return setExtendDirectory([...extendedDirectories]);
+        // }
+        // setExtendDirectory([...extendedDirectories, file]);
+    };
+
+    const handleContextMenuList = target => e => {
+        e.stopPropagation();
+        const findIndex = files.findIndex(file => file === target);
+        setSelectedTargetIndex(findIndex);
+        if (findIndex < 0) return;
+
+        const { Menu } = remote;
+        const contextMenu = [
+            {
+                label: 'New File',
+                // click: () => setOpenNewFileForm({ opened: true, type: 'file' }) | (!serverFiles.length && search())
+            },
+            {
+                label: 'New Directory',
+                // click: () => setOpenNewFileForm({ opened: true, type: 'directory' })
+            },
+        ];
+
+        contextMenu.push({ type: 'separator' }, {
+                label: 'Delete...', click: async () => {
+                    const options = {
+                        type: 'question',
+                        title: 'Delete',
+                        message: `Delete ${target.type.toLowerCase()} "${target.name}"?`,
+                        buttons: ['Yes', 'No']
+                    };
+                    const returnValue = await remote.dialog.showMessageBox(options);
+
+                    if (returnValue.response !== 0) return;
+                    const forgetFile = file => {
+                        // if(!file.isDirectory) watchFile(file, false);
+                        // if (!!file.child && file.child.length) file.child.map(forgetFile);
+                    };
+                }
+            }
+        );
+        const menu = new Menu.buildFromTemplate(contextMenu);
+        return menu.popup();
+    };
 
     return <Presenter
         files={files}
         search={search}
-        serverFiles={serverFiles}
         newFileForm={newFileForm}
-        selectedFile={selectedFile}
-        extendedDirectories={extendedDirectories}
+        handleClickList={handleClickList}
+        selectedTarget={selectedTarget}
         // watchedFiles={watchedFiles}
         // handleAddFile={handleAddFile}
         // closeNewFileForm={closeNewFileForm}
-        // handleClickList={handleClickList}
-        // handleDoubleClickFile={handleDoubleClickFile}
+        handleDoubleClickFile={handleDoubleClickFile}
         // handleFileWatchSwitch={handleFileWatchSwitch}
-        // handleContextMenuList={handleContextMenuList}
+        handleContextMenuList={handleContextMenuList}
     />;
 };
 

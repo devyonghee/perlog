@@ -8,6 +8,7 @@ import {
     SET_SERVER_INFO,
     SET_SOCKET, REMOVE_SOCKET
 } from './actions';
+import { changeMiddleValue } from '../utils';
 
 const limitMessage = 200;
 
@@ -21,12 +22,6 @@ const initialState = {
     loading: false,
 };
 
-const changeMiddleValue =
-    index => values => array => [
-        ...array.slice(0, index),
-        { ...array[index], ...values },
-        ...array.slice(index + 1)
-    ];
 
 const setSocket = (state, { url, socket }) => {
     const replaceUrl = url => url.trim().toLowerCase().replace('\/', '');

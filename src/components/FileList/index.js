@@ -1,7 +1,7 @@
 import React, {Fragment} from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import {Collapse, ListItem, ListItemIcon, ListItemText, Switch, Typography} from '@material-ui/core';
+import {ListItem, ListItemIcon, ListItemText, Switch, Typography} from '@material-ui/core';
 import FolderIcon from '@material-ui/icons/Folder';
 import FileIcon from '@material-ui/icons/InsertDriveFile';
 import ArrowRightIcon from '@material-ui/icons/ArrowRightRounded';
@@ -9,6 +9,7 @@ import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDownRounded';
 import {useTheme} from '@material-ui/styles';
 import useStyles from './styles';
 import HighLighter from "../Highlighter";
+import { DIRECTORY } from 'src/modules/file/reducer';
 
 const fileShape = PropTypes.shape({
     child: PropTypes.array,
@@ -21,14 +22,12 @@ const fileShape = PropTypes.shape({
 const propTypes = {
     files: PropTypes.arrayOf(fileShape),
     regexp: PropTypes.instanceOf(RegExp),
-    extendedDirectories: PropTypes.arrayOf(fileShape),
-    watchedFiles: PropTypes.arrayOf(fileShape),
     selectedFile: fileShape,
     depth: PropTypes.number,
     dense: PropTypes.bool,
     draggable: PropTypes.bool,
-    invisibleSwitch: PropTypes.bool,
-    invisibleLoading: PropTypes.bool,
+    switchable: PropTypes.bool,
+    lazyLoading: PropTypes.bool,
     handleClickFile: PropTypes.func,
     handleFileWatchSwitch: PropTypes.func,
     handleContextMenuList: PropTypes.func,
@@ -57,11 +56,9 @@ const FileList = props => {
         regexp,
         selectedFile,
         depth,
-        watchedFiles,
-        extendedDirectories,
         dense,
-        invisibleSwitch,
-        invisibleLoading,
+        switchable,
+        lazyLoading,
         handleClickFile,
         handleDoubleClickFile,
         handleFileWatchSwitch,
@@ -88,9 +85,9 @@ const FileList = props => {
                     onContextMenu={e => !dense && handleContextMenuList(e, file)}
                 >
                     <ListItemIcon className={classes.iconWrap}>
-                        {file.isDirectory ?
+                        {file.type === DIRECTORY ?
                             (<Fragment>
-                                {extendedDirectories.includes(file) ?
+                                {file.extended ?
                                     <ArrowDropDownIcon
                                         className={classes.arrowIcon}
                                         onClick={e => handleDoubleClickFile(e, file)}/> :
@@ -109,7 +106,7 @@ const FileList = props => {
                                       {file.isDirectory ? file.name :
                                           <HighLighter regexp={regexp}>{file.name}</HighLighter>}
                                   </Typography>}/>
-                    {!invisibleSwitch && !file.isDirectory ?
+                    {switchable && !file.isDirectory ?
                         <Switch
                             classes={{
                                 root: classes.switchRoot,
@@ -118,20 +115,18 @@ const FileList = props => {
                                 track: classes[`colorSwitchBar${file.color}`],
                             }}
                             onChange={e => handleFileWatchSwitch(e, file)}
-                            checked={watchedFiles.includes(file)}/> : null}
+                            checked={false}/> : null}
                 </ListItem>
-                <Collapse in={extendedDirectories.includes(file)} timeout={0}>
-                    {(!file.child || !file.child.length) ? (
-                            <ListItem className={classes.emptyText}>
-                                <ListItemText
-                                    className={classes.textList}
-                                    style={{paddingLeft: `${(theme.spacing(3)) * (depth + 1)}px`}}
-                                    disableTypography
-                                    primary={!file.child && !invisibleLoading ? '...loading' : '빈 폴더입니다.'}/>
-                            </ListItem>) :
-                        <FileList {...props} depth={depth + 1} files={file.child}/>
-                    }
-                </Collapse>
+                {(!file.child || !file.child.length) ? (
+                        <ListItem className={classes.emptyText}>
+                            <ListItemText
+                                className={classes.textList}
+                                style={{ paddingLeft: `${(theme.spacing(3)) * (depth + 1)}px` }}
+                                disableTypography
+                                primary={!file.child && lazyLoading ? '...loading' : '빈 폴더입니다.'}/>
+                        </ListItem>) :
+                    <FileList {...props} depth={depth + 1} files={file.child}/>
+                }
             </Fragment>
         )
     });

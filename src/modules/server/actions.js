@@ -84,9 +84,9 @@ const addMessage = (path, message) => {
     };
 };
 
-const registerEvent = (socket, dispatch) => {
+const registerEvent = (url, socket) => dispatch => {
     socket.on('connect', () => {
-        dispatch(setSocket(socket));
+        dispatch(setSocket(url, socket));
     });
 
     socket.on('searched', (path, files) => dispatch(setFiles(path, files)));
@@ -109,21 +109,18 @@ const registerEvent = (socket, dispatch) => {
     });
 };
 
-const connectAndRegister = (url, token) => {
-    return (dispatch) => {
-        const socket = io.connect(`${url}?token=${token}`, {
-            transports: ['websocket'],
-            reconnection: true,
-            reconnectionAttempts: 3,
-        });
+const connectAndRegister = (url, token) => dispatch => {
+    const socket = io.connect(`${url}?token=${token}`, {
+        transports: ['websocket'],
+        reconnection: true,
+        reconnectionAttempts: 3,
+    });
 
-        saveServer(url, token);
-        registerEvent(socket, dispatch);
-    };
+    saveServer(url, token);
+    dispatch(registerEvent(url, socket));
 };
 
-const connectByToken = (url, token) => {
-    return async (dispatch) => {
+const connectByToken = (url, token) => async dispatch => {
         try {
             const response = await axios.post(url + '/login', { token });
             if (response.status !== 200) {
@@ -135,33 +132,30 @@ const connectByToken = (url, token) => {
             removeServerToken(url);
             ipcRenderer.send('notice', '토큰이 만료되었습니다.');
         }
-    };
 };
 
-const connect = (url, name) => {
-    return async (dispatch, getState) => {
-        const { id, password } = getState().user;
-        dispatch(setServerInfo({ loading: true }));
+const connect = (url, name) => async (dispatch, getState) => {
+    const { id, password } = getState().user;
+    dispatch(setServerInfo({ loading: true }));
 
-        try {
-            const response = await axios({ url, method: 'HEAD' });
-            if (response.status !== 200) return ipcRenderer.send('notice', '연결할 수 없습니다.');
+    try {
+        const response = await axios({ url, method: 'HEAD' });
+        if (response.status !== 200) return ipcRenderer.send('notice', '연결할 수 없습니다.');
 
-            if (!id || !password) {
-                dispatch(addServer(name, url));
-                dispatch(setServerInfo({ openNewServer: false, tempUrl: url }));
-                dispatch(fileActions.addServer(name, url));
-                return dispatch(userActions.setUserInfo({ openLogin: true }));
-            }
-
-            await dispatch(userActions.login(id, password, url));
-            dispatch(setServerInfo({ openNewServer: false }));
-        } catch {
-            ipcRenderer.send('notice', '연결할 수 없습니다.');
-        } finally {
-            dispatch(setServerInfo({ loading: false }));
+        if (!id || !password) {
+            dispatch(addServer(name, url));
+            dispatch(setServerInfo({ openNewServer: false, tempUrl: url }));
+            dispatch(fileActions.addServer(name, url));
+            return dispatch(userActions.setUserInfo({ openLogin: true }));
         }
-    };
+
+        await dispatch(userActions.login(id, password, url));
+        dispatch(setServerInfo({ openNewServer: false }));
+    } catch {
+        ipcRenderer.send('notice', '연결할 수 없습니다.');
+    } finally {
+        dispatch(setServerInfo({ loading: false }));
+    }
 };
 
 export default {

@@ -6,13 +6,14 @@ import fileActions from 'src/modules/file/actions';
 
 const mapStateToProps = state => {
     return {
-        files: state.file,
+        files: state.file.list,
     };
 };
 
 const mapDispatchToProps = (dispatch) => {
     return bindActionCreators({
         search: serverActions.search,
+        extend: fileActions.extend,
         watchFile: serverActions.requestWatch,
         addFile: fileActions.addFile,
         addDirectory: fileActions.addDirectory,

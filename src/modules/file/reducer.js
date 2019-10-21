@@ -1,11 +1,15 @@
-import { ADD_SERVER, ADD_FILE, ADD_DIRECTORY, REMOVE_FILE } from './actions';
+import { ADD_SERVER, ADD_FILE, ADD_DIRECTORY, REMOVE_FILE, EXTEND_TARGET } from './actions';
 import { colorsIndex } from './colors';
+import { changeMiddleValue } from '../utils';
 
-export const SERVER = Symbol('SERVER');
-export const DIRECTORY = Symbol('DIRECTORY');
-export const FILE = Symbol('FILE');
+export const SERVER = 'SERVER';
+export const DIRECTORY = 'DIRECTORY';
+export const FILE = 'FILE';
 
-const initialState = [];
+const initialState = {
+    list: [],
+    selectedIndex: -1,
+};
 
 const sortCompare = (preFile, curFile) => {
     if (preFile.isDirectory !== curFile.isDirectory) {
@@ -30,10 +34,14 @@ const checkAdding = (name, target) => files => {
 
 const addServer = (state, { name, url }) => {
     if (!name || !url) return state;
-    return [...state, {
-        name, url,
-        type: SERVER,
-    }];
+    return {
+        ...state,
+        list: [...state.list, {
+            name, url,
+            type: SERVER,
+            extended: false,
+        }]
+    };
 };
 
 const addDirectory = (state, { name, target }) => {
@@ -44,9 +52,15 @@ const addDirectory = (state, { name, target }) => {
             name: name,
             type: DIRECTORY,
             parent: target,
+            extended: false,
         };
 
-        return [...state, newDirectory];
+        return {
+            ...state,
+            list: [...state.list, {
+                newDirectory
+            }]
+        };
 
     } catch (e) {
         console.log(e.message);
@@ -54,17 +68,27 @@ const addDirectory = (state, { name, target }) => {
     }
 };
 
+const extend = (state, { index }) => {
+    return {
+        ...state,
+        list: changeMiddleValue(index)({ extended: true })(state.list)
+    };
+};
+
 const addFile = (state, { name, path, target }) => {
     try {
         checkAdding(name, target)(state);
 
-        return [...state, {
-            name, path,
-            type: FILE,
-            color: colorsIndex.next().value,
-            parent: target,
-            watch: false,
-        }];
+        return {
+            ...state,
+            list: [...state.list, {
+                name, path,
+                type: FILE,
+                color: colorsIndex.next().value,
+                parent: target,
+                watch: false,
+            }]
+        };
 
     } catch (e) {
         console.log(e.message);
@@ -89,6 +113,9 @@ export default (state = initialState || [], action) => {
 
         case REMOVE_FILE:
             return removeFile(state, action);
+
+        case EXTEND_TARGET:
+            return extend(state, action);
 
         default:
             return state;

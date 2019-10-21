@@ -1,5 +1,6 @@
 const ADD_SERVER = Symbol('ADD_SERVER');
 const ADD_DIRECTORY = Symbol('ADD_DIRECTORY');
+const EXTEND_TARGET = Symbol('EXTEND_TARGET');
 const REMOVE_DIRECTORY = Symbol('REMOVE_DIRECTORY');
 const ADD_FILE = Symbol('ADD_FILE');
 const REMOVE_FILE = Symbol('REMOVE_FILE');
@@ -7,6 +8,7 @@ const REMOVE_FILE = Symbol('REMOVE_FILE');
 export {
     ADD_SERVER,
     ADD_DIRECTORY,
+    EXTEND_TARGET,
     REMOVE_DIRECTORY,
     ADD_FILE,
     REMOVE_FILE,
@@ -40,9 +42,17 @@ const remove = file => {
     };
 };
 
+const extend = index => {
+    return {
+        type: EXTEND_TARGET,
+        index
+    }
+};
+
 export default {
     addServer,
     addDirectory,
     addFile,
+    extend,
     remove
 };
