@@ -4,8 +4,8 @@ import container from "./container";
 
 const mapStateToProps = state => {
     return {
-        messages: state.server.messages,
-        files: state.server.watchedFiles.length
+        messages: state.messages,
+        files: state.file.list,
     }
 };
 

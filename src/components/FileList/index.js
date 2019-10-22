@@ -8,20 +8,13 @@ import {
     Folder as FolderIcon,
     InsertDriveFile as FileIcon
 } from '@material-ui/icons';
+import classNames from 'classnames';
 import useStyles from './styles';
 import HighLighter from '../Highlighter';
 import { DIRECTORY, FILE, SERVER } from 'src/modules/utils';
 
-const fileShape = PropTypes.shape({
-    child: PropTypes.array,
-    parent: PropTypes.object,
-    name: PropTypes.string,
-    path: PropTypes.string,
-    isDirectory: PropTypes.bool,
-});
-
 const propTypes = {
-    files: PropTypes.arrayOf(fileShape),
+    files: PropTypes.array,
     regexp: PropTypes.instanceOf(RegExp),
     parent: PropTypes.object,
     selectedTarget: PropTypes.object,
@@ -49,9 +42,9 @@ const defaultProps = {
     handleFileWatchSwitch: () => null,
 };
 
-const ArrowIcon = (props) => {
-    const Icon = (props.extended) ? ArrowDropDownIcon : ArrowRightIcon;
-    return (<Icon {...props}/>);
+const ArrowIcon = ({ extended, onClick, className }) => {
+    const Icon = (extended) ? ArrowDropDownIcon : ArrowRightIcon;
+    return (<Icon onClick={onClick} className={className}/>);
 };
 
 const IconByType = (props) => {
@@ -66,7 +59,18 @@ const IconByType = (props) => {
         default:
             Icon = FileIcon;
     }
-    return <Icon {...props}/>;
+    return <Icon className={props.className}/>;
+};
+
+const sortCompare = (preFile, curFile) => {
+    if (preFile.type !== curFile.type) {
+        return (preFile.type === DIRECTORY && curFile.type !== DIRECTORY) ? -1 : 1;
+    }
+    const icmp = preFile.name.toLowerCase().localeCompare(curFile.name.toLowerCase());
+    if (icmp !== 0) return icmp;
+    if (preFile.name > curFile.name) return 1;
+    else if (preFile.name < curFile.name) return -1;
+    else return 0;
 };
 
 
@@ -88,7 +92,7 @@ const FileList = props => {
 
     const classes = useStyles({ depth, dense });
 
-    return files.filter(file => !parent ? !file.parent : file.parent && file.parent === parent).map((curFile, index) => {
+    return files.filter(file => !parent ? !file.parent : file.parent && file.parent === parent).sort(sortCompare).map((curFile, index) => {
         if (regexp && !curFile.isDirectory && !curFile.name.match(regexp)) return null;
         return (
             <Fragment key={index}>
@@ -99,13 +103,16 @@ const FileList = props => {
                     onDoubleClick={handleDoubleClickFile(curFile)}
                     onContextMenu={handleContextMenuList(curFile)}
                 >
-                    <ListItemIcon className={classes.iconWrap}>
-                        {curFile.type !== FILE &&
-                        <ArrowIcon
-                            onClick={handleDoubleClickFile(curFile)}
-                            className={classes.arrowIcon}
-                            extended={curFile.extended}/>}
-                        <IconByType type={curFile.type} className={classes.iconMargin}/>
+                    <ListItemIcon
+                        className={curFile.type === FILE ? classNames(classes.iconWrap, classes.iconPadding) : classes.iconWrap}>
+                        <>
+                            {curFile.type !== FILE &&
+                            <ArrowIcon
+                                onClick={handleDoubleClickFile(curFile)}
+                                className={classes.arrowIcon}
+                                extended={curFile.extended}/>}
+                            <IconByType type={curFile.type} className={classes.iconMargin}/>
+                        </>
                     </ListItemIcon>
                     <ListItemText primary={
                                       <Typography>

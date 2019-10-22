@@ -11,8 +11,6 @@ const setUserInfo = values => ({
 
 const checkLogin = (id, password) => {
     return async (url) => {
-        console.log(url, id, password);
-
         if (!url || !id || !password) {
             throw new Error('로그인 오류');
         }

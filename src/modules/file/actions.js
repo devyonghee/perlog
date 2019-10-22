@@ -25,24 +25,24 @@ const addServer = (name, url) => {
     };
 };
 
-const addDirectory = (name, target) => {
+const addDirectory = (name) => {
     return {
         type: ADD_DIRECTORY,
-        name, target
+        name
     };
 };
 
-const addFile = (file, target) => {
+const addFile = (file) => {
     return {
         type: ADD_FILE,
-        file, target
+        file
     };
 };
 
-const setSelected = (index = -1) => {
+const setSelected = (target) => {
     return {
         type: SET_SELECTED,
-        index
+        target
     };
 };
 
@@ -53,10 +53,10 @@ const remove = file => {
     };
 };
 
-const toggleExtend = index => {
+const toggleExtend = target => {
     return {
         type: TOGGLE_EXTEND,
-        index
+        target
     }
 };
 

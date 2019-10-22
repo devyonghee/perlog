@@ -1,26 +1,26 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import Presenter from './presenter';
-import { DIRECTORY } from 'src/modules/utils';
+import { FILE, DIRECTORY } from 'src/modules/utils';
 
 const { ipcRenderer, remote } = window.require('electron');
 
 const propTypes = {
-    files: PropTypes.array.isRequired,
+    files: PropTypes.array,
+    selectedTarget: PropTypes.object,
     toggleExtend: PropTypes.func.isRequired,
     setSelected: PropTypes.func.isRequired,
     openNewAdd: PropTypes.func.isRequired,
 };
 
 const defaultProps = {
-    servers: [],
+    files: [],
+    selectedTarget: null
 };
 
 const container = props => {
-    const { search, files, toggleExtend, setSelected, selectedIndex, openNewAdd } = props;
-    const [newFileForm, setOpenNewFileForm] = useState({ opened: false, type: '' });
+    const { search, files, toggleExtend, setSelected, selectedTarget, openNewAdd } = props;
 
-    const selectedTarget = useMemo(() => files[selectedIndex], [files, selectedIndex]);
     // const closeNewFileForm = () => setOpenNewFileForm({ opened: false, type: '' });
 
     // const handleAddFile = target => {
@@ -58,29 +58,26 @@ const container = props => {
 
     const handleClickList = (target = null) => e => {
         e.stopPropagation();
-        setSelected(files.findIndex(file => file === target));
+        setSelected(target);
     };
 
     const handleDoubleClickFile = (target = null) => e => {
         e.preventDefault();
-        const findIndex = files.findIndex(file => file === target);
-        setSelected(findIndex);
-        if (findIndex < 0) return;
-
-        toggleExtend(findIndex);
+        setSelected(target);
+        if (!target) return;
+        toggleExtend(target);
     };
 
     const handleContextMenuList = target => e => {
         e.stopPropagation();
-        const findIndex = files.findIndex(file => file === target);
-        setSelected(findIndex);
-        if (findIndex < 0) return;
+        setSelected(target);
+        if (!target) return;
 
         const { Menu } = remote;
         const contextMenu = [
             {
                 label: 'New File',
-                click: () => openNewAdd(DIRECTORY)
+                click: () => openNewAdd(FILE)
             },
             {
                 label: 'New Directory',
@@ -113,7 +110,6 @@ const container = props => {
     return <Presenter
         files={files}
         search={search}
-        newFileForm={newFileForm}
         handleClickList={handleClickList}
         selectedTarget={selectedTarget}
         // watchedFiles={watchedFiles}

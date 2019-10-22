@@ -57,7 +57,7 @@ const App = class {
             console.log(`${socket._id} searching... `, newSearchPath);
             const file = new File(newSearchPath);
             const files = file.search();
-            socket.emit('searched', newSearchPath, files);
+            socket.emit('searched', files);
         } catch (e) {
             console.log(e.message);
             socket.emit('fileError', searchPath, ' 경로가 잘못 되었습니다.');

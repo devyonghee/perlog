@@ -3,10 +3,12 @@ import Presenter from './presenter';
 import PropTypes from 'prop-types';
 
 const propTypes = {
-    messages: PropTypes.array.isRequired,
+    messages: PropTypes.array,
 };
 
-const defaultProps = {};
+const defaultProps = {
+    messages: [],
+};
 
 const container = (props) => {
     const [now, setNow] = useState(new Date().getTime());
@@ -30,7 +32,7 @@ const container = (props) => {
     const messageSpeed = (elapsed !== 0) ? (messagesCount / elapsed).toFixed(2) : Number(0).toFixed(2);
 
     return <Presenter
-        {...props}
+        files={1}
         time={prettyTime}
         messageSpeed={messageSpeed}
         messagesCount={messagesCount}

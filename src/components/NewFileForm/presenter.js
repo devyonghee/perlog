@@ -12,15 +12,15 @@ import FileList from '../FileList';
 import { DIRECTORY } from 'src/modules/utils';
 
 const propTypes = {
-    opened: PropTypes.bool,
-    type: PropTypes.type,
-    name: PropTypes.string,
-    filterString: PropTypes.string,
-    handleNameChange: PropTypes.func,
-    handleNameKeyPress: PropTypes.func,
-    handleClickConfirm: PropTypes.func.isRequired,
-    handleClose: PropTypes.func.isRequired,
-    handleFilterStringChange: PropTypes.func.isRequired,
+    // opened: PropTypes.bool,
+    // type: PropTypes.type,
+    // name: PropTypes.string,
+    // filterString: PropTypes.string,
+    // handleNameChange: PropTypes.func,
+    // handleNameKeyPress: PropTypes.func,
+    // handleClickConfirm: PropTypes.func.isRequired,
+    // handleClose: PropTypes.func.isRequired,
+    // handleFilterStringChange: PropTypes.func.isRequired,
 };
 
 const defaultProps = {
@@ -37,11 +37,13 @@ const presenter = (props) => {
         files,
         opened,
         filterString,
+        selected,
         handleClose,
-        handleNameChange,
+        handleChange,
+        handleKeypress,
+        handleClickFile,
         handleClickConfirm,
-        handleNameKeyPress,
-        handleFilterStringChange,
+        handleDoubleClickFile,
     } = props;
 
     const classes = useStyles();
@@ -52,25 +54,25 @@ const presenter = (props) => {
             aria-describedby="simple-modal-description"
             open={opened}
             onClose={handleClose}
-            transitionDuration={{exit: 0}}
+            transitionDuration={{ exit: 0 }}
             fullWidth
-            classes={(type === DIRECTORY) ? null : {paper: classes.wrapPaper}}
+            classes={(type === DIRECTORY) ? null : { paper: classes.wrapPaper }}
             maxWidth={(type === DIRECTORY) ? 'xs' : 'sm'}
         >
             <DialogTitle id="alert-dialog-title">
-                {`New ${type.charAt(0).toUpperCase()}${type.slice(1)}`}
+                {`New ${type.charAt(0).toUpperCase()}${type.slice(1).toLowerCase()}`}
             </DialogTitle>
             <DialogContent>
                 {(type === DIRECTORY) ?
                     <TextField
                         margin="dense"
                         className={classes.textField}
-                        helperText="Enter a New File Name"
+                        helperText="Enter a New Directory Name"
                         fullWidth
                         autoFocus
                         inputProps={{
-                            onChange: handleNameChange,
-                            onKeyPress: handleNameKeyPress,
+                            onChange: handleChange('name'),
+                            onKeyPress: handleKeypress,
                             value: name
                         }}
                     /> :
@@ -82,18 +84,20 @@ const presenter = (props) => {
                                 fullWidth
                                 variant="outlined"
                                 inputProps={{
-                                    onChange: handleFilterStringChange,
+                                    onChange: handleChange('filter'),
                                     value: filterString
                                 }}
-                                InputLabelProps={{shrink: true}}
+                                InputLabelProps={{ shrink: true }}
                             />
                             <List dense className={classes.folderList}>
                                 <FileList
-                                    files={[]}
                                     dense
-                                    {...props}
-                                    regexp={!!filterString ? new RegExp(filterString, 'gi') : null}
+                                    regexp={filterString ? new RegExp(filterString, 'gi') : null}
+                                    files={files}
                                     invisibleSwitch
+                                    selectedTarget={selected}
+                                    handleClickFile={handleClickFile}
+                                    handleDoubleClickFile={handleDoubleClickFile}
                                 />
                             </List>
                         </div>

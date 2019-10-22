@@ -4,22 +4,11 @@ import { changeMiddleValue, DIRECTORY, FILE, SERVER } from '../utils';
 
 const initialState = {
     list: [],
-    selected: -1,
+    selected: null,
     newForm: {
         open: false,
         type: '',
     },
-};
-
-const sortCompare = (preFile, curFile) => {
-    if (preFile.isDirectory !== curFile.isDirectory) {
-        return (preFile.isDirectory && !curFile.isDirectory) ? -1 : 1;
-    }
-    const icmp = preFile.name.toLowerCase().localeCompare(curFile.name.toLowerCase());
-    if (icmp !== 0) return icmp;
-    if (preFile.name > curFile.name) return 1;
-    else if (preFile.name < curFile.name) return -1;
-    else return 0;
 };
 
 const checkAdding = (name, target) => files => {
@@ -93,10 +82,12 @@ const removeFile = (state, { file }) => {
     return state;
 };
 
-const toggleExtend = (state, { index }) => {
+const toggleExtend = (state, { target }) => {
+    const findIndex = state.list.findIndex(file => file === target);
+    if (findIndex < -1) return state;
     return {
         ...state,
-        list: changeMiddleValue(index)({ extended: !state.list[index].extended })(state.list)
+        list: changeMiddleValue(findIndex)({ extended: !state.list[findIndex].extended })(state.list)
     };
 };
 
@@ -120,7 +111,7 @@ export default (state = initialState || [], action) => {
         case SET_SELECTED:
             return {
                 ...state,
-                selected: action.index
+                selected: action.target
             };
 
         case SET_NEW_FORM:

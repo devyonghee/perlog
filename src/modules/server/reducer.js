@@ -6,12 +6,11 @@ import {
     SET_ERROR_FILE,
     SET_FILES,
     SET_SERVER_INFO,
-    SET_SOCKET, REMOVE_SOCKET
+    SET_SOCKET, REMOVE_SOCKET, TOGGLE_EXTEND
 } from './actions';
-import { changeMiddleValue } from '../utils';
+import { changeMiddleValue, DIRECTORY, FILE } from '../utils';
 
 const limitMessage = 200;
-
 
 const initialState = {
     servers: [],
@@ -21,7 +20,6 @@ const initialState = {
     openNewServer: false,
     loading: false,
 };
-
 
 const setSocket = (state, { url, socket }) => {
     const replaceUrl = url => url.trim().toLowerCase().replace('\/', '');
@@ -34,13 +32,13 @@ const setSocket = (state, { url, socket }) => {
     };
 };
 
-const removeSocket = (state, {index, socket}) => {
+const removeSocket = (state, { index, socket }) => {
     if (index < 0 && !socket) return state;
 
     if (index >= 0 && state.servers[index]) {
         return {
             ...state,
-            servers: changeMiddleValue(index)({ socket:null })(state.servers)
+            servers: changeMiddleValue(index)({ socket: null })(state.servers)
         };
     }
 
@@ -52,7 +50,7 @@ const removeSocket = (state, {index, socket}) => {
 
     return {
         ...state,
-        servers: changeMiddleValue(serverIndex)({ socket:null })(state.servers)
+        servers: changeMiddleValue(serverIndex)({ socket: null })(state.servers)
     };
 };
 
@@ -65,26 +63,25 @@ const createWithSortFiles = (files, parent) =>
         child: null
     })).sort(file => file.isDirectory ? -1 : 1) : [];
 
-const applyFiles = (state, { path, files: newFiles }) => {
-    const trimPath = path.replace(/(\\+|\/+)/g, '/').replace(/\/$/g, '');
-    if (!trimPath) return state;
 
-    const { searching: searchingDirectory } = state;
-
-    if (!searchingDirectory) {
-        const directory = {
-            name: trimPath,
-            isDirectory: true,
-            path: trimPath,
-            parent: searchingDirectory,
-        };
-
-        directory.child = createWithSortFiles(newFiles, directory);
-        return { ...state, files: [directory] };
-    }
-
-    searchingDirectory.child = createWithSortFiles(newFiles, searchingDirectory);
-    return { ...state, searching: null, files: [...state.files] };
+const setFiles = (state, { server, files, parent = null }) => {
+    const serverIndex = state.servers.findIndex(stateServer => stateServer === server);
+    if (serverIndex < 0) return state;
+    return {
+        ...state,
+        servers: changeMiddleValue(serverIndex)({
+            files: [
+                ...state.servers[serverIndex].files,
+                ...files.map(file => ({
+                    name: file.name,
+                    path: file.path,
+                    parent,
+                    type: file.isDirectory ? DIRECTORY : FILE,
+                    extended: false
+                }))
+            ]
+        })(state.servers)
+    };
 };
 
 const applyWatchingFile = (state, { file, watch }) => {
@@ -110,15 +107,21 @@ const applyErrorFile = (state, { path: errorPath }) => {
     return { ...state, watchedFiles: [...state.watchedFiles], errorFiles: [...state.errorFiles, watchedFile] };
 };
 
-const applyAddMessage = (state, action) => {
-    if (!state.socket || !action.hasOwnProperty('message')) return state;
-    const { path, message } = action;
-    const watchedFile = state.watchedFiles.find(file => file.path === path);
-    if (!watchedFile) return state;
+const toggleExtend = (state, { server, file, extend = null }) => {
+    const serverIndex = state.servers.findIndex(stateServer => stateServer === server);
+    if (serverIndex < 0) return state;
+    const fileIndex = state.servers[serverIndex].files.findIndex(stateFile => stateFile === file);
+    if (fileIndex < 0) return state;
 
-    if (state.messages.length >= limitMessage) state.messages.shift();
+    const files = (extend !== null && extend || !file.extended) ? [] :
+        changeMiddleValue(fileIndex)({
+            extended: (extend !== null) ? extend : !state.servers[serverIndex].files[fileIndex].extended
+        })(state.servers[serverIndex].files);
 
-    return { ...state, messages: [...state.messages, { file: watchedFile, message }] };
+    return {
+        ...state,
+        servers: changeMiddleValue(serverIndex)({ files })(state.servers)
+    };
 };
 
 export default (state = initialState, action) => {
@@ -134,7 +137,6 @@ export default (state = initialState, action) => {
                         socket: null,
                         token: '',
                         files: [],
-                        searching: null,
                     }]
             };
 
@@ -144,19 +146,14 @@ export default (state = initialState, action) => {
         case REMOVE_SOCKET:
             return removeSocket(state, action);
 
-        case SEARCH:
-            if (!state.socket) return state;
-            state.socket.emit('search', (!!action.directory) ? action.directory.path : '');
-            return { ...state, searching: action.directory };
-
         case SET_FILES:
-            return applyFiles(state, action);
+            return setFiles(state, action);
 
         case REQUEST_WATCH:
             return applyWatchingFile(state, action);
 
-        case ADD_MESSAGE:
-            return applyAddMessage(state, action);
+        case TOGGLE_EXTEND:
+            return toggleExtend(state, action);
 
         case SET_SERVER_INFO:
             return {

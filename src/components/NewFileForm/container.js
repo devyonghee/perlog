@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Presenter from './presenter';
 import { DIRECTORY } from 'src/modules/utils';
@@ -10,25 +10,31 @@ const propTypes = {
     type: PropTypes.string,
     close: PropTypes.func.isRequired,
     search: PropTypes.func.isRequired,
-    closeNewFileForm: PropTypes.func.isRequired,
-    handleAddFile: PropTypes.func.isRequired,
+    files: PropTypes.array,
 };
 
 const defaultProps = {
     type: '',
-    opened: false
+    opened: false,
+    files: [],
 };
 
 const container = (props) => {
-    const { opened, type, close, handleAddFile, target, server } = props;
-    const [name, setName] = useState('');
-    const [filterString, setFilterString] = useState('');
-    const [selectedFile, setSelectedTarget] = useState(null);
+    const { opened, type, close, addDirectory, server, search, toggleExtend } = props;
+    const [values, setValues] = useState({
+        name: '',
+        filter: '',
+        selected: null
+    });
 
-    const initState = () => setName('') & setSelectedTarget();
+    useEffect(() => {
+        if (!opened || server.files.length) return;
+        search();
+    }, [opened]);
+
     const handleClickFile = file => e => {
         e.preventDefault();
-        if (selectedFile !== file) setSelectedTarget(file);
+        setValues({ ...values, selected: file });
     };
 
     const handleClose = e => {
@@ -36,62 +42,62 @@ const container = (props) => {
         close();
     };
 
-    const handleFilterStringChange = e => {
+    const handleChange = key => e => {
         e.preventDefault();
-        setFilterString(e.target.value.replace(/\\/g, ''));
+        if (!values.hasOwnProperty(key)) return;
+        setValues({
+            ...values,
+            [key]: key === 'filter' ? e.target.value.replace(/\\/g, '') : e.target.value
+        });
     };
 
-    const handleNameChange = e => {
+    const handleKeyPress = e => {
+        if (e.key.toLowerCase() !== 'enter') return;
         e.preventDefault();
-        setName(e.target.value);
+        if (!values.name) return ipcRenderer.send('notice', '폴더명을 입력해주세요.', 'New Directory');
+        addDirectory(values.name);
+        setValues({ ...values, name: '' });
     };
 
     const handleClickConfirm = e => {
         e.preventDefault();
         if (!type) return;
         if (type === DIRECTORY) {
-            if (!name) return ipcRenderer.send('notice', '폴더명을 입력해주세요.', 'New Directory');
-            return handleAddFile({ name }) & initState();
+            if (!values.name) return ipcRenderer.send('notice', '폴더명을 입력해주세요.', 'New Directory');
+            addDirectory(values.name);
+            return setValues({ ...values, name: '' });
         }
-        if (!selectedFile || selectedFile.isDirectory) return ipcRenderer.send('notice', '파일을 선택해주세요.', 'New File');
-        return handleAddFile(selectedFile) & initState();
-    };
 
-    const handleNameKeyPress = e => {
-        if (e.key.toLowerCase() !== 'enter' || !name) return;
-        e.preventDefault();
-        handleAddFile({ name });
-        setName('');
+        // if (!selected || selected.isDirectory) return ipcRenderer.send('notice', '파일을 선택해주세요.', 'New File');
+        // return handleAddFile(selected);
     };
 
     const handleDoubleClickFile = file => e => {
         e.preventDefault();
-        selectedFile !== file && setSelectedTarget(file);
-        if (!file.type === DIRECTORY) return handleAddFile(file) & initState();
-/*
-        if (extendedDirectories.includes(file)) {
-            extendedDirectories.splice(extendedDirectories.indexOf(file), 1);
-            return setExtendDirectory([...extendedDirectories]);
-        }
+        setValues({ ...values, selected: file });
 
-        setExtendDirectory([...extendedDirectories, file]);
-        !file.child && search(file);*/
+        if (file.type === DIRECTORY) {
+            toggleExtend(server, file);
+            if (!file.extended) search(file);
+            // return handleAddFile(file) & initState();
+        }
+        // !file.child && search(file);
     };
 
     return (
         <Presenter
             type={type}
-            name={name}
+            name={values.name}
             opened={opened}
-            filterString={filterString}
-            selectedFile={selectedFile}
-            handleClickFile={handleClickFile}
+            files={server.files || []}
+            filterString={values.filter}
+            selected={values.selected}
             handleClose={handleClose}
-            handleNameChange={handleNameChange}
+            handleChange={handleChange}
+            handleKeypress={handleKeyPress}
+            handleClickFile={handleClickFile}
             handleClickConfirm={handleClickConfirm}
-            handleNameKeyPress={handleNameKeyPress}
             handleDoubleClickFile={handleDoubleClickFile}
-            handleFilterStringChange={handleFilterStringChange}
         />
     );
 

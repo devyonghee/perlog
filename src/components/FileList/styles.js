@@ -32,6 +32,10 @@ const useStyles = makeStyles(theme => ({
         marginRight: '0'
     },
 
+    iconPadding: {
+        paddingLeft: '24px',
+    },
+
     arrowIcon: {
         cursor: 'pointer',
     },

@@ -6,7 +6,7 @@ import FileList from '../FileList';
 
 const propTypes = {
     files: PropTypes.array,
-    selectedTarget: PropTypes.Object,
+    selectedTarget: PropTypes.object,
     handleClickList: PropTypes.func.isRequired,
     handleDoubleClickFile: PropTypes.func.isRequired,
     handleContextMenuList: PropTypes.func.isRequired,
@@ -14,8 +14,8 @@ const propTypes = {
 
 const defaultProps = {
     files: [],
+    selectedTarget: null,
     isOpenedNewForm: false,
-    selectedTargetIndex: null,
 };
 
 const presenter = props => {
@@ -32,12 +32,12 @@ const presenter = props => {
         <Paper className={classes.root} elevation={0} onClick={handleClickList()}>
             <List className={classes.list}>
                 <FileList
-                  files={files}
-                  switchable
-                  selectedTarget={selectedTarget}
-                  handleClickFile={handleClickList}
-                  handleDoubleClickFile={handleDoubleClickFile}
-                  handleContextMenuList={handleContextMenuList}
+                    files={files}
+                    switchable
+                    selectedTarget={selectedTarget}
+                    handleClickFile={handleClickList}
+                    handleDoubleClickFile={handleDoubleClickFile}
+                    handleContextMenuList={handleContextMenuList}
                 />
             </List>
             {/*<Divider className={classes.divider}/>*/}

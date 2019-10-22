@@ -3,6 +3,7 @@ import io from 'socket.io-client';
 import { removeServerToken, saveServer } from '../storage';
 import userActions from '../user/actions';
 import fileActions from '../file/actions';
+import { SERVER } from '../utils';
 
 const ipcRenderer = window.require('electron').ipcRenderer;
 
@@ -15,7 +16,7 @@ export const REQUEST_WATCH = Symbol('REQUEST_WATCH');
 export const SEARCH = Symbol('SEARCH');
 export const SET_FILES = Symbol('SET_FILES');
 export const ADD_MESSAGE = Symbol('ADD_MESSAGE');
-export const SET_ERROR_FILE = Symbol('SET_ERROR_FILE');
+export const TOGGLE_EXTEND = Symbol('TOGGLE_EXTEND');
 
 const addServer = (name, url) => {
     return {
@@ -59,29 +60,20 @@ const requestWatch = (file, watch) => {
     };
 };
 
-const search = (index, directory = null) => {
-    return {
-        type: SEARCH,
-        index,
-        directory
-    };
-};
-
-const setFiles = (index, path, files) => {
+const setFiles = (server, files, parent = null) => {
     return {
         type: SET_FILES,
-        index,
-        path,
+        server,
         files,
+        parent
     };
 };
 
-const addMessage = (path, message) => {
+const toggleExtend = (server, file, extend = null) => {
     return {
-        type: ADD_MESSAGE,
-        path,
-        message
-    };
+        type: TOGGLE_EXTEND,
+        server, file, extend
+    }
 };
 
 const registerEvent = (url, socket) => dispatch => {
@@ -89,7 +81,7 @@ const registerEvent = (url, socket) => dispatch => {
         dispatch(setSocket(url, socket));
     });
 
-    socket.on('searched', (path, files) => dispatch(setFiles(path, files)));
+    // socket.on('searched', (path, files) => dispatch(setFiles(path, files)));
     socket.on('log', (path, message) => dispatch(addMessage(path, message)));
     socket.on('fileError', (path, message) => ipcRenderer.send('notice', message));
 
@@ -109,6 +101,23 @@ const registerEvent = (url, socket) => dispatch => {
     });
 };
 
+const getSelectedServer = (file, servers) => {
+    if (!file) return null;
+    if (file.type === SERVER) return servers.find(server => server.url === file.url);
+    if (file.parent) return getSelectedServer(file.parent, servers);
+    return null;
+};
+
+const search = (parent = null) => (dispatch, getState) => {
+    const { file, server: serverState } = getState();
+    if (!file.selected) return;
+    const server = getSelectedServer(file.selected, serverState.servers);
+    if (!server || !server.socket) return;
+
+    server.socket.once('searched', files => dispatch(setFiles(server, files, parent)));
+    server.socket.emit('search', parent ? parent.path : '');
+};
+
 const connectAndRegister = (url, token) => dispatch => {
     const socket = io.connect(`${url}?token=${token}`, {
         transports: ['websocket'],
@@ -121,17 +130,17 @@ const connectAndRegister = (url, token) => dispatch => {
 };
 
 const connectByToken = (url, token) => async dispatch => {
-        try {
-            const response = await axios.post(url + '/login', { token });
-            if (response.status !== 200) {
-                return ipcRenderer.send('notice', '서버 오류');
-            }
-            dispatch(connectAndRegister(url, response.data));
-            dispatch(setServerInfo({ token }));
-        } catch (e) {
-            removeServerToken(url);
-            ipcRenderer.send('notice', '토큰이 만료되었습니다.');
+    try {
+        const response = await axios.post(url + '/login', { token });
+        if (response.status !== 200) {
+            return ipcRenderer.send('notice', '서버 오류');
         }
+        dispatch(connectAndRegister(url, response.data));
+        dispatch(setServerInfo({ token }));
+    } catch (e) {
+        removeServerToken(url);
+        ipcRenderer.send('notice', '토큰이 만료되었습니다.');
+    }
 };
 
 const connect = (url, name) => async (dispatch, getState) => {
@@ -165,7 +174,7 @@ export default {
     setFiles,
     requestWatch,
     search,
-    addMessage,
+    toggleExtend,
     connect,
     connectAndRegister,
     connectByToken

@@ -1,10 +1,19 @@
-import React, {useRef, useEffect, useState} from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import Presenter from './presenter';
+import PropTypes from 'prop-types';
 
 const { ipcRenderer } = window.require('electron');
 
+const propTypes = {
+    messages: PropTypes.array,
+};
+
+const defaultProps = {
+    messages: [],
+};
+
 const container = (props) => {
-    const {messages} = props;
+    const { messages } = props;
     const screen = useRef(null);
     const [preScrollHeight, setPreScrollHeight] = useState(0);
     const [filterString, setFilterString] = useState('');
@@ -32,7 +41,7 @@ const container = (props) => {
         }
 
         screen.current.scrollTop = screen.current.scrollHeight - screen.current.clientHeight;
-        setPreScrollHeight(screen.current.scrollHeight)
+        setPreScrollHeight(screen.current.scrollHeight);
     }, [props.messages]);
 
     return <Presenter
@@ -42,5 +51,8 @@ const container = (props) => {
         handleFilterStringChange={handleFilterStringChange}
     />;
 };
+
+container.propTypes = propTypes;
+container.defaultProps = defaultProps;
 
 export default container;
