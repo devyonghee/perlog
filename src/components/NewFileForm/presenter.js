@@ -91,6 +91,7 @@ const presenter = (props) => {
                             />
                             <List dense className={classes.folderList}>
                                 <FileList
+                                    lazyLoading
                                     dense
                                     regexp={filterString ? new RegExp(filterString, 'gi') : null}
                                     files={files}

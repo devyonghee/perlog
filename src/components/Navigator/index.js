@@ -7,7 +7,7 @@ import fileActions from 'src/modules/file/actions';
 const mapStateToProps = state => {
     return {
         files: state.file.list,
-        selectedTarget: state.file.selected,
+        selectedIndex: state.file.selectedIndex,
     };
 };
 

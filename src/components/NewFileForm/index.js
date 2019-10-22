@@ -5,30 +5,30 @@ import fileActions from 'src/modules/file/actions';
 import serverActions from 'src/modules/server/actions';
 import { SERVER } from 'src/modules/utils';
 
-const getSelectedServer = (file, serverState) => {
-    if (!file) return null;
-    if (file.type === SERVER) {
-        const server = serverState.servers.find(server => server.url === file.url);
-        return server ? server : null;
-    }
-    if (file.parent) return getSelectedServer(file.parent, serverState);
-    return null;
+const getSelectedServerIndex = (fileList, index, servers) => {
+    if (index < 0 || !fileList.hasOwnProperty(index)) return -1;
+    if (fileList[index].type === SERVER) return servers.findIndex(server => server.url === fileList[index].url);
+    return getSelectedServerIndex(fileList, fileList[index].parentIndex, servers);
 };
 
 const mapStateToProps = state => {
+    const selectedServerIndex = getSelectedServerIndex(state.file.list, state.file.selectedIndex, state.server.servers);
+
     return {
         opened: state.file.newForm.open,
         type: state.file.newForm.type,
-        server: getSelectedServer(state.file.selected, state.server),
+        serverIndex: selectedServerIndex,
+        files: selectedServerIndex >= 0 ? state.server.servers[selectedServerIndex] : []
     };
 };
 
 const mapDispatchToProps = (dispatch) => {
     return bindActionCreators({
-        shrink: serverActions.to,
+        toggleExtend: serverActions.toggleExtend,
         search: serverActions.search,
         close: () => fileActions.setNewForm(false),
         addDirectory: fileActions.addDirectory,
+        addFile: fileActions.addFile,
     }, dispatch);
 };
 

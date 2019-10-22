@@ -19,7 +19,7 @@ const defaultProps = {
 };
 
 const container = props => {
-    const { search, files, toggleExtend, setSelected, selectedTarget, openNewAdd } = props;
+    const { search, files, toggleExtend, setSelected, selectedIndex, openNewAdd } = props;
 
     // const closeNewFileForm = () => setOpenNewFileForm({ opened: false, type: '' });
 
@@ -111,8 +111,7 @@ const container = props => {
         files={files}
         search={search}
         handleClickList={handleClickList}
-        selectedTarget={selectedTarget}
-        // watchedFiles={watchedFiles}
+        selectedTarget={files[selectedIndex]}
         handleDoubleClickFile={handleDoubleClickFile}
         // handleFileWatchSwitch={handleFileWatchSwitch}
         handleContextMenuList={handleContextMenuList}

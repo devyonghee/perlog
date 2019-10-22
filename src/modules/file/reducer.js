@@ -1,23 +1,23 @@
 import { ADD_DIRECTORY, ADD_FILE, ADD_SERVER, REMOVE_FILE, SET_NEW_FORM, SET_SELECTED, TOGGLE_EXTEND } from './actions';
 import { colorsIndex } from './colors';
-import { changeMiddleValue, DIRECTORY, FILE, SERVER } from '../utils';
+import { changeValue, DIRECTORY, FILE, SERVER } from '../utils';
 
 const initialState = {
     list: [],
-    selected: null,
+    selectedIndex: -1,
     newForm: {
         open: false,
         type: '',
     },
 };
 
-const checkAdding = (name, target) => files => {
-    if (!name || !target) throw new Error('인자가 잘못되었습니다.');
+const checkAdding = (name, selectedIndex = -1) => files => {
+    if (!name || selectedIndex < 0) throw new Error('인자가 잘못되었습니다.');
 
-    const currentParent = files.find(file => file === target);
+    const currentParent = files[selectedIndex];
     if (!currentParent || currentParent.type === File) throw new Error('추가할 디렉토리를 선택해주세요');
 
-    const child = files.find(file => file.parent && file.parent === currentParent);
+    const child = files.find(file => file.parentIndex && file.parent === currentParent);
     if (child.some(child => child.name === name)) throw new Error('추가할 디렉토리를 선택해주세요');
 };
 
@@ -33,14 +33,14 @@ const addServer = (state, { name, url }) => {
     };
 };
 
-const addDirectory = (state, { name, target }) => {
+const addDirectory = (state, { name }) => {
     try {
-        checkAdding(name, target)(state);
+        checkAdding(name, state.selectedIndex)(state);
 
         const newDirectory = {
             name: name,
             type: DIRECTORY,
-            parent: target,
+            parentIndex: state.selectedIndex,
             extended: false,
         };
 
@@ -57,9 +57,9 @@ const addDirectory = (state, { name, target }) => {
     }
 };
 
-const addFile = (state, { name, path, target }) => {
+const addFile = (state, { name, path }) => {
     try {
-        checkAdding(name, target)(state);
+        checkAdding(name, state.selectedIndex)(state);
 
         return {
             ...state,
@@ -67,7 +67,7 @@ const addFile = (state, { name, path, target }) => {
                 name, path,
                 type: FILE,
                 color: colorsIndex.next().value,
-                parent: target,
+                parentIndex: state.selectedIndex,
                 watch: false,
             }]
         };
@@ -83,11 +83,11 @@ const removeFile = (state, { file }) => {
 };
 
 const toggleExtend = (state, { target }) => {
-    const findIndex = state.list.findIndex(file => file === target);
-    if (findIndex < -1) return state;
+    const findTarget = state.list.find(file => file === target);
+    if (!findTarget || findTarget.type === FILE) return state;
     return {
         ...state,
-        list: changeMiddleValue(findIndex)({ extended: !state.list[findIndex].extended })(state.list)
+        list: changeValue(target)({ extended: !findTarget.extended })(state.list)
     };
 };
 
@@ -111,7 +111,7 @@ export default (state = initialState || [], action) => {
         case SET_SELECTED:
             return {
                 ...state,
-                selected: action.target
+                selectedIndex: state.list.findIndex(file => file === action.target)
             };
 
         case SET_NEW_FORM:

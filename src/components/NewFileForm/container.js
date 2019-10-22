@@ -8,33 +8,34 @@ const ipcRenderer = window.require('electron').ipcRenderer;
 const propTypes = {
     opened: PropTypes.bool,
     type: PropTypes.string,
+    serverIndex: PropTypes.number,
     close: PropTypes.func.isRequired,
     search: PropTypes.func.isRequired,
-    files: PropTypes.array,
 };
 
 const defaultProps = {
     type: '',
     opened: false,
-    files: [],
+    serverIndex: -1
 };
 
 const container = (props) => {
-    const { opened, type, close, addDirectory, server, search, toggleExtend } = props;
+    const { opened, type, close, addDirectory, serverIndex, search, toggleExtend, addFile, files } = props;
+
     const [values, setValues] = useState({
         name: '',
         filter: '',
-        selected: null
+        selectedIndex: -1
     });
 
     useEffect(() => {
-        if (!opened || server.files.length) return;
+        if (!opened) return;
         search();
     }, [opened]);
 
-    const handleClickFile = file => e => {
+    const handleClickFile = target => e => {
         e.preventDefault();
-        setValues({ ...values, selected: file });
+        setValues({ ...values, selectedIndex: files.findIndex(file => file === target) });
     };
 
     const handleClose = e => {
@@ -68,17 +69,18 @@ const container = (props) => {
             return setValues({ ...values, name: '' });
         }
 
-        // if (!selected || selected.isDirectory) return ipcRenderer.send('notice', '파일을 선택해주세요.', 'New File');
-        // return handleAddFile(selected);
+        if (values.selectedIndex < 0 || (files[values.selectedIndex] && files[values.selectedIndex].type === DIRECTORY)) return ipcRenderer.send('notice', '파일을 선택해주세요.', 'New File');
+        return addFile(values.selectedIndex);
     };
 
-    const handleDoubleClickFile = file => e => {
+    const handleDoubleClickFile = target => e => {
         e.preventDefault();
-        setValues({ ...values, selected: file });
+        const fileIndex = files.findIndex(file => file === target);
+        setValues({ ...values, selectedIndex: fileIndex });
 
-        if (file.type === DIRECTORY) {
-            toggleExtend(server, file);
-            if (!file.extended) search(file);
+        if (target.type === DIRECTORY) {
+            toggleExtend(serverIndex, fileIndex);
+            if (!target.extended) search(fileIndex);
             // return handleAddFile(file) & initState();
         }
         // !file.child && search(file);
@@ -89,9 +91,9 @@ const container = (props) => {
             type={type}
             name={values.name}
             opened={opened}
-            files={server.files || []}
+            files={files}
             filterString={values.filter}
-            selected={values.selected}
+            selected={files[values.selectedIndex]}
             handleClose={handleClose}
             handleChange={handleChange}
             handleKeypress={handleKeyPress}

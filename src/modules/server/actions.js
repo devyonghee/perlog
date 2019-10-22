@@ -60,19 +60,19 @@ const requestWatch = (file, watch) => {
     };
 };
 
-const setFiles = (server, files, parent = null) => {
+const setFiles = (server, files, parentIndex = -1) => {
     return {
         type: SET_FILES,
         server,
         files,
-        parent
+        parentIndex
     };
 };
 
-const toggleExtend = (server, file, extend = null) => {
+const toggleExtend = (serverIndex, targetIndex, extend = null) => {
     return {
         type: TOGGLE_EXTEND,
-        server, file, extend
+        serverIndex, targetIndex, extend
     }
 };
 
@@ -81,8 +81,7 @@ const registerEvent = (url, socket) => dispatch => {
         dispatch(setSocket(url, socket));
     });
 
-    // socket.on('searched', (path, files) => dispatch(setFiles(path, files)));
-    socket.on('log', (path, message) => dispatch(addMessage(path, message)));
+    // socket.on('log', (path, message) => dispatch(addMessage(path, message)));
     socket.on('fileError', (path, message) => ipcRenderer.send('notice', message));
 
     socket.on('disconnect', reason => {
@@ -101,21 +100,21 @@ const registerEvent = (url, socket) => dispatch => {
     });
 };
 
-const getSelectedServer = (file, servers) => {
-    if (!file) return null;
-    if (file.type === SERVER) return servers.find(server => server.url === file.url);
-    if (file.parent) return getSelectedServer(file.parent, servers);
-    return null;
+const getSelectedServerIndex = (fileList, index, servers) => {
+    if (index < 0 || !fileList.hasOwnProperty(index)) return -1;
+    if (fileList[index].type === SERVER) return servers.findIndex(server => server.url === fileList[index].url);
+    return getSelectedServerIndex(fileList, fileList[index].parentIndex, servers);
 };
 
-const search = (parent = null) => (dispatch, getState) => {
-    const { file, server: serverState } = getState();
-    if (!file.selected) return;
-    const server = getSelectedServer(file.selected, serverState.servers);
+const search = (parentIndex = -1) => (dispatch, getState) => {
+    const { file : fileState, server: serverState } = getState();
+    if (fileState.selectedIndex < 0) return;
+    const server = getSelectedServerIndex(fileState.list[fileState.selectedIndex], serverState.servers);
     if (!server || !server.socket) return;
+    const file = server.files[parentIndex];
 
-    server.socket.once('searched', files => dispatch(setFiles(server, files, parent)));
-    server.socket.emit('search', parent ? parent.path : '');
+    server.socket.once('searched', files => dispatch(setFiles(server, files, file ? parentIndex : -1)));
+    server.socket.emit('search', file ? file.path : '');
 };
 
 const connectAndRegister = (url, token) => dispatch => {
