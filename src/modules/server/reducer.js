@@ -1,7 +1,7 @@
 import {
     ADD_SERVER,
     REMOVE_SOCKET,
-    REQUEST_WATCH, SELECT_SERVER,
+    REQUEST_WATCH,
     SET_FILES,
     SET_SERVER_INFO,
     SET_SOCKET,
@@ -61,20 +61,6 @@ const setFiles = (state, { files, index = [] }) => {
     };
 };
 
-const applyWatchingFile = (state, { file, watch }) => {
-    if (!state.socket || !file || file.isDirectory || !file.path) return state;
-    const { watchedFiles } = state;
-    if (watch) {
-        !watchedFiles.includes(file) && watchedFiles.push(file);
-        state.socket.emit('watch', file.path);
-    } else {
-        state.socket.emit('forget', file.path);
-        watchedFiles.includes(file) && watchedFiles.splice(watchedFiles.indexOf(file), 1);
-    }
-
-    return { ...state, watchedFiles: [...watchedFiles] };
-};
-
 const toggleExtend = (state, { extend = null }) => {
     const selectedIndex = state.selectedFile;
 
@@ -110,9 +96,6 @@ export default (state = initialState, action) => {
 
         case SET_FILES:
             return setFiles(state, action);
-
-        case REQUEST_WATCH:
-            return applyWatchingFile(state, action);
 
         case TOGGLE_EXTEND:
             return toggleExtend(state, action);

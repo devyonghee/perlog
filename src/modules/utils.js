@@ -16,12 +16,21 @@ export const changeChildValue = indexes => values => array => {
     if (!Array.isArray(indexes) || !Array.isArray(array)) return array;
     const newIndexes = [...indexes];
     const currentIndex = newIndexes.shift();
-    if (!array[currentIndex]) return array;
-    if (newIndexes.length) return changeChildValue(newIndexes)(values)(array.child);
+    if (!array[currentIndex] && array[currentIndex].type === FILE) return array;
+    if (newIndexes.length) {
+        return [
+            ...array.slice(0, currentIndex),
+            {
+                ...array[currentIndex],
+                child: changeChildValue(newIndexes)(values)(array[currentIndex].child)
+            },
+            ...array.slice(currentIndex + 1)
+        ];
+    }
 
     return [
         ...array.slice(0, currentIndex),
-        Object.assign(array[currentIndex], { ...values }),
+        Object.assign(array[currentIndex], values),
         ...array.slice(currentIndex + 1)
     ];
 };

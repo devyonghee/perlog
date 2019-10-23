@@ -54,8 +54,10 @@ const useStyles = makeStyles(theme => ({
         width: '100px',
         userSelect: 'none',
     },
+
     emptyText : {
-        height: '10px'
+        paddingLeft: ({ depth }) => `${(theme.spacing(3) * depth) + 56}px !important`,
+        height: ({ dense }) => dense ? '25px' : '45px',
     },
 
     switchRoot: {

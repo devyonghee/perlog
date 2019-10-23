@@ -1,9 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Presenter from './presenter';
-import { FILE, DIRECTORY, findByIndex, SERVER } from 'src/modules/utils';
+import { DIRECTORY, FILE, findByIndex, SERVER } from 'src/modules/utils';
 
-const { ipcRenderer, remote } = window.require('electron');
+const { remote } = window.require('electron');
 
 const propTypes = {
     files: PropTypes.array,
@@ -21,26 +21,6 @@ const defaultProps = {
 const container = props => {
     const { files, toggleExtend, selectIndex, servers, selectServer, selectedIndex, openNewAdd } = props;
 
-    // const closeNewFileForm = () => setOpenNewFileForm({ opened: false, type: '' });
-
-    // const handleAddFile = target => {
-    //     const currentDirectory = (!!selectedFile) ? selectedFile.child : files;
-    //     if (!!currentDirectory && currentDirectory.some(file => file.name === target.name && file.isDirectory === (newFileForm.type === 'directory'))) {
-    //         return ipcRenderer.send('notice', `이미 존재하는 ${newFileForm.type}입니다.`, newFileForm.type);
-    //     }
-    //
-    //     let parent = null;
-    //     if (!!selectedFile) {
-    //         parent = selectedFile.isDirectory ? selectedFile : selectedFile.parent;
-    //     }
-    //
-    //     (newFileForm.type === 'directory') ?
-    //         addDirectory(target.name, parent) :
-    //         addFile(target, parent);
-    //
-    //     !!parent && !extendedDirectories.includes(parent) && setExtendDirectory([...extendedDirectories, parent]);
-    //     closeNewFileForm();
-    // };
     //
     // const handleFileWatchSwitch = (e, file) => {
     //     e.stopPropagation();
@@ -64,7 +44,8 @@ const container = props => {
     const handleDoubleClickFile = (index) => e => {
         e.preventDefault();
         selectIndex(index);
-        toggleExtend();
+        const file = findByIndex(files);
+        if (file && file.type !== FILE) toggleExtend();
     };
 
     const handleContextMenuList = index => e => {
@@ -75,40 +56,43 @@ const container = props => {
         if (!target) return;
 
         const { Menu } = remote;
-        const contextMenu = [
+        const contextMenu = (target.type !== FILE) ? [
             {
                 label: 'New File',
                 click: () => {
-                    const rootFile = findByIndex(index.slice(0,1))(files);
-                    if(!rootFile || rootFile.type !== SERVER) return;
-                    selectServer(servers.findIndex(url=> url === rootFile.url));
-                    openNewAdd(FILE)
+                    const rootFile = findByIndex(index.slice(0, 1))(files);
+                    if (!rootFile || rootFile.type !== SERVER) return;
+                    selectServer(servers.findIndex(url => url === rootFile.url));
+                    openNewAdd(FILE);
                 }
             },
             {
                 label: 'New Directory',
                 click: () => openNewAdd(DIRECTORY)
             },
-        ];
+            { type: 'separator' },
+        ] : [];
 
-        contextMenu.push({ type: 'separator' }, {
-                label: 'Delete...', click: async () => {
-                    const options = {
-                        type: 'question',
-                        title: 'Delete',
-                        message: `Delete ${target.type.toLowerCase()} "${target.name}"?`,
-                        buttons: ['Yes', 'No']
-                    };
-                    const returnValue = await remote.dialog.showMessageBox(options);
+        contextMenu.push({
+            label: 'Delete...',
+            click: async () => {
+                const options = {
+                    type: 'question',
+                    title: 'Delete',
+                    message: `Delete ${target.type.toLowerCase()} "${target.name}"?`,
+                    buttons: ['Yes', 'No']
+                };
+                const returnValue = await remote.dialog.showMessageBox(options);
 
-                    if (returnValue.response !== 0) return;
-                    const forgetFile = file => {
-                        // if(!file.isDirectory) watchFile(file, false);
-                        // if (!!file.child && file.child.length) file.child.map(forgetFile);
-                    };
-                }
+                if (returnValue.response !== 0) return;
+                const forgetFile = file => {
+                    // if(!file.isDirectory) watchFile(file, false);
+                    // if (!!file.child && file.child.length) file.child.map(forgetFile);
+                };
             }
-        );
+
+        });
+
         const menu = new Menu.buildFromTemplate(contextMenu);
         return menu.popup();
     };

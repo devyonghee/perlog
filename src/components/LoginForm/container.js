@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Presenter from './presenter';
 
-const ipcRenderer = window.require('electron').ipcRenderer;
-
 const propTypes = {
     open: PropTypes.bool,
     closeForm: PropTypes.func.isRequired

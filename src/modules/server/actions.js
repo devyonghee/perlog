@@ -51,14 +51,6 @@ const resetSocket = () => {
     };
 };
 
-const requestWatch = (file, watch) => {
-    return {
-        type: REQUEST_WATCH,
-        file,
-        watch,
-    };
-};
-
 const setFiles = (files, index) => {
     return {
         type: SET_FILES,
@@ -107,6 +99,22 @@ const search = (index = []) => (dispatch, getState) => {
     const file = findByIndex(index)(serverState.files);
     server.socket.once('searched', files => dispatch(setFiles(files, index)));
     server.socket.emit('search', file ? file.path : '');
+};
+
+const watch = (index, watch) => (dispatch, getState) => {
+    const { server: serverState, file: fileState } = getState();
+    const rootFile = findByIndex(index.slice(0, 1))(fileState.list);
+    if (!rootFile || rootFile !== SERVER) return;
+
+    const server = serverState.servers.find(server => server.url === rootFile.url);
+    if (!server || !server.socket) return;
+
+    const target = findByIndex(index)(fileState.list);
+    if (!target || !target.path) return;
+
+    server.socket.emit('forget', target.path);
+    if (watch) server.socket.emit('watch', target.path);
+    dispatch(fileActions.setWatch(index, watch));
 };
 
 const connectAndRegister = (url, token) => dispatch => {
@@ -163,7 +171,7 @@ export default {
     setServerInfo,
     resetSocket,
     setFiles,
-    requestWatch,
+    watch,
     search,
     toggleExtend,
     connect,

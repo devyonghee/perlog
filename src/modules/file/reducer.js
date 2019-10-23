@@ -2,8 +2,10 @@ import {
     ADD_DIRECTORY,
     ADD_FILE,
     ADD_SERVER,
-    REMOVE_FILE, SELECT_INDEX,
+    REMOVE_FILE,
+    SELECT_INDEX,
     SET_NEW_FORM,
+    SET_WATCH,
     TOGGLE_EXTEND
 } from './actions';
 import { colorsIndex } from './colors';
@@ -49,10 +51,10 @@ const addDirectory = (state, { name }) => {
         return {
             ...state,
             list: changeChildValue(index)({
+                extended: true,
                 child: [...findByIndex(index)(state.list).child, {
                     name: name,
                     type: DIRECTORY,
-                    parentIndex: state.selectedIndex,
                     extended: false,
                     child: [],
                 }]
@@ -65,19 +67,20 @@ const addDirectory = (state, { name }) => {
     }
 };
 
-const addFile = (state, { name, path }) => {
+const addFile = (state, { file }) => {
     try {
         const index = state.selectedIndex;
-        checkAdding(name, index)(state.list);
+        checkAdding(file.name, index)(state.list);
 
         return {
             ...state,
             list: changeChildValue(index)({
+                extended: true,
                 child: [...findByIndex(index)(state.list).child, {
-                    name, path,
+                    name: file.name,
+                    path: file.path,
                     type: FILE,
                     color: colorsIndex.next().value,
-                    parentIndex: state.selectedIndex,
                     watch: false,
                 }]
             })(state.list)
@@ -89,19 +92,31 @@ const addFile = (state, { name, path }) => {
     }
 };
 
+const setWatch = (state, { index, watch }) => {
+    const findFile = findByIndex(index)(state.list);
+    if (!findFile || findFile !== FILE) return state;
+
+    return {
+        ...state,
+        list: changeChildValue(index)({ watch })(state.list)
+    };
+
+};
+
 const removeFile = (state, { file }) => {
     return state;
 };
 
-const toggleExtend = (state) => {
+const toggleExtend = (state, { extend = null }) => {
     const index = state.selectedIndex;
     const selected = findByIndex(index)(state.list);
-    if (!selected) return state;
+    if (!selected || selected.type === FILE) return state;
 
+    const newExtend = extend !== null ? extend : !selected.extended;
     return {
         ...state,
         list: changeChildValue(index)({
-            extended: !selected.extended
+            extended: newExtend
         })(state.list)
     };
 };
@@ -119,6 +134,8 @@ export default (state = initialState || [], action) => {
 
         case REMOVE_FILE:
             return removeFile(state, action);
+        case SET_WATCH:
+            return setWatch(state, action);
 
         case TOGGLE_EXTEND:
             return toggleExtend(state, action);
