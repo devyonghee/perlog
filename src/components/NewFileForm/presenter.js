@@ -37,7 +37,7 @@ const presenter = (props) => {
         files,
         opened,
         filterString,
-        selected,
+        selectedFile,
         handleClose,
         handleChange,
         handleKeypress,
@@ -96,7 +96,7 @@ const presenter = (props) => {
                                     regexp={filterString ? new RegExp(filterString, 'gi') : null}
                                     files={files}
                                     invisibleSwitch
-                                    selectedTarget={selected}
+                                    selectedIndex={selectedFile}
                                     handleClickFile={handleClickFile}
                                     handleDoubleClickFile={handleDoubleClickFile}
                                 />

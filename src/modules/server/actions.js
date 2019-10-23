@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 import { removeServerToken, saveServer } from '../storage';
 import userActions from '../user/actions';
 import fileActions from '../file/actions';
-import { SERVER } from '../utils';
+import { findByIndex, SERVER } from '../utils';
 
 const ipcRenderer = window.require('electron').ipcRenderer;
 
@@ -13,7 +13,6 @@ export const REMOVE_SOCKET = Symbol('REMOVE_SOCKET');
 export const SET_SERVER_INFO = Symbol('SET_SERVER_INFO');
 export const RESET_SOCKET = Symbol('RESET_SOCKET');
 export const REQUEST_WATCH = Symbol('REQUEST_WATCH');
-export const SEARCH = Symbol('SEARCH');
 export const SET_FILES = Symbol('SET_FILES');
 export const ADD_MESSAGE = Symbol('ADD_MESSAGE');
 export const TOGGLE_EXTEND = Symbol('TOGGLE_EXTEND');
@@ -60,19 +59,18 @@ const requestWatch = (file, watch) => {
     };
 };
 
-const setFiles = (server, files, parentIndex = -1) => {
+const setFiles = (files, index) => {
     return {
         type: SET_FILES,
-        server,
         files,
-        parentIndex
+        index
     };
 };
 
-const toggleExtend = (serverIndex, targetIndex, extend = null) => {
+const toggleExtend = (extend = null) => {
     return {
         type: TOGGLE_EXTEND,
-        serverIndex, targetIndex, extend
+        extend
     }
 };
 
@@ -100,20 +98,14 @@ const registerEvent = (url, socket) => dispatch => {
     });
 };
 
-const getSelectedServerIndex = (fileList, index, servers) => {
-    if (index < 0 || !fileList.hasOwnProperty(index)) return -1;
-    if (fileList[index].type === SERVER) return servers.findIndex(server => server.url === fileList[index].url);
-    return getSelectedServerIndex(fileList, fileList[index].parentIndex, servers);
-};
+const search = (index = []) => (dispatch, getState) => {
+    const { server: serverState } = getState();
+    if (serverState.selectedServer < 0) return;
+    const server = serverState.servers[serverState.selectedServer];
 
-const search = (parentIndex = -1) => (dispatch, getState) => {
-    const { file : fileState, server: serverState } = getState();
-    if (fileState.selectedIndex < 0) return;
-    const server = getSelectedServerIndex(fileState.list[fileState.selectedIndex], serverState.servers);
     if (!server || !server.socket) return;
-    const file = server.files[parentIndex];
-
-    server.socket.once('searched', files => dispatch(setFiles(server, files, file ? parentIndex : -1)));
+    const file = findByIndex(index)(serverState.files);
+    server.socket.once('searched', files => dispatch(setFiles(files, index)));
     server.socket.emit('search', file ? file.path : '');
 };
 

@@ -24,7 +24,7 @@ const useStyles = makeStyles(theme => ({
         "&:hover": {
             backgroundColor: "rgba(0,0,0, 0.08)",
         },
-        paddingLeft: ({ depth }) => `${depth * 20}px`,
+        paddingLeft: ({ depth }) => `${(theme.spacing(3)) * (depth)}px !important`,
         height: ({ dense }) => dense ? '25px' : '45px',
     },
     iconWrap: {
@@ -53,7 +53,6 @@ const useStyles = makeStyles(theme => ({
         overflow: 'hidden',
         width: '100px',
         userSelect: 'none',
-        paddingLeft: ({ depth }) => `${(theme.spacing(3)) * (depth + 1)}px`,
     },
     emptyText : {
         height: '10px'

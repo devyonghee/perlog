@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import Presenter from './presenter';
-import { FILE, DIRECTORY } from 'src/modules/utils';
+import { FILE, DIRECTORY, findByIndex, SERVER } from 'src/modules/utils';
 
 const { ipcRenderer, remote } = window.require('electron');
 
@@ -9,7 +9,7 @@ const propTypes = {
     files: PropTypes.array,
     selectedTarget: PropTypes.object,
     toggleExtend: PropTypes.func.isRequired,
-    setSelected: PropTypes.func.isRequired,
+    selectIndex: PropTypes.func.isRequired,
     openNewAdd: PropTypes.func.isRequired,
 };
 
@@ -19,7 +19,7 @@ const defaultProps = {
 };
 
 const container = props => {
-    const { search, files, toggleExtend, setSelected, selectedIndex, openNewAdd } = props;
+    const { files, toggleExtend, selectIndex, servers, selectServer, selectedIndex, openNewAdd } = props;
 
     // const closeNewFileForm = () => setOpenNewFileForm({ opened: false, type: '' });
 
@@ -56,28 +56,34 @@ const container = props => {
     // };
     //
 
-    const handleClickList = (target = null) => e => {
+    const handleClickList = (index = []) => e => {
         e.stopPropagation();
-        setSelected(target);
+        selectIndex(index);
     };
 
-    const handleDoubleClickFile = (target = null) => e => {
+    const handleDoubleClickFile = (index) => e => {
         e.preventDefault();
-        setSelected(target);
-        if (!target) return;
-        toggleExtend(target);
+        selectIndex(index);
+        toggleExtend();
     };
 
-    const handleContextMenuList = target => e => {
+    const handleContextMenuList = index => e => {
         e.stopPropagation();
-        setSelected(target);
+        selectIndex(index);
+
+        const target = findByIndex(index)(files);
         if (!target) return;
 
         const { Menu } = remote;
         const contextMenu = [
             {
                 label: 'New File',
-                click: () => openNewAdd(FILE)
+                click: () => {
+                    const rootFile = findByIndex(index.slice(0,1))(files);
+                    if(!rootFile || rootFile.type !== SERVER) return;
+                    selectServer(servers.findIndex(url=> url === rootFile.url));
+                    openNewAdd(FILE)
+                }
             },
             {
                 label: 'New Directory',
@@ -109,9 +115,8 @@ const container = props => {
 
     return <Presenter
         files={files}
-        search={search}
         handleClickList={handleClickList}
-        selectedTarget={files[selectedIndex]}
+        selectedIndex={selectedIndex}
         handleDoubleClickFile={handleDoubleClickFile}
         // handleFileWatchSwitch={handleFileWatchSwitch}
         handleContextMenuList={handleContextMenuList}

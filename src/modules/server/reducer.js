@@ -1,63 +1,63 @@
 import {
     ADD_SERVER,
     REMOVE_SOCKET,
-    REQUEST_WATCH,
+    REQUEST_WATCH, SELECT_SERVER,
     SET_FILES,
     SET_SERVER_INFO,
     SET_SOCKET,
     TOGGLE_EXTEND
 } from './actions';
-import { changeValue, DIRECTORY, FILE } from '../utils';
+import { changeChildValue, changeValue, DIRECTORY, FILE, findByIndex } from '../utils';
 
 const initialState = {
     servers: [],
+    files: [],
     watchedFiles: [],
-    selecting: null,
     tempUrl: '',
     openNewServer: false,
     loading: false,
+    selectedServer: -1,
+    selectedFile: [],
 };
 
 const setSocket = (state, { url, socket }) => {
     const replaceUrl = url => url.trim().toLowerCase().replace('\/', '');
-    const server = state.servers.find(server => replaceUrl(server.url) === replaceUrl(url));
-    if (!server) return state;
+    const serverIndex = state.servers.findIndex(server => replaceUrl(server.url) === replaceUrl(url));
+    if (serverIndex < 0) return state;
 
     return {
         ...state,
-        servers: changeValue(server)({ socket })(state.servers)
+        servers: changeValue(serverIndex)({ socket })(state.servers)
     };
 };
 
 const removeSocket = (state, { socket }) => {
-    const server = state.servers.find(server => server.socket === socket);
-    if (!server) return state;
+    const serverIndex = state.servers.findIndex(server => server.socket === socket);
+    if (serverIndex< 0) return state;
 
-    if (server.socket) server.socket.disconnect();
+    const stateSocket = state.servers[serverIndex].socket;
+    if (stateSocket) stateSocket.disconnect();
 
     return {
         ...state,
-        servers: changeValue(server)({ socket: null })(state.servers)
+        servers: changeValue(serverIndex)({ socket: null })(state.servers)
     };
 };
 
-const setFiles = (state, { server: targetServer, files, parentIndex = -1 }) => {
-    const server = state.servers.find(server => server === targetServer);
-    if (!server) return state;
+const setFiles = (state, { files, index = [] }) => {
+    const findFile = findByIndex(index)(state.files);
 
-    const newFiles = parentIndex < 0 ? [] : [...server.files];
+    const newFiles = (Array.isArray(files) && files.length) ? files.map(file => ({
+        name: file.name,
+        path: file.path,
+        type: file.isDirectory ? DIRECTORY : FILE,
+        child: [],
+        extended: false
+    })) : null;
+
     return {
         ...state,
-        servers: changeValue(server)({
-            files: newFiles.concat(...files.map(file => ({
-                    name: file.name,
-                    path: file.path,
-                    parentIndex,
-                    type: file.isDirectory ? DIRECTORY : FILE,
-                    extended: false
-                }))
-            )
-        })(state.servers)
+        files: findFile ? changeChildValue(index)({ child: newFiles })(state.files) : newFiles
     };
 };
 
@@ -75,35 +75,14 @@ const applyWatchingFile = (state, { file, watch }) => {
     return { ...state, watchedFiles: [...watchedFiles] };
 };
 
-const toggleExtend = (state, { serverIndex, targetIndex, extend = null }) => {
-    const server = state.servers[serverIndex];
-    if(!server) return state;
+const toggleExtend = (state, { extend = null }) => {
+    const selectedIndex = state.selectedFile;
 
-    const file = state.servers[serverIndex].files[targetIndex];
-    if(!file) return state;
-
+    const file = findByIndex(selectedIndex)(state.files);
     const newExtended = (extend !== null) ? extend : !file.extended;
-    if (!newExtended) {
-        const newFiles = server.files.filter(file => file.parent !== target);
-        return {
-            ...state,
-            servers: changeValue(server)(
-                {
-                    files: changeValue(target)({
-                        extended: newExtended
-                    })(newFiles)
-                }
-            )(state.servers)
-        };
-    }
-
     return {
         ...state,
-        servers: changeValue(server)(
-            {
-                files: changeValue(target)({ extended: newExtended })(server.files)
-            }
-        )(state.servers)
+        files: changeChildValue(selectedIndex)({ extended: newExtended })(state.files)
     };
 };
 

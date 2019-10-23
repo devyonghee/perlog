@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Presenter from './presenter';
-import { DIRECTORY } from 'src/modules/utils';
+import { DIRECTORY, findByIndex } from 'src/modules/utils';
 
 const ipcRenderer = window.require('electron').ipcRenderer;
 
@@ -20,22 +20,21 @@ const defaultProps = {
 };
 
 const container = (props) => {
-    const { opened, type, close, addDirectory, serverIndex, search, toggleExtend, addFile, files } = props;
+    const { opened, type, close, addDirectory, selectedFile, selectFile, search, toggleExtend, addFile, files } = props;
 
     const [values, setValues] = useState({
         name: '',
         filter: '',
-        selectedIndex: -1
     });
 
     useEffect(() => {
-        if (!opened) return;
+        if (!opened || files.length) return;
         search();
-    }, [opened]);
+    }, [opened, files]);
 
-    const handleClickFile = target => e => {
+    const handleClickFile = (index = []) => e => {
         e.preventDefault();
-        setValues({ ...values, selectedIndex: files.findIndex(file => file === target) });
+        selectFile(index);
     };
 
     const handleClose = e => {
@@ -73,17 +72,16 @@ const container = (props) => {
         return addFile(values.selectedIndex);
     };
 
-    const handleDoubleClickFile = target => e => {
+    const handleDoubleClickFile = (index = []) => e => {
         e.preventDefault();
-        const fileIndex = files.findIndex(file => file === target);
-        setValues({ ...values, selectedIndex: fileIndex });
+        selectFile(index);
 
-        if (target.type === DIRECTORY) {
-            toggleExtend(serverIndex, fileIndex);
-            if (!target.extended) search(fileIndex);
-            // return handleAddFile(file) & initState();
+        const file = findByIndex(index)(files);
+        if (file.type === DIRECTORY) {
+            if (!file.extended) search(index);
+            toggleExtend();
         }
-        // !file.child && search(file);
+        // handleAddFile(file);
     };
 
     return (
@@ -93,7 +91,7 @@ const container = (props) => {
             opened={opened}
             files={files}
             filterString={values.filter}
-            selected={files[values.selectedIndex]}
+            selectedFile={selectedFile}
             handleClose={handleClose}
             handleChange={handleChange}
             handleKeypress={handleKeyPress}

@@ -1,22 +1,11 @@
-const ADD_SERVER = Symbol('ADD_SERVER');
-const ADD_DIRECTORY = Symbol('ADD_DIRECTORY');
-const TOGGLE_EXTEND = Symbol('TOGGLE_EXTEND');
-const SET_NEW_FORM = Symbol('SET_NEW_FORM');
-const REMOVE_DIRECTORY = Symbol('REMOVE_DIRECTORY');
-const SET_SELECTED = Symbol('SET_SELECTED');
-const ADD_FILE = Symbol('ADD_FILE');
-const REMOVE_FILE = Symbol('REMOVE_FILE');
-
-export {
-    ADD_SERVER,
-    ADD_DIRECTORY,
-    TOGGLE_EXTEND,
-    SET_SELECTED,
-    SET_NEW_FORM,
-    REMOVE_DIRECTORY,
-    ADD_FILE,
-    REMOVE_FILE,
-};
+export const ADD_SERVER = Symbol('ADD_SERVER');
+export const ADD_DIRECTORY = Symbol('ADD_DIRECTORY');
+export const TOGGLE_EXTEND = Symbol('TOGGLE_EXTEND');
+export const SET_NEW_FORM = Symbol('SET_NEW_FORM');
+export const REMOVE_DIRECTORY = Symbol('REMOVE_DIRECTORY');
+export const SELECT_INDEX = Symbol('SELECT_INDEX');
+export const ADD_FILE = Symbol('ADD_FILE');
+export const REMOVE_FILE = Symbol('REMOVE_FILE');
 
 const addServer = (name, url) => {
     return {
@@ -39,24 +28,22 @@ const addFile = (file) => {
     };
 };
 
-const setSelected = (target) => {
+const selectIndex = (index) => {
     return {
-        type: SET_SELECTED,
-        target
+        type: SELECT_INDEX,
+        index
     };
 };
 
-const remove = file => {
+const remove = () => {
     return {
         type: REMOVE_FILE,
-        file,
     };
 };
 
-const toggleExtend = target => {
+const toggleExtend = () => {
     return {
         type: TOGGLE_EXTEND,
-        target
     }
 };
 
@@ -73,6 +60,6 @@ export default {
     addFile,
     toggleExtend,
     setNewForm,
-    setSelected,
+    selectIndex,
     remove
 };

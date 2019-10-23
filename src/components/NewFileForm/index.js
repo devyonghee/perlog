@@ -5,20 +5,21 @@ import fileActions from 'src/modules/file/actions';
 import serverActions from 'src/modules/server/actions';
 import { SERVER } from 'src/modules/utils';
 
-const getSelectedServerIndex = (fileList, index, servers) => {
-    if (index < 0 || !fileList.hasOwnProperty(index)) return -1;
-    if (fileList[index].type === SERVER) return servers.findIndex(server => server.url === fileList[index].url);
-    return getSelectedServerIndex(fileList, fileList[index].parentIndex, servers);
+const getSelectedServer = (fileList, index, servers) => {
+    if (!index || !index.length) return undefined;
+
+    const root = index[0];
+    if (root.type === SERVER) return undefined;
+    return servers.find(server => server.url === root.url);
 };
 
 const mapStateToProps = state => {
-    const selectedServerIndex = getSelectedServerIndex(state.file.list, state.file.selectedIndex, state.server.servers);
-
     return {
         opened: state.file.newForm.open,
         type: state.file.newForm.type,
-        serverIndex: selectedServerIndex,
-        files: selectedServerIndex >= 0 ? state.server.servers[selectedServerIndex] : []
+        files: state.server.files,
+        selectedFile: state.server.selectedFile,
+        server: getSelectedServer(state.file.list, state.file.selectedIndex, state.server.servers),
     };
 };
 
@@ -26,6 +27,7 @@ const mapDispatchToProps = (dispatch) => {
     return bindActionCreators({
         toggleExtend: serverActions.toggleExtend,
         search: serverActions.search,
+        selectFile: index => serverActions.setServerInfo({ selectedFile: index }),
         close: () => fileActions.setNewForm(false),
         addDirectory: fileActions.addDirectory,
         addFile: fileActions.addFile,

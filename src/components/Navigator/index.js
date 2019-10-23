@@ -8,6 +8,7 @@ const mapStateToProps = state => {
     return {
         files: state.file.list,
         selectedIndex: state.file.selectedIndex,
+        servers: state.server.servers.map(server => server.url)
     };
 };
 
@@ -15,13 +16,11 @@ const mapDispatchToProps = (dispatch) => {
     return bindActionCreators({
         search: serverActions.search,
         toggleExtend: fileActions.toggleExtend,
-        setSelected: fileActions.setSelected,
+        selectIndex: fileActions.selectIndex,
+        selectServer: index => serverActions.setServerInfo({ selectedServer: index }),
         openNewAdd: type => fileActions.setNewForm(true, type),
         watchFile: serverActions.requestWatch,
-        addFile: fileActions.addFile,
-        addDirectory: fileActions.addDirectory,
         removeFile: fileActions.remove,
-        select: fileActions.select,
     }, dispatch);
 };
 

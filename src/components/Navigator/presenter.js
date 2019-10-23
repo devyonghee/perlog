@@ -21,7 +21,7 @@ const defaultProps = {
 const presenter = props => {
     const {
         files,
-        selectedTarget,
+        selectedIndex,
         handleClickList,
         handleDoubleClickFile,
         handleContextMenuList
@@ -34,7 +34,7 @@ const presenter = props => {
                 <FileList
                     files={files}
                     switchable
-                    selectedTarget={selectedTarget}
+                    selectedIndex={selectedIndex}
                     handleClickFile={handleClickList}
                     handleDoubleClickFile={handleDoubleClickFile}
                     handleContextMenuList={handleContextMenuList}

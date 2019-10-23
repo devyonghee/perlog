@@ -16,8 +16,8 @@ import { DIRECTORY, FILE, SERVER } from 'src/modules/utils';
 const propTypes = {
     files: PropTypes.array,
     regexp: PropTypes.instanceOf(RegExp),
-    parentIndex: PropTypes.number,
-    selectedTarget: PropTypes.object,
+    index: PropTypes.array,
+    selectedIndex: PropTypes.array,
     depth: PropTypes.number,
     dense: PropTypes.bool,
     draggable: PropTypes.bool,
@@ -30,10 +30,11 @@ const propTypes = {
 
 const defaultProps = {
     files: [],
+    index: [],
+    selectedIndex:[],
     parentIndex: -1,
     regexp: null,
     depth: 0,
-    indexes: [],
     dense: false,
     draggable: false,
     invisibleWhenEmpty: false,
@@ -76,9 +77,9 @@ const sortCompare = (preFile, curFile) => {
 const FileList = props => {
     const {
         files,
-        parentIndex,
+        index,
         regexp,
-        selectedTarget,
+        selectedIndex,
         depth,
         dense,
         switchable,
@@ -91,60 +92,60 @@ const FileList = props => {
 
     const classes = useStyles({ depth, dense });
     return files
-        .filter(file => (parentIndex < 0) ? (!file.parentIndex || file.parentIndex < 0) : parentIndex === file.parentIndex)
         .filter(file => file.type !== FILE || !regexp || file.name.match(regexp))
-        .sort(sortCompare).map(curFile => {
-            const curIndex = files.findIndex(file => file === curFile);
+        .sort(sortCompare).map(file => {
+            const curIndex = files.indexOf(file);
+            const indexRoute = index.concat(curIndex);
 
             return (
                 <Fragment key={curIndex}>
                     <ListItem
                         className={classes.listItem}
-                        selected={curFile === selectedTarget}
-                        onClick={handleClickFile(curFile)}
-                        onDoubleClick={handleDoubleClickFile(curFile)}
-                        onContextMenu={handleContextMenuList(curFile)}
+                        selected={!!selectedIndex.length && indexRoute.join('&') === selectedIndex.join('&')}
+                        onClick={handleClickFile(indexRoute)}
+                        onDoubleClick={handleDoubleClickFile(indexRoute)}
+                        onContextMenu={handleContextMenuList(indexRoute)}
                     >
                         <ListItemIcon
-                            className={curFile.type === FILE ? classNames(classes.iconWrap, classes.iconPadding) : classes.iconWrap}>
+                            className={file.type === FILE ? classNames(classes.iconWrap, classes.iconPadding) : classes.iconWrap}>
                             <>
-                                {curFile.type !== FILE &&
+                                {file.type !== FILE &&
                                 <ArrowIcon
-                                    onClick={handleDoubleClickFile(curFile)}
+                                    onClick={handleDoubleClickFile(indexRoute)}
                                     className={classes.arrowIcon}
-                                    extended={curFile.extended}/>}
-                                <IconByType type={curFile.type} className={classes.iconMargin}/>
+                                    extended={file.extended}/>}
+                                <IconByType type={file.type} className={classes.iconMargin}/>
                             </>
                         </ListItemIcon>
                         <ListItemText
                             className={classes.textList}
                             primary={
                                 <Typography>
-                                    {regexp && curFile.type === FILE ? curFile.name :
-                                        <HighLighter regexp={regexp}>{curFile.name}</HighLighter>}
+                                    {regexp && file.type === FILE ? file.name :
+                                        <HighLighter regexp={regexp}>{file.name}</HighLighter>}
                                 </Typography>
                             }
                         />
-                        {switchable && curFile.type === FILE ?
+                        {switchable && file.type === FILE ?
                             <Switch
                                 classes={{
                                     root: classes.switchRoot,
-                                    switchBase: classes[`colorSwitchBase${curFile.color}`],
-                                    checked: classes[`colorSwitchChecked${curFile.color}`],
-                                    track: classes[`colorSwitchBar${curFile.color}`],
+                                    switchBase: classes[`colorSwitchBase${file.color}`],
+                                    checked: classes[`colorSwitchChecked${file.color}`],
+                                    track: classes[`colorSwitchBar${file.color}`],
                                 }}
-                                onChange={handleFileWatchSwitch(curFile)}
+                                onChange={handleFileWatchSwitch(file)}
                                 checked={false}/> : null}
                     </ListItem>
-                    {curFile.extended ?
-                        (files.some(file => file.parentIndex === curIndex)) ?
-                            <FileList {...props} parentIndex={curIndex} depth={depth + 1}/> : (
-                                <ListItem className={classes.emptyText}>
-                                    <ListItemText
-                                        className={classes.textList}
-                                        disableTypography
-                                        primary={!curFile.child && lazyLoading ? '...loading' : '빈 폴더입니다.'}/>
-                                </ListItem>)
+                    {file.extended ?
+                        (Array.isArray(file.child) && file.child.length) ?
+                            <FileList {...props} files={file.child} index={indexRoute} depth={depth + 1}/> :
+                            (<ListItem className={classes.emptyText}>
+                                <ListItemText
+                                    className={classes.textList}
+                                    disableTypography
+                                    primary={file.child && lazyLoading ? '...loading' : '빈 폴더입니다.'}/>
+                            </ListItem>)
                         : null
                     }
                 </Fragment>
