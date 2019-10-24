@@ -83,11 +83,9 @@ const App = class {
             }
 
             file.register(observer);
-            this.files[path] = file;
         } catch (e) {
             console.log(e.message);
             socket.emit('fileError', requestPath, e.message);
-            socket.leave(path, () => null);
         }
 
     }

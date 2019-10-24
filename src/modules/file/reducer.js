@@ -11,6 +11,8 @@ import {
 import { colorsIndex } from './colors';
 import { changeChildValue, DIRECTORY, FILE, findByIndex, SERVER } from '../utils';
 
+const ipcRenderer = window.require('electron').ipcRenderer;
+
 const initialState = {
     list: [],
     selectedIndex: [],
@@ -31,6 +33,9 @@ const checkAdding = (name, selectedIndex = []) => files => {
 
 const addServer = (state, { name, url }) => {
     if (!name || !url) return state;
+    if(state.list.some(server => server.type === SERVER && server.url === url)){
+        return ipcRenderer.send('notice', '이미 존재하는 서버입니다.')
+    }
     return {
         ...state,
         list: [...state.list,
@@ -62,7 +67,7 @@ const addDirectory = (state, { name }) => {
         };
 
     } catch (e) {
-        console.log(e.message);
+        ipcRenderer.send('notice', e.message);
         return state;
     }
 };
@@ -87,7 +92,7 @@ const addFile = (state, { file }) => {
         };
 
     } catch (e) {
-        console.log(e.message);
+        ipcRenderer.send('notice', e.message);
         return state;
     }
 };

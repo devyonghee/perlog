@@ -13,7 +13,7 @@ const defaultProps = {
 };
 
 const container = (props) => {
-    const { messages, watchCount } = props;
+    const { messages } = props;
 
     const screen = useRef(null);
     const [preScrollHeight, setPreScrollHeight] = useState(0);
@@ -30,7 +30,7 @@ const container = (props) => {
     useEffect(() => {
         const addedMessage = messages[messages.length - 1];
         const regexp = new RegExp(filterString, 'gi');
-        if (!!filterString && !!addedMessage && regexp.test(addedMessage.message)) {
+        if (filterString && addedMessage && regexp.test(addedMessage.message)) {
             ipcRenderer.send('alert-message', addedMessage.file.name, addedMessage.message.slice(0, 200));
         }
 
@@ -43,7 +43,7 @@ const container = (props) => {
 
         screen.current.scrollTop = screen.current.scrollHeight - screen.current.clientHeight;
         setPreScrollHeight(screen.current.scrollHeight);
-    }, [props.messages]);
+    }, [messages]);
 
     return <Presenter
         {...props}
