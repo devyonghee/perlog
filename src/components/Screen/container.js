@@ -13,7 +13,8 @@ const defaultProps = {
 };
 
 const container = (props) => {
-    const { messages } = props;
+    const { messages, watchCount } = props;
+
     const screen = useRef(null);
     const [preScrollHeight, setPreScrollHeight] = useState(0);
     const [filterString, setFilterString] = useState('');

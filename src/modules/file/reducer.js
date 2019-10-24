@@ -94,7 +94,7 @@ const addFile = (state, { file }) => {
 
 const setWatch = (state, { index, watch }) => {
     const findFile = findByIndex(index)(state.list);
-    if (!findFile || findFile !== FILE) return state;
+    if (!findFile || findFile.type !== FILE) return state;
 
     return {
         ...state,
@@ -107,15 +107,15 @@ const removeFile = (state, { file }) => {
     return state;
 };
 
-const toggleExtend = (state, { extend = null }) => {
-    const index = state.selectedIndex;
-    const selected = findByIndex(index)(state.list);
+const toggleExtend = (state, { index = [], extend = null }) => {
+    const selectedIndex = index.length ? index : state.selectedIndex;
+    const selected = findByIndex(selectedIndex)(state.list);
     if (!selected || selected.type === FILE) return state;
 
     const newExtend = extend !== null ? extend : !selected.extended;
     return {
         ...state,
-        list: changeChildValue(index)({
+        list: changeChildValue(selectedIndex)({
             extended: newExtend
         })(state.list)
     };

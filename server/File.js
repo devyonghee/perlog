@@ -3,6 +3,8 @@ const pathLib = require('path');
 
 const File = class {
     constructor(path) {
+        this.observers = [];
+        this.watcher = null;
         this._path = path.replace(/\/*$/, '');
     }
 
@@ -20,18 +22,23 @@ const File = class {
         }).filter(Boolean);
     }
 
+    isSame(path) {
+        return this._path === path;
+    }
+
     watch() {
         if (!fs.existsSync(this._path) || !File._isAvailableExt(this._path)) throw new Error(`${this._path} file can not watch`);
 
         this.preSize = fs.statSync(this._path).size;
-        this.watching = fs.watch(this._path, event => this._registerWatchEvents(event));
+        this.watcher = fs.watch(this._path, this._registerWatchEvents.bind(this));
         console.log(`${this._path} file is watching`);
         return this;
     }
 
-    forget() {
-        if (!!this.watching) {
-            this.watching.close();
+    _forget() {
+        if (this.watcher) {
+            this.watcher.close();
+            this.watcher = null;
             return true;
         }
         console.log(`${this._path} file is not watching!!`);
@@ -54,12 +61,21 @@ const File = class {
         if (curr < prev) return;
         const readStream = fs.createReadStream(this._path, {encoding: 'utf8', start: prev, end: curr});
         readStream.on('data', data =>
-            (!!data && typeof this.onChangeCallback === 'function' && this.onChangeCallback(data.replace(/\n{2,}/g, '\n'))));
+            (data && this.observers.map(observer => observer.notify(data.replace(/\n{2,}/g, '\n'))))
+        );
     }
 
-    onChange(onChangeCallback) {
-        this.onChangeCallback = onChangeCallback;
-        return this;
+    isNotWatching() {
+        return !!this.watcher;
+    }
+
+    register(observer) {
+        this.observers.push(observer);
+    }
+
+    removeBySocket(socket) {
+        this.observers.find(observer => observer.isSame(socket));
+        if (!this.observers.length) this._forget();
     }
 
     static set availableExt(extensions) {

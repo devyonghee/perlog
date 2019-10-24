@@ -1,5 +1,6 @@
 const Server = require('./Server');
 const File = require('./File');
+const Observer = require('./Observer');
 const pathLib = require('path');
 const jwt = require('jsonwebtoken');
 
@@ -7,7 +8,7 @@ const App = class {
     constructor(config) {
         this.config = config;
         this._defaultDirectory = pathLib.resolve(this.config.defaultDirectory || '/');
-        this.files = {};
+        this.files = [];
     }
 
     run() {
@@ -33,7 +34,7 @@ const App = class {
 
     _registerEvents() {
         this.io.sockets.on('connection', socket => {
-            socket.on('watch', path => this._watch(path, socket));
+            socket.on('watch', (target, path) => this._watch(target, path, socket));
             socket.on('forget', path => {
                 console.log(`${socket._id} request forgetting ${path}`);
                 this._forget(path, socket)
@@ -64,45 +65,42 @@ const App = class {
         }
     }
 
-    _watch(path, socket) {
-        console.log(`${socket._id} request watching ${path}`);
-        const replacedPath = this._replacePath(path);
+    _watch(target, requestPath, socket) {
+        console.log(`${socket._id} request watching ${requestPath}`);
+        const path = this._replacePath(requestPath);
 
-        if (!replacedPath) return socket.emit('fileError', path, '경로가 잘못 되었습니다.');
+        if (!path) return socket.emit('fileError', requestPath, '경로가 잘못 되었습니다.');
 
-        socket.join(replacedPath, () => {
-            try {
-                if (!!this.files[replacedPath]) return;
+        const observer = new Observer(socket, target);
 
-                const file = new File(replacedPath);
-                file.watch().onChange(message => this.io.sockets.to(path).emit('log', replacedPath, message));
+        try {
+            let file = this.files.find(file => file.isSame(path));
 
-                this.files[replacedPath] = file;
-            } catch (e) {
-                console.log(e.message);
-                socket.emit('fileError', path, e.message);
-                socket.leave(replacedPath, () => null);
+            if (!file) {
+                file = new File(path);
+                this.files.push(file);
+                file.watch();
             }
-        });
+
+            file.register(observer);
+            this.files[path] = file;
+        } catch (e) {
+            console.log(e.message);
+            socket.emit('fileError', requestPath, e.message);
+            socket.leave(path, () => null);
+        }
 
     }
 
     _forget(path, socket) {
-        socket.leave(path, () =>
-            this.files.hasOwnProperty(path) &&
-            !this._isSomeoneWatching(path) &&
-            this.files[path].forget() &&
-            this.files[path].forget() &&
-            delete this.files[path] &&
-            console.log(`${path} is forgotten`)
-        );
-    }
+        const file = this.files.find(file => file.isSame(path));
+        if (!file) return;
 
-    _isSomeoneWatching(path) {
-        return (this.io.sockets.hasOwnProperty('adapter') &&
-            this.io.sockets.adapter.hasOwnProperty('rooms') &&
-            this.io.sockets.adapter.rooms.hasOwnProperty(path) &&
-            !!this.io.sockets.adapter.rooms[path].length);
+        file.removeBySocket(socket);
+        if (file.isNotWatching()) {
+            this.files.splice(this.files.indexOf(file), 1);
+            console.log(`${path} is forgotten`);
+        }
     }
 
     _replacePath(path) {

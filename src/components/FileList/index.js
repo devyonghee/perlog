@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { ListItem, ListItemIcon, ListItemText, Switch, Typography } from '@material-ui/core';
+import { ListItem, ListItemIcon, ListItemText, Typography } from '@material-ui/core';
 import {
     ArrowDropDown as ArrowDropDownIcon,
     ArrowRight as ArrowRightIcon,
@@ -9,6 +9,7 @@ import {
     InsertDriveFile as FileIcon
 } from '@material-ui/icons';
 import classNames from 'classnames';
+import Switch from './Switch';
 import useStyles from './styles';
 import HighLighter from '../Highlighter';
 import { DIRECTORY, FILE, SERVER } from 'src/modules/utils';
@@ -24,7 +25,7 @@ const propTypes = {
     switchable: PropTypes.bool,
     lazyLoading: PropTypes.bool,
     handleClickFile: PropTypes.func,
-    handleFileWatchSwitch: PropTypes.func,
+    handleChangeSwitch: PropTypes.func,
     handleContextMenuList: PropTypes.func,
 };
 
@@ -37,10 +38,9 @@ const defaultProps = {
     depth: 0,
     dense: false,
     draggable: false,
-    invisibleWhenEmpty: false,
     handleClickFile: () => null,
+    handleChangeSwitch: () => null,
     handleContextMenuList: () => null,
-    handleFileWatchSwitch: () => null,
 };
 
 const ArrowIcon = ({ extended, onClick, className }) => {
@@ -85,6 +85,7 @@ const FileList = props => {
         switchable,
         lazyLoading,
         handleClickFile,
+        handleChangeSwitch,
         handleDoubleClickFile,
         handleFileWatchSwitch,
         handleContextMenuList,
@@ -128,14 +129,9 @@ const FileList = props => {
                         />
                         {switchable && file.type === FILE ?
                             <Switch
-                                classes={{
-                                    root: classes.switchRoot,
-                                    switchBase: classes[`colorSwitchBase${file.color}`],
-                                    checked: classes[`colorSwitchChecked${file.color}`],
-                                    track: classes[`colorSwitchBar${file.color}`],
-                                }}
-                                onChange={handleFileWatchSwitch(file)}
-                                checked={false}/> : null}
+                                customcolor={file.color}
+                                onChange={handleChangeSwitch(indexRoute)}
+                                checked={file.watch}/> : null}
                     </ListItem>
                     {file.extended ?
                         (Array.isArray(file.child) && file.child.length) ?

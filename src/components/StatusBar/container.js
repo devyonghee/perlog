@@ -11,13 +11,14 @@ const defaultProps = {
 };
 
 const container = (props) => {
+    const { messages, watchCount } = props;
     const [now, setNow] = useState(new Date().getTime());
     const [start] = useState(new Date().getTime());
     const [messagesCount, setMessageCount] = useState(0);
 
     useEffect(() => {
-        if (!!props.messages && !!props.messages.length) setMessageCount(messagesCount + 1);
-    }, [props.messages]);
+        if (!!messages && !!messages.length) setMessageCount(messagesCount + 1);
+    }, [messages]);
 
 
     useEffect(() => {
@@ -32,7 +33,7 @@ const container = (props) => {
     const messageSpeed = (elapsed !== 0) ? (messagesCount / elapsed).toFixed(2) : Number(0).toFixed(2);
 
     return <Presenter
-        files={1}
+        views={watchCount}
         time={prettyTime}
         messageSpeed={messageSpeed}
         messagesCount={messagesCount}

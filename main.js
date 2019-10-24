@@ -71,10 +71,12 @@ const createWindow = (dev = true, devUrl = '') => {
         mainWindow.webContents.openDevTools();
         const {default: installExtension, REACT_DEVELOPER_TOOLS} = require('electron-devtools-installer');
         installExtension(REACT_DEVELOPER_TOOLS).then((name) => console.log(`Added Extension:  ${name}`));
+        console.log(devUrl);
         return mainWindow.loadURL(devUrl);
     }
 
-    mainWindow.loadFile(path.join(__dirname, './build/index.html'));
+    // mainWindow.loadFile(path.join(__dirname, './build/index.html'));
+    mainWindow.loadURL('http://localhost:3000/');
 };
 
 

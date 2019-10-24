@@ -2,9 +2,7 @@ import React, {Fragment} from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import Paper from '@material-ui/core/Paper';
-import InputBase from '@material-ui/core/InputBase';
 import Typography from '@material-ui/core/Typography';
-import SearchIcon from '@material-ui/icons/Search';
 import useStyles from "./styles";
 import RootRef from '@material-ui/core/RootRef';
 import HighLighter from "../Highlighter";
@@ -46,7 +44,7 @@ const presenter = (props) => {
                         return (
                             <div className={classes.message} key={index}>
                                 <Typography inline
-                                            className={classNames(classes.name, classes[`fileName${file.color}`])}>{file.route}</Typography>
+                                            className={classes.name}>{file.route}</Typography>
                                 <Typography inline className={classes.contents}>
                                     {message.split('\n').map((line, index) => (
                                         <Fragment key={index}>

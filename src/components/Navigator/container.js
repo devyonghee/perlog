@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Presenter from './presenter';
 import { DIRECTORY, FILE, findByIndex, SERVER } from 'src/modules/utils';
 
-const { remote } = window.require('electron');
+const { remote, ipcRenderer } = window.require('electron');
 
 const propTypes = {
     files: PropTypes.array,
@@ -19,22 +19,20 @@ const defaultProps = {
 };
 
 const container = props => {
-    const { files, toggleExtend, selectIndex, servers, selectServer, selectedIndex, openNewAdd } = props;
+    const { files, toggleExtend, selectIndex, servers, selectServer, selectedIndex, openNewAdd, watch } = props;
 
-    //
-    // const handleFileWatchSwitch = (e, file) => {
-    //     e.stopPropagation();
-    //     const { target: { checked } } = e;
-    //     if (!!checked && watchedFiles.some(watchedFile => watchedFile.path === file.path))
-    //         return ipcRenderer.send('notice', '현재 관찰중인 파일입니다.', 'File');
-    //
-    //     if (!!checked && errorFiles.includes(file)) {
-    //         return ipcRenderer.send('notice', '잘못된 경로입니다.', 'File');
-    //     }
-    //
-    //     watchFile(file, !!checked);
-    // };
-    //
+    const handleChangeSwitch = index => e => {
+        e.stopPropagation();
+        const findFile = findByIndex(index)(files);
+        if(!findFile || findFile.type !== FILE) return;
+
+        const { target: { checked } } = e;
+        if (checked && findFile.watch) {
+            return ipcRenderer.send('notice', '현재 관찰중인 파일입니다.', 'File');
+        }
+        watch(index, checked);
+    };
+
 
     const handleClickList = (index = []) => e => {
         e.stopPropagation();
@@ -99,10 +97,10 @@ const container = props => {
 
     return <Presenter
         files={files}
-        handleClickList={handleClickList}
         selectedIndex={selectedIndex}
+        handleClickList={handleClickList}
+        handleChangeSwitch={handleChangeSwitch}
         handleDoubleClickFile={handleDoubleClickFile}
-        // handleFileWatchSwitch={handleFileWatchSwitch}
         handleContextMenuList={handleContextMenuList}
     />;
 };

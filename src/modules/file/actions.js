@@ -48,9 +48,10 @@ const remove = () => {
     };
 };
 
-const toggleExtend = (extend = null) => {
+const toggleExtend = (index = [], extend = null) => {
     return {
         type: TOGGLE_EXTEND,
+        index,
         extend
     };
 };

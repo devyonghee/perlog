@@ -3,7 +3,8 @@ import io from 'socket.io-client';
 import { removeServerToken, saveServer } from '../storage';
 import userActions from '../user/actions';
 import fileActions from '../file/actions';
-import { findByIndex, SERVER } from '../utils';
+import messageActions from '../message/actions';
+import { findByIndex, findByIndexWithRoute, SERVER } from '../utils';
 
 const ipcRenderer = window.require('electron').ipcRenderer;
 
@@ -31,10 +32,10 @@ const setSocket = (url, socket) => {
     };
 };
 
-const removeSocket = (socket = null, index = -1) => {
+const removeSocket = (socket) => {
     return {
         type: REMOVE_SOCKET,
-        socket, index
+        socket
     };
 };
 
@@ -63,30 +64,29 @@ const toggleExtend = (extend = null) => {
     return {
         type: TOGGLE_EXTEND,
         extend
-    }
+    };
 };
 
-const registerEvent = (url, socket) => dispatch => {
-    socket.on('connect', () => {
-        dispatch(setSocket(url, socket));
-    });
+const removeSocketAndShrink = (url, socket, message) => (dispatch, getState) => {
+    const { file: fileState } = getState();
 
-    // socket.on('log', (path, message) => dispatch(addMessage(path, message)));
+    const server = fileState.list.find(server => server.type === SERVER && server.url === url);
+    if (server) ipcRenderer.send('notice', message, `${server.name} error`);
+
+    dispatch(removeSocket(socket));
+
+    const fileIndex = fileState.list.indexOf(server);
+    dispatch(fileActions.toggleExtend(fileIndex, false));
+};
+
+const registerEvent = (url, socket) => (dispatch, getState) => {
+    socket.on('connect', () => dispatch(setSocket(url, socket)));
     socket.on('fileError', (path, message) => ipcRenderer.send('notice', message));
-
-    socket.on('disconnect', reason => {
-        ipcRenderer.send('notice', reason);
-        dispatch(resetSocket());
-    });
-
-    socket.on('reconnect_failed', () => {
-        ipcRenderer.send('notice', '서버와의 연결이 끊겼습니다.');
-        dispatch(resetSocket());
-    });
-
-    socket.on('error', (path, message) => {
-        ipcRenderer.send('notice', message, '서버와의 연결이 끊겼습니다.');
-        dispatch(resetSocket());
+    socket.on('disconnect', reason => dispatch(removeSocketAndShrink(url, socket, reason)));
+    socket.on('reconnect_failed', () => dispatch(removeSocketAndShrink(url, socket, '서버와의 연결이 끊겼습니다.')));
+    socket.on('log', (index, message) => {
+        const file = findByIndexWithRoute(index)(getState().file.list);
+        if (file) dispatch(messageActions.addMessage(file.route, file.color, message));
     });
 };
 
@@ -104,7 +104,7 @@ const search = (index = []) => (dispatch, getState) => {
 const watch = (index, watch) => (dispatch, getState) => {
     const { server: serverState, file: fileState } = getState();
     const rootFile = findByIndex(index.slice(0, 1))(fileState.list);
-    if (!rootFile || rootFile !== SERVER) return;
+    if (!rootFile || rootFile.type !== SERVER) return;
 
     const server = serverState.servers.find(server => server.url === rootFile.url);
     if (!server || !server.socket) return;
@@ -113,7 +113,7 @@ const watch = (index, watch) => (dispatch, getState) => {
     if (!target || !target.path) return;
 
     server.socket.emit('forget', target.path);
-    if (watch) server.socket.emit('watch', target.path);
+    if (watch) server.socket.emit('watch', index, target.path);
     dispatch(fileActions.setWatch(index, watch));
 };
 

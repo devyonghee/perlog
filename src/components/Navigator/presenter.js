@@ -8,6 +8,7 @@ const propTypes = {
     files: PropTypes.array,
     selectedTarget: PropTypes.object,
     handleClickList: PropTypes.func.isRequired,
+    handleChangeSwitch: PropTypes.func.isRequired,
     handleDoubleClickFile: PropTypes.func.isRequired,
     handleContextMenuList: PropTypes.func.isRequired,
 };
@@ -23,6 +24,7 @@ const presenter = props => {
         files,
         selectedIndex,
         handleClickList,
+        handleChangeSwitch,
         handleDoubleClickFile,
         handleContextMenuList
     } = props;
@@ -36,6 +38,7 @@ const presenter = props => {
                     switchable
                     selectedIndex={selectedIndex}
                     handleClickFile={handleClickList}
+                    handleChangeSwitch={handleChangeSwitch}
                     handleDoubleClickFile={handleDoubleClickFile}
                     handleContextMenuList={handleContextMenuList}
                 />

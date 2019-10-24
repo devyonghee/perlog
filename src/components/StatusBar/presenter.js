@@ -7,12 +7,12 @@ const propTypes = {
     time: PropTypes.string.isRequired,
     messageSpeed: PropTypes.string.isRequired,
     messagesCount: PropTypes.number.isRequired,
-    files: PropTypes.number.isRequired,
+    views: PropTypes.number.isRequired,
 };
 
 const defaultProps = {};
 
-const presenter = ({time, messageSpeed, messagesCount, files}) => {
+const presenter = ({time, messageSpeed, messagesCount, views}) => {
     const classes = useStyles();
 
     return (
@@ -30,7 +30,7 @@ const presenter = ({time, messageSpeed, messagesCount, files}) => {
                 <span className="label">messages</span>
             </div>
             <div className={classes.status}>
-                <span className="num">{files}</span>
+                <span className="num">{views}</span>
                 <span className="label">views</span>
             </div>
         </Paper>

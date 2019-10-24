@@ -22,6 +22,5 @@ const container = props => {
 };
 
 container.propTypes = propTypes;
-// container.defaultProps = defaultProps;
 
 export default container;

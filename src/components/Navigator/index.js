@@ -19,7 +19,7 @@ const mapDispatchToProps = (dispatch) => {
         selectIndex: fileActions.selectIndex,
         selectServer: index => serverActions.setServerInfo({ selectedServer: index }),
         openNewAdd: type => fileActions.setNewForm(true, type),
-        watchFile: serverActions.requestWatch,
+        watch: serverActions.watch,
         removeFile: fileActions.remove,
     }, dispatch);
 };

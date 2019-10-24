@@ -5,10 +5,9 @@ const initialState = [];
 export default (state = initialState, action) => {
     switch (action.type) {
         case ADD_MESSAGE:
-            const { message, color, name } = action;
             return [
                 ...state,
-                { message, color, name }
+                { name: action.name, color: action.color, message: action.message }
             ];
 
         default:
