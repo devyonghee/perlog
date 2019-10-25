@@ -87,13 +87,12 @@ const FileList = props => {
         handleClickFile,
         handleChangeSwitch,
         handleDoubleClickFile,
-        handleFileWatchSwitch,
         handleContextMenuList,
     } = props;
 
     const classes = useStyles({ depth, dense });
     return files
-        .filter(file => file.type !== FILE || !regexp || file.name.match(regexp))
+        .filter(file => file.type !== FILE || !regexp || regexp.test(file.name))
         .sort(sortCompare).map(file => {
             const curIndex = files.indexOf(file);
             const indexRoute = index.concat(curIndex);
@@ -122,7 +121,7 @@ const FileList = props => {
                             className={classes.textList}
                             primary={
                                 <Typography>
-                                    {regexp && file.type === FILE ? file.name :
+                                    {!regexp || file.type !== FILE ? file.name :
                                         <HighLighter regexp={regexp}>{file.name}</HighLighter>}
                                 </Typography>
                             }

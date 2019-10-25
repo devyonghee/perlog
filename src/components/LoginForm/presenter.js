@@ -84,7 +84,6 @@ const presenter = (props) => {
                             label="Password"
                             margin="normal"
                             fullWidth
-                            autoFocus
                             placeholder="Enter a Password"
                             onChange={handleTextChange('password')}
                             className={classes.textField}

@@ -1,24 +1,18 @@
-import React, {Fragment} from 'react';
-import classNames from 'classnames';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
-import useStyles from "./styles";
-import RootRef from '@material-ui/core/RootRef';
-import HighLighter from "../Highlighter";
-
+import { Button, Paper, RootRef, Typography } from '@material-ui/core';
+import useStyles from './styles';
+import HighLighter from '../Highlighter';
 
 const propTypes = {
     messages: PropTypes.arrayOf(
         PropTypes.shape({
             message: PropTypes.string.isRequired,
-            file: PropTypes.shape({
-                color: PropTypes.number.isRequired,
-                route: PropTypes.string.isRequired,
-            }).isRequired,
+            color: PropTypes.object.isRequired,
+            name: PropTypes.string.isRequired,
         })
     ),
-    screenRef: PropTypes.object,
+    filter: PropTypes.object
 };
 
 const defaultProps = {
@@ -30,6 +24,7 @@ const presenter = (props) => {
         messages,
         screenRef,
         filter,
+        handleMessageClick
     } = props;
 
     const classes = useStyles();
@@ -44,15 +39,19 @@ const presenter = (props) => {
                             <div className={classes.message} key={index}>
                                 <Typography style={{ color: message.color[500] }}
                                             className={classes.name}>{message.name}</Typography>
-                                <Typography className={classes.contents}>
+                                <Button classes={{ root: classes.contentsRoot, label: classes.contentsLabel }}
+                                        onClick={handleMessageClick}
+                                        disableFocusRipple>
                                     {message.message.split('\n').map((line, index) => (
                                         <Fragment key={index}>
-                                            <HighLighter regexp={filter}>{line}</HighLighter><br/>
+                                            <HighLighter regexp={filter}>
+                                                {line}
+                                            </HighLighter><br/>
                                         </Fragment>)
                                     )}
-                                </Typography>
+                                </Button>
                             </div>
-                    ))
+                        ))
                 }
             </Paper>
         </RootRef>

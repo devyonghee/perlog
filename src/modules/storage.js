@@ -40,7 +40,7 @@ export const saveServer = (url, token) => {
     window.localStorage.setItem('server', JSON.stringify({ url, token }));
 };
 
-export const removeServerToken = (url) => {
+export const removeServerToken = url => {
     if (!url) return;
     const server = JSON.parse(window.localStorage.getItem('server'));
     if (server && server.url && server.url.replace(/\/$/g, '') === url.replace(/\/$/g, '')) {

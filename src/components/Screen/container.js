@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Presenter from './presenter';
 import PropTypes from 'prop-types';
 
@@ -24,6 +24,11 @@ const container = (props) => {
             screen.current.scrollTop = screen.current.scrollHeight - screen.current.clientHeight;
         }
     };
+
+    const handleMessageClick = message => e => {
+
+    };
+
     useEffect(() => {
         const addedMessage = messages[messages.length - 1];
         if (filter && addedMessage && filter.test(addedMessage.message)) {
@@ -45,6 +50,7 @@ const container = (props) => {
         messages={messages}
         screenRef={screen}
         filter={filter}
+        handleMessageClick={handleMessageClick}
         handleFilterStringChange={handleFilterStringChange}
     />;
 };

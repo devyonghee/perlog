@@ -10,6 +10,7 @@ const ipcRenderer = window.require('electron').ipcRenderer;
 
 export const ADD_SERVER = Symbol('ADD_SERVER');
 export const SET_SOCKET = Symbol('SET_SOCKET');
+export const SET_TOKEN = Symbol('SET_TOKEN');
 export const REMOVE_SOCKET = Symbol('REMOVE_SOCKET');
 export const SET_SERVER_INFO = Symbol('SET_SERVER_INFO');
 export const RESET_SOCKET = Symbol('RESET_SOCKET');
@@ -30,6 +31,14 @@ const setSocket = (url, socket) => {
         type: SET_SOCKET,
         url, socket
     };
+};
+
+const setToken = (url, token) => {
+    return {
+        type: SET_TOKEN,
+        token
+    };
+
 };
 
 const removeSocket = (socket) => {
@@ -124,7 +133,6 @@ const connectAndRegister = (url, token) => dispatch => {
         reconnectionAttempts: 3,
     });
 
-    saveServer(url, token);
     dispatch(registerEvent(url, socket));
 };
 
@@ -135,7 +143,7 @@ const connectByToken = (url, token) => async dispatch => {
             return ipcRenderer.send('notice', '서버 오류');
         }
         dispatch(connectAndRegister(url, response.data));
-        dispatch(setServerInfo({ token }));
+        dispatch(setToken(url, response.data));
     } catch (e) {
         removeServerToken(url);
         ipcRenderer.send('notice', '토큰이 만료되었습니다.');

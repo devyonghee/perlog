@@ -11,7 +11,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = (dispatch) => {
     return bindActionCreators({
         openNewServer: () => serverActions.setServerInfo({ openNewServer: true }),
-        setFilter: () => messageActions.setFilter
+        setFilter: messageActions.setFilter
     }, dispatch);
 };
 

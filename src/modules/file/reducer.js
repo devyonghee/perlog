@@ -55,6 +55,10 @@ const addDirectory = (state, { name }) => {
 
         return {
             ...state,
+            newForm: {
+                ...state.newForm,
+                open: false,
+            },
             list: changeChildValue(index)({
                 extended: true,
                 child: [...findByIndex(index)(state.list).child, {
@@ -79,6 +83,10 @@ const addFile = (state, { file }) => {
 
         return {
             ...state,
+            newForm: {
+                ...state.newForm,
+                open: false,
+            },
             list: changeChildValue(index)({
                 extended: true,
                 child: [...findByIndex(index)(state.list).child, {
@@ -87,7 +95,7 @@ const addFile = (state, { file }) => {
                     type: FILE,
                     color: colorsIndex.next().value,
                     watch: false,
-                }]
+                }],
             })(state.list)
         };
 

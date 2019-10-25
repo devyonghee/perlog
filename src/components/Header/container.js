@@ -18,8 +18,9 @@ const container = props => {
     const handleTextChange = e => {
         e.preventDefault();
         const value = e.currentTarget.value.replace(/\\/g, '');
+        if(value && value.length > 30) return;
         setFilterString(e.currentTarget.value);
-        setFilter(value ? new RegExp(value) : null);
+        setFilter(value ? new RegExp(value, 'gi') : null);
     };
 
     return (

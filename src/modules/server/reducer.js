@@ -1,11 +1,4 @@
-import {
-    ADD_SERVER,
-    REMOVE_SOCKET,
-    SET_FILES,
-    SET_SERVER_INFO,
-    SET_SOCKET,
-    TOGGLE_EXTEND
-} from './actions';
+import { ADD_SERVER, REMOVE_SOCKET, SET_FILES, SET_SERVER_INFO, SET_SOCKET, SET_TOKEN, TOGGLE_EXTEND } from './actions';
 import { changeChildValue, changeValue, DIRECTORY, FILE, findByIndex, replaceUrl } from '../utils';
 
 const initialState = {
@@ -17,6 +10,16 @@ const initialState = {
     loading: false,
     selectedServer: -1,
     selectedFile: [],
+};
+
+const setToken = (state, { url, token }) => {
+    const serverIndex = state.servers.findIndex(server => replaceUrl(server.url) === replaceUrl(url));
+    if (serverIndex < 0) return state;
+    return {
+        ...state,
+        servers: changeValue(serverIndex)({ token })(state.servers)
+    };
+
 };
 
 const setSocket = (state, { url, socket }) => {
@@ -85,6 +88,9 @@ export default (state = initialState, action) => {
                         files: [],
                     }]
             };
+
+        case SET_TOKEN:
+            return setToken(state, action);
 
         case SET_SOCKET:
             return setSocket(state, action);

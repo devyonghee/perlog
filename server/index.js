@@ -52,7 +52,7 @@ const App = class {
             const newSearchPath = (!searchPath) ? this._defaultDirectory : this._replacePath(searchPath);
             if (!newSearchPath) {
                 console.log('path is not exist');
-                return socket.emit('fileError', searchPath, ' 경로가 잘못 되었습니다.');
+                return socket.emit('fileError', searchPath, '오류가 발생했습니다.');
             }
 
             console.log(`${socket._id} searching... `, newSearchPath);
@@ -61,7 +61,7 @@ const App = class {
             socket.emit('searched', files);
         } catch (e) {
             console.log(e.message);
-            socket.emit('fileError', searchPath, ' 경로가 잘못 되었습니다.');
+            socket.emit('fileError', searchPath, '오류가 발생했습니다.');
         }
     }
 

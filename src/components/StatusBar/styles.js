@@ -1,14 +1,21 @@
-import {makeStyles} from '@material-ui/styles'
-
+import { makeStyles } from '@material-ui/styles';
 
 const useStyles = makeStyles(theme => ({
-    statusPaper: {
+    wrapper: {
         marginTop: '16px',
+    },
+
+    clearBtn: {
+        float: 'left',
+    },
+
+    statusPaper: {
         flexBasis: `${theme.footerHeight}px`,
         backgroundColor: 'inherit',
         textAlign: 'end',
         overflowX: 'hidden',
         overflowY: '-webkit-paged-x',
+        lineHeight: '28px'
     },
 
     status: {

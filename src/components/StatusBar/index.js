@@ -1,6 +1,8 @@
 import { connect } from 'react-redux';
 import container from './container';
-import { FILE } from '../../modules/utils';
+import { FILE } from 'src/modules/utils';
+import messageActions from 'src/modules/message/actions';
+import { bindActionCreators } from 'redux';
 
 const calculateWatchCount = (files) => {
     let count = 0;
@@ -14,9 +16,15 @@ const calculateWatchCount = (files) => {
 
 const mapStateToProps = state => {
     return {
-        messages: state.messages,
+        messageCount: state.message.list.length,
         watchCount: calculateWatchCount(state.file.list),
     };
 };
 
-export default connect(mapStateToProps)(container);
+const mapDispatchToProps = (dispatch) => {
+    return bindActionCreators({
+        clear: messageActions.clear
+    }, dispatch);
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(container);

@@ -1,4 +1,5 @@
-import {makeStyles} from '@material-ui/styles'
+import { makeStyles } from '@material-ui/styles';
+import { grey } from '@material-ui/core/colors';
 
 const useStyles = makeStyles(theme => ({
     paper: {
@@ -15,10 +16,19 @@ const useStyles = makeStyles(theme => ({
         whiteSpace: 'pre-wrap',
     },
 
-    contents: {
-        paddingLeft: '10px',
-        h1: true,
+    contentsRoot: {
+        display: 'block',
+        textAlign: 'justify',
+        width: '100%',
+        textTransform :'none !important',
+        justifyContent: 'normal !important',
     },
+
+    contentsLabel:{
+        lineHeight: '1.1',
+        display: 'block'
+    }
+
 }));
 
 export default useStyles;

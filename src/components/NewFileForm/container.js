@@ -55,9 +55,8 @@ const container = (props) => {
         if (e.key.toLowerCase() !== 'enter') return;
         e.preventDefault();
         if (!values.name) return ipcRenderer.send('notice', '폴더명을 입력해주세요.', 'New Directory');
-        addDirectory(values.name);
         setValues({ ...values, name: '' });
-        close();
+        addDirectory(values.name);
     };
 
     const handleClickConfirm = e => {
@@ -65,15 +64,14 @@ const container = (props) => {
         if (!type) return;
         if (type === DIRECTORY) {
             if (!values.name) return ipcRenderer.send('notice', '폴더명을 입력해주세요.', 'New Directory');
-            addDirectory(values.name);
             setValues({ ...values, name: '' });
-            return close();
+            addDirectory(values.name);
+            return;
         }
 
         const file = findByIndex(selectedFile)(files);
         if (!file || file.type === DIRECTORY) return ipcRenderer.send('notice', '파일을 선택해주세요.', 'New File');
         addFile(file);
-        close();
     };
 
     const handleDoubleClickFile = (index = []) => e => {
@@ -87,7 +85,6 @@ const container = (props) => {
             return;
         }
         addFile(file);
-        close();
     };
 
     return (
