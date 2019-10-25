@@ -13,7 +13,7 @@ const useStyles = makeStyles(theme => ({
         textAlign: 'center'
     },
 
-    textField: {
+    nameText: {
         '& label': {
             color: theme.palette.text.disabled,
         },
@@ -29,6 +29,24 @@ const useStyles = makeStyles(theme => ({
             '&:hover fieldset': {},
             '&.Mui-focused fieldset': {},
         }
+    },
+
+    protocol:{
+        float: 'left',
+        top: '38px',
+        display: 'inline-block',
+        position: 'absolute'
+    },
+
+    urlWrap: {
+        position:'relative',
+    },
+
+
+    urlText: {
+        marginLeft: '50px !important',
+        width: 'calc(100% - 50px)',
+        display:'relative',
     },
 
     textFieldInput: {

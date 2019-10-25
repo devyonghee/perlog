@@ -2,12 +2,16 @@ export const SERVER = 'SERVER';
 export const DIRECTORY = 'DIRECTORY';
 export const FILE = 'FILE';
 
+export const withHttp = url => !/^https?:\/\//i.test(url) ? `http://${url}` : url;
+export const replaceUrl = url => url.trim().toLowerCase().replace('\\', '');
+
+
 export const findByIndexWithRoute = (indexes, routes = []) => array => {
     if (!Array.isArray(indexes) || !Array.isArray(array)) return null;
     const newIndexes = [...indexes];
     const currentIndex = newIndexes.shift();
     if (!array[currentIndex]) return null;
-    if (newIndexes.length) return findByIndex(newIndexes, routes.concat(array[currentIndex].name))(array[currentIndex].child);
+    if (newIndexes.length) return findByIndexWithRoute(newIndexes, routes.concat(array[currentIndex].name))(array[currentIndex].child);
 
     return { ...array[currentIndex], route: routes.join('/') };
 };

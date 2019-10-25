@@ -23,11 +23,12 @@ const container = (props) => {
         url: 'localhost:50000',
     });
 
-    // useEffect(() => setValues({ url: '', name: '' }), [open]);
+    useEffect(() => {
+        if (!open) setValues({ url: '', name: '' });
+    }, [open]);
 
     const fixValuesAndConnect = async () => {
-        const withHttp = url => !/^https?:\/\//i.test(url) ? `http://${url}` : url;
-        const url = withHttp(values.url.trim());
+        const url = values.url.trim();
         const name = values.name.trim();
         if (!url || !name) {
             return ipcRenderer.send('notice', '값을 입력해주세요.');
@@ -41,12 +42,10 @@ const container = (props) => {
         await fixValuesAndConnect();
     };
 
-    const handleTextChange = (prop) => (
-        (e) => {
-            e.preventDefault();
-            if (values.hasOwnProperty(prop)) setValues({ ...values, [prop]: e.target.value });
-        }
-    );
+    const handleTextChange = prop => e => {
+        e.preventDefault();
+        if (values.hasOwnProperty(prop)) setValues({ ...values, [prop]: e.target.value });
+    };
 
     return (
         <Presenter

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import Presenter from './presenter';
 import PropTypes from 'prop-types';
 
@@ -13,25 +13,21 @@ const defaultProps = {
 };
 
 const container = (props) => {
-    const { messages } = props;
+    const { messages, filter } = props;
 
     const screen = useRef(null);
     const [preScrollHeight, setPreScrollHeight] = useState(0);
-    const [filterString, setFilterString] = useState('');
     const handleFilterStringChange = e => {
         const filter = e.target.value.replace(/\\/g, '');
         e.preventDefault();
-        setFilterString(filter);
         if (!filter && !!screen) {
             screen.current.scrollTop = screen.current.scrollHeight - screen.current.clientHeight;
         }
     };
-
     useEffect(() => {
         const addedMessage = messages[messages.length - 1];
-        const regexp = new RegExp(filterString, 'gi');
-        if (filterString && addedMessage && regexp.test(addedMessage.message)) {
-            ipcRenderer.send('alert-message', addedMessage.file.name, addedMessage.message.slice(0, 200));
+        if (filter && addedMessage && filter.test(addedMessage.message)) {
+            ipcRenderer.send('alert-message', addedMessage.name, addedMessage.message.slice(0, 20));
         }
 
         if (!screen.current ||
@@ -46,9 +42,9 @@ const container = (props) => {
     }, [messages]);
 
     return <Presenter
-        {...props}
+        messages={messages}
         screenRef={screen}
-        filterString={filterString}
+        filter={filter}
         handleFilterStringChange={handleFilterStringChange}
     />;
 };

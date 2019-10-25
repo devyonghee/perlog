@@ -27,34 +27,32 @@ const defaultProps = {
 
 const presenter = (props) => {
     const {
-        messages, screenRef,
-        filterString,
-        handleFilterStringChange,
+        messages,
+        screenRef,
+        filter,
     } = props;
+
     const classes = useStyles();
-    const regexp = !!filterString ? new RegExp(filterString, 'gi') : null;
 
     return (
         <RootRef rootRef={screenRef}>
             <Paper className={classes.paper} elevation={2}>
                 {
-                    messages.map(({file, message}, index) => {
-                        if (!!regexp && !regexp.test(message)) return null;
-
-                        return (
+                    messages
+                        .filter(message => (!filter || filter.test(message.message)))
+                        .map((message, index) => (
                             <div className={classes.message} key={index}>
-                                <Typography inline
-                                            className={classes.name}>{file.route}</Typography>
-                                <Typography inline className={classes.contents}>
-                                    {message.split('\n').map((line, index) => (
+                                <Typography style={{ color: message.color[500] }}
+                                            className={classes.name}>{message.name}</Typography>
+                                <Typography className={classes.contents}>
+                                    {message.message.split('\n').map((line, index) => (
                                         <Fragment key={index}>
-                                            <HighLighter regexp={regexp}>{line}</HighLighter><br/>
+                                            <HighLighter regexp={filter}>{line}</HighLighter><br/>
                                         </Fragment>)
                                     )}
                                 </Typography>
                             </div>
-                        )
-                    })
+                    ))
                 }
             </Paper>
         </RootRef>

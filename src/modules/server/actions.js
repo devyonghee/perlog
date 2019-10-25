@@ -4,7 +4,7 @@ import { removeServerToken, saveServer } from '../storage';
 import userActions from '../user/actions';
 import fileActions from '../file/actions';
 import messageActions from '../message/actions';
-import { findByIndex, findByIndexWithRoute, SERVER } from '../utils';
+import { findByIndex, findByIndexWithRoute, replaceUrl, SERVER, withHttp } from '../utils';
 
 const ipcRenderer = window.require('electron').ipcRenderer;
 
@@ -86,7 +86,7 @@ const registerEvent = (url, socket) => (dispatch, getState) => {
     socket.on('reconnect_failed', () => dispatch(removeSocketAndShrink(url, socket, '서버와의 연결이 끊겼습니다.')));
     socket.on('log', (index, message) => {
         const file = findByIndexWithRoute(index)(getState().file.list);
-        if (file) dispatch(messageActions.addMessage(file.route, file.color, message));
+        if (file) dispatch(messageActions.addMessage(file.route.concat(`/${file.name}`), file.color, message));
     });
 };
 
@@ -142,8 +142,14 @@ const connectByToken = (url, token) => async dispatch => {
     }
 };
 
-const connect = (url, name) => async (dispatch, getState) => {
-    const { id, password } = getState().user;
+const connect = (requestUrl, name) => async (dispatch, getState) => {
+    const { file, user: { id, password } } = getState();
+    const url = withHttp(replaceUrl(requestUrl));
+    const index = file.list.findIndex(server =>
+        (server.type === SERVER && server.url === url) || server.name === name
+    );
+    if (index >= 0) return ipcRenderer.send('notice', '이미 존재합니다.');
+
     dispatch(setServerInfo({ loading: true }));
 
     try {

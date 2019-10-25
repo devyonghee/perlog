@@ -8,6 +8,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import useStyles from './styles';
+import { Typography } from '@material-ui/core';
 
 const propTypes = {
     values: PropTypes.shape({
@@ -63,7 +64,7 @@ const presenter = (props) => {
                             margin='normal'
                             autoFocus
                             placeholder="Enter a name"
-                            className={classes.textField}
+                            className={classes.nameText}
                             onChange={handleTextChange('name')}
                             value={values.name}
                             inputProps={{
@@ -72,20 +73,24 @@ const presenter = (props) => {
                                 onKeyPress: handleKeyPress,
                             }}
                         />
-                        <TextField
-                            label="url"
-                            fullWidth
-                            margin='normal'
-                            placeholder="Enter a url"
-                            className={classes.textField}
-                            onChange={handleTextChange('url')}
-                            value={values.url}
-                            inputProps={{
-                                classes: { root: classes.textFieldInput },
-                                onChange: handleTextChange('url'),
-                                onKeyPress: handleKeyPress,
-                            }}
-                        />
+                        <div className={classes.urlWrap}>
+                            <Typography className={classes.protocol}>
+                                http://
+                            </Typography>
+                            <TextField
+                                label="url"
+                                margin='normal'
+                                placeholder="Enter a url"
+                                className={classes.urlText}
+                                onChange={handleTextChange('url')}
+                                value={values.url}
+                                inputProps={{
+                                    classes: { root: classes.textFieldInput },
+                                    onChange: handleTextChange('url'),
+                                    onKeyPress: handleKeyPress,
+                                }}
+                            />
+                        </div>
                     </>
                 }
             </DialogContent>

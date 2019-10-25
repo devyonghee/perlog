@@ -1,13 +1,12 @@
 import {
     ADD_SERVER,
     REMOVE_SOCKET,
-    REQUEST_WATCH,
     SET_FILES,
     SET_SERVER_INFO,
     SET_SOCKET,
     TOGGLE_EXTEND
 } from './actions';
-import { changeChildValue, changeValue, DIRECTORY, FILE, findByIndex } from '../utils';
+import { changeChildValue, changeValue, DIRECTORY, FILE, findByIndex, replaceUrl } from '../utils';
 
 const initialState = {
     servers: [],
@@ -21,7 +20,6 @@ const initialState = {
 };
 
 const setSocket = (state, { url, socket }) => {
-    const replaceUrl = url => url.trim().toLowerCase().replace('\/', '');
     const serverIndex = state.servers.findIndex(server => replaceUrl(server.url) === replaceUrl(url));
     if (serverIndex < 0) return state;
 

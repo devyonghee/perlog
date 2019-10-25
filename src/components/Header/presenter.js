@@ -15,7 +15,11 @@ const defaultProps = {};
 
 const CustomToolbar = withStyles(() => ({ root: { backgroundColor: '#ffffff' } }))(Toolbar);
 const presenter = props => {
-    const { handleClickNewServerBtn } = props;
+    const {
+        filterString,
+        handleTextChange,
+        handleClickNewServerBtn
+    } = props;
 
     const classes = useStyle();
 
@@ -37,8 +41,8 @@ const presenter = props => {
                         }}
                         inputProps={{
                             'aria-label': 'Search',
-                            // onChange: handleFilterStringChange,
-                            // value: filterString
+                            onChange: handleTextChange,
+                            value: filterString
                         }}
                     />
                 </Box>
