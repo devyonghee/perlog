@@ -18,10 +18,10 @@ const setFilter = filter => {
     };
 };
 
-const addMessage = (name, color, message) => {
+const addMessage = (messages) => {
     return {
         type: ADD_MESSAGE,
-        name, color, message
+        messages
     };
 };
 

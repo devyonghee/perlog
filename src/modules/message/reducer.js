@@ -2,7 +2,9 @@ import { ADD_MESSAGE, CLEAR_MESSAGE, SET_FILTER } from './actions';
 import {red} from '@material-ui/core/colors';
 const initialState = {
     filter: null,
-    list: [{name: 'asdf', color:red, message: 'zxcvxcvasdasd\nzxcvzxvv\nasdasd'}]
+    list: [
+        {name: 'asdf', color:red, message: 'zxcvxcvasdasd\nzxcvzxvv\nasdasd'},
+        ]
 };
 
 export default (state = initialState, action) => {
@@ -13,7 +15,7 @@ export default (state = initialState, action) => {
                 ...state,
                 list: [
                     ...slicedList,
-                    { name: action.name, color: action.color, message: action.message }
+                    ...action.messages
                 ]
             };
 

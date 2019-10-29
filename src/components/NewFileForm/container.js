@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Presenter from './presenter';
 import { DIRECTORY, findByIndex } from 'src/modules/utils';
@@ -26,11 +26,6 @@ const container = (props) => {
         name: '',
         filter: '',
     });
-
-    useEffect(() => {
-        if (!opened || files.length) return;
-        search();
-    }, [opened, files]);
 
     const handleClickFile = (index = []) => e => {
         e.preventDefault();
@@ -81,7 +76,7 @@ const container = (props) => {
         const file = findByIndex(index)(files);
         if (file.type === DIRECTORY) {
             if (!file.extended) search(index);
-            toggleExtend();
+            toggleExtend(index, !file.extended);
             return;
         }
         addFile(file);

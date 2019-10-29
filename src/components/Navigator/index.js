@@ -18,9 +18,9 @@ const mapDispatchToProps = (dispatch) => {
         toggleExtend: fileActions.toggleExtend,
         selectIndex: fileActions.selectIndex,
         selectServer: index => serverActions.setServerInfo({ selectedServer: index }),
-        openNewAdd: type => fileActions.setNewForm(true, type),
+        openNewAdd: type => fileActions.openNewForm(true, type),
         watch: serverActions.watch,
-        removeFile: fileActions.remove,
+        deleteFile: fileActions.deleteFile,
     }, dispatch);
 };
 

@@ -58,18 +58,14 @@ const setFiles = (state, { files, index = [] }) => {
 
     return {
         ...state,
-        files: findFile ? changeChildValue(index)({ child: newFiles })(state.files) : newFiles
+        files: findFile ? changeChildValue(index)({ child: newFiles, extended: true })(state.files) : newFiles
     };
 };
 
-const toggleExtend = (state, { extend = null }) => {
-    const selectedIndex = state.selectedFile;
-
-    const file = findByIndex(selectedIndex)(state.files);
-    const newExtended = (extend !== null) ? extend : !file.extended;
+const toggleExtend = (state, { index, extend }) => {
     return {
         ...state,
-        files: changeChildValue(selectedIndex)({ extended: newExtended })(state.files)
+        files: changeChildValue(index)({ extended: extend })(state.files)
     };
 };
 
@@ -84,7 +80,6 @@ export default (state = initialState, action) => {
                         url: action.url,
                         name: action.name,
                         socket: null,
-                        token: '',
                         files: [],
                     }]
             };

@@ -66,7 +66,7 @@ const File = class {
     }
 
     isNotWatching() {
-        return !!this.watcher;
+        return !this.watcher;
     }
 
     register(observer) {
@@ -74,7 +74,8 @@ const File = class {
     }
 
     removeBySocket(socket) {
-        this.observers.find(observer => observer.isSame(socket));
+        const index = this.observers.findIndex(observer => observer.isSame(socket));
+        this.observers.splice(index, 1);
         if (!this.observers.length) this._forget();
     }
 

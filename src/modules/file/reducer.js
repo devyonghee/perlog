@@ -4,17 +4,19 @@ import {
     ADD_SERVER,
     REMOVE_FILE,
     SELECT_INDEX,
+    SET_EXTEND,
     SET_NEW_FORM,
+    SET_TOKEN,
     SET_WATCH,
-    TOGGLE_EXTEND
 } from './actions';
 import { colorsIndex } from './colors';
-import { changeChildValue, DIRECTORY, FILE, findByIndex, SERVER } from '../utils';
+import { changeChildValue, changeValue, DIRECTORY, FILE, findByIndex, SERVER } from '../utils';
+import { loadFiles, saveFiles } from '../storage';
 
 const ipcRenderer = window.require('electron').ipcRenderer;
 
 const initialState = {
-    list: [],
+    list: [...loadFiles()],
     selectedIndex: [],
     newForm: {
         open: false,
@@ -33,18 +35,28 @@ const checkAdding = (name, selectedIndex = []) => files => {
 
 const addServer = (state, { name, url }) => {
     if (!name || !url) return state;
-    if(state.list.some(server => server.type === SERVER && server.url === url)){
-        return ipcRenderer.send('notice', '이미 존재하는 서버입니다.')
+    if (state.list.some(server => server.type === SERVER && server.url === url)) {
+        return ipcRenderer.send('notice', '이미 존재하는 서버입니다.');
     }
     return {
         ...state,
-        list: [...state.list,
+        list: saveFiles([...state.list,
             {
                 name, url,
                 type: SERVER,
+                token: '',
                 extended: false,
                 child: [],
-            }]
+            }])
+    };
+};
+
+const setToken = (state, { token, url }) => {
+    const findIndex = state.list.findIndex(file => file.url === url);
+
+    return {
+        ...state,
+        list: saveFiles(changeValue(findIndex)({ token })(state.list))
     };
 };
 
@@ -59,7 +71,7 @@ const addDirectory = (state, { name }) => {
                 ...state.newForm,
                 open: false,
             },
-            list: changeChildValue(index)({
+            list: saveFiles(changeChildValue(index)({
                 extended: true,
                 child: [...findByIndex(index)(state.list).child, {
                     name: name,
@@ -67,7 +79,7 @@ const addDirectory = (state, { name }) => {
                     extended: false,
                     child: [],
                 }]
-            })(state.list)
+            })(state.list))
         };
 
     } catch (e) {
@@ -87,7 +99,7 @@ const addFile = (state, { file }) => {
                 ...state.newForm,
                 open: false,
             },
-            list: changeChildValue(index)({
+            list: saveFiles(changeChildValue(index)({
                 extended: true,
                 child: [...findByIndex(index)(state.list).child, {
                     name: file.name,
@@ -96,7 +108,7 @@ const addFile = (state, { file }) => {
                     color: colorsIndex.next().value,
                     watch: false,
                 }],
-            })(state.list)
+            })(state.list))
         };
 
     } catch (e) {
@@ -116,20 +128,36 @@ const setWatch = (state, { index, watch }) => {
 
 };
 
-const removeFile = (state, { file }) => {
-    return state;
-};
+const removeFile = (state, { index }) => {
+    const parentIndex = index.slice(0, -1);
+    const parent = findByIndex(parentIndex)(state.list);
+    const target = findByIndex(index)(state.list);
+    if (!parent) {
+        return {
+            ...state,
+            list: saveFiles([
+                ...state.list.slice(0, state.list.indexOf(target)),
+                ...state.list.slice(state.list.indexOf(target) + 1)
+            ])
+        };
+    }
 
-const toggleExtend = (state, { index = [], extend = null }) => {
-    const selectedIndex = index.length ? index : state.selectedIndex;
-    const selected = findByIndex(selectedIndex)(state.list);
-    if (!selected || selected.type === FILE) return state;
-
-    const newExtend = extend !== null ? extend : !selected.extended;
     return {
         ...state,
-        list: changeChildValue(selectedIndex)({
-            extended: newExtend
+        list: saveFiles(changeChildValue(parentIndex)({
+            child: [
+                ...parent.child.slice(0, parent.child.indexOf(target)),
+                ...parent.child.slice(parent.child.indexOf(target) + 1)
+            ]
+        })(state.list))
+    };
+};
+
+const setExtend = (state, { index, extend }) => {
+    return {
+        ...state,
+        list: changeChildValue(index)({
+            extended: extend
         })(state.list)
     };
 };
@@ -139,6 +167,9 @@ export default (state = initialState || [], action) => {
         case ADD_SERVER:
             return addServer(state, action);
 
+        case SET_TOKEN:
+            return setToken(state, action);
+
         case ADD_DIRECTORY:
             return addDirectory(state, action);
 
@@ -147,11 +178,12 @@ export default (state = initialState || [], action) => {
 
         case REMOVE_FILE:
             return removeFile(state, action);
+
         case SET_WATCH:
             return setWatch(state, action);
 
-        case TOGGLE_EXTEND:
-            return toggleExtend(state, action);
+        case SET_EXTEND:
+            return setExtend(state, action);
 
         case SELECT_INDEX:
             return { ...state, selectedIndex: action.index };

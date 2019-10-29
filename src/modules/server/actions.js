@@ -1,6 +1,5 @@
 import axios from 'axios';
 import io from 'socket.io-client';
-import { removeServerToken, saveServer } from '../storage';
 import userActions from '../user/actions';
 import fileActions from '../file/actions';
 import messageActions from '../message/actions';
@@ -69,9 +68,10 @@ const setFiles = (files, index) => {
     };
 };
 
-const toggleExtend = (extend = null) => {
+const toggleExtend = (index, extend) => {
     return {
         type: TOGGLE_EXTEND,
+        index,
         extend
     };
 };
@@ -85,7 +85,7 @@ const removeSocketAndShrink = (url, socket, message) => (dispatch, getState) => 
     dispatch(removeSocket(socket));
 
     const fileIndex = fileState.list.indexOf(server);
-    dispatch(fileActions.toggleExtend(fileIndex, false));
+    dispatch(fileActions.toggleExtend([fileIndex], false));
 };
 
 const registerEvent = (url, socket) => (dispatch, getState) => {
@@ -93,9 +93,20 @@ const registerEvent = (url, socket) => (dispatch, getState) => {
     socket.on('fileError', (path, message) => ipcRenderer.send('notice', message));
     socket.on('disconnect', reason => dispatch(removeSocketAndShrink(url, socket, reason)));
     socket.on('reconnect_failed', () => dispatch(removeSocketAndShrink(url, socket, '서버와의 연결이 끊겼습니다.')));
+
+    let time = null;
+    const messages = [];
     socket.on('log', (index, message) => {
         const file = findByIndexWithRoute(index)(getState().file.list);
-        if (file) dispatch(messageActions.addMessage(file.route.concat(`/${file.name}`), file.color, message));
+        if (!file) return;
+        messages.push({ name: file.route.concat(`/${file.name}`), color: file.color, message });
+
+        if (time) return;
+        time = setTimeout(() => {
+            if (messages.length) dispatch(messageActions.addMessage(messages));
+            messages.splice(0, message.length);
+            time = null;
+        }, 500);
     });
 };
 
@@ -126,7 +137,7 @@ const watch = (index, watch) => (dispatch, getState) => {
     dispatch(fileActions.setWatch(index, watch));
 };
 
-const connectAndRegister = (url, token) => dispatch => {
+const connectAndRegister = (url, token) => (dispatch, getState) => {
     const socket = io.connect(`${url}?token=${token}`, {
         transports: ['websocket'],
         reconnection: true,
@@ -134,19 +145,29 @@ const connectAndRegister = (url, token) => dispatch => {
     });
 
     dispatch(registerEvent(url, socket));
+
+    const { file: fileState } = getState();
+    const fileIndex = fileState.list.findIndex(file => file.url === url);
+    dispatch(fileActions.setExtend([fileIndex], true));
 };
 
-const connectByToken = (url, token) => async dispatch => {
+const connectByToken = (name, url, token) => async (dispatch, getState) => {
     try {
         const response = await axios.post(url + '/login', { token });
         if (response.status !== 200) {
             return ipcRenderer.send('notice', '서버 오류');
         }
         dispatch(connectAndRegister(url, response.data));
-        dispatch(setToken(url, response.data));
+        dispatch(fileActions.setToken(url, response.data));
     } catch (e) {
-        removeServerToken(url);
-        ipcRenderer.send('notice', '토큰이 만료되었습니다.');
+        const { user: { id, password } } = getState();
+
+        if (!id || !password) {
+            ipcRenderer.send('notice', '토큰이 만료되었습니다.');
+            dispatch(userActions.setUserInfo({ openLogin: true }));
+            return;
+        }
+        await dispatch(userActions.login(id, password, url));
     }
 };
 
@@ -156,7 +177,6 @@ const connect = (requestUrl, name) => async (dispatch, getState) => {
     const index = file.list.findIndex(server =>
         (server.type === SERVER && server.url === url) || server.name === name
     );
-    if (index >= 0) return ipcRenderer.send('notice', '이미 존재합니다.');
 
     dispatch(setServerInfo({ loading: true }));
 
@@ -167,7 +187,7 @@ const connect = (requestUrl, name) => async (dispatch, getState) => {
         if (!id || !password) {
             dispatch(addServer(name, url));
             dispatch(setServerInfo({ openNewServer: false, tempUrl: url }));
-            dispatch(fileActions.addServer(name, url));
+            if (index < 0) dispatch(fileActions.addServer(name, url));
             return dispatch(userActions.setUserInfo({ openLogin: true }));
         }
 

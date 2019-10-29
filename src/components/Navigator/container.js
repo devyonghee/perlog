@@ -11,6 +11,7 @@ const propTypes = {
     toggleExtend: PropTypes.func.isRequired,
     selectIndex: PropTypes.func.isRequired,
     openNewAdd: PropTypes.func.isRequired,
+    deleteFile: PropTypes.func.isRequired,
 };
 
 const defaultProps = {
@@ -19,7 +20,7 @@ const defaultProps = {
 };
 
 const container = props => {
-    const { files, toggleExtend, selectIndex, servers, selectServer, selectedIndex, openNewAdd, watch } = props;
+    const { files, toggleExtend, selectIndex, servers, selectServer, selectedIndex, openNewAdd, watch,deleteFile } = props;
 
     const handleChangeSwitch = index => e => {
         e.stopPropagation();
@@ -39,11 +40,11 @@ const container = props => {
         selectIndex(index);
     };
 
-    const handleDoubleClickFile = (index) => e => {
+    const handleDoubleClickFile = index => e => {
         e.preventDefault();
         selectIndex(index);
-        const file = findByIndex(files);
-        if (file && file.type !== FILE) toggleExtend();
+        const file = findByIndex(index)(files);
+        if (file && file.type !== FILE) toggleExtend(index, !file.extended);
     };
 
     const handleContextMenuList = index => e => {
@@ -81,14 +82,8 @@ const container = props => {
                     buttons: ['Yes', 'No']
                 };
                 const returnValue = await remote.dialog.showMessageBox(options);
-
-                if (returnValue.response !== 0) return;
-                const forgetFile = file => {
-                    // if(!file.isDirectory) watchFile(file, false);
-                    // if (!!file.child && file.child.length) file.child.map(forgetFile);
-                };
+                if (returnValue.response === 0) deleteFile(index);
             }
-
         });
 
         const menu = new Menu.buildFromTemplate(contextMenu);
