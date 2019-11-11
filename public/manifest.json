@@ -1,0 +1,13 @@
+{
+  "short_name": "remolog",
+  "name": "This is log monitoring desktop app",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "type": "image/x-icon"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff"
+}
