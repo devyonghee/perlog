@@ -63,7 +63,7 @@ npm start
 
 ### start for Development
 ```bash 
-npm run server-dev
+npm run dev
 ```
 
 ### Configs
