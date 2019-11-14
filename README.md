@@ -76,7 +76,7 @@ websocket network port
 login check url
 #### secretKey
 secret key for jwt(json web token) 
-#### defaultDirectory
+#### rootDirectory
 Root directory for observing server file  
 #### extensions
 File extensions Allowed for observation

@@ -8,14 +8,14 @@ const logger = require('./Logger');
 const App = class {
     constructor(config) {
         this.config = config;
-        this._defaultDirectory = pathLib.resolve(this.config.defaultDirectory || '/');
+        this._rootDirectory = pathLib.resolve(this.config.rootDirectory || '/');
         this.files = [];
     }
 
     run() {
         if (!this.config.host || !this.config.port) return logger.info('not enough config');
 
-        if (!!this._defaultDirectory && !this._availableDefaultPath()) return;
+        if (!!this._rootDirectory && !this._availableDefaultPath()) return;
 
         const server = new Server(this.config.authUrl, this.config.secretKey);
         this.io = server.openSocket(this.config.host, this.config.port);
@@ -56,7 +56,7 @@ const App = class {
 
     _search(searchPath, socket) {
         try {
-            const newSearchPath = (!searchPath) ? this._defaultDirectory : this._replacePath(searchPath);
+            const newSearchPath = (!searchPath) ? this._rootDirectory : this._replacePath(searchPath);
             if (!newSearchPath) {
                 logger.info('path is not exist');
                 return socket.emit('fileError', searchPath, '오류가 발생했습니다.');
@@ -109,13 +109,13 @@ const App = class {
     }
 
     _replacePath(path) {
-        const slicedPath = pathLib.resolve(path).slice(0, this._defaultDirectory.length);
-        if (slicedPath !== this._defaultDirectory) {
+        const slicedPath = pathLib.resolve(path).slice(0, this._rootDirectory.length);
+        if (slicedPath !== this._rootDirectory) {
             logger.info(`${path} is bad path`);
             return '';
         }
 
-        const restPath = path.slice(this._defaultDirectory.length);
+        const restPath = path.slice(this._rootDirectory.length);
         const filteredPaths = restPath.split('/').filter(String);
         if (filteredPaths.includes('..')) {
             logger.info(`${path} is bad path`);
@@ -123,15 +123,15 @@ const App = class {
         }
 
         const newPath = filteredPaths.join('/');
-        return pathLib.join(this._defaultDirectory, newPath);
+        return pathLib.join(this._rootDirectory, newPath);
     }
 
     _availableDefaultPath() {
         try {
-            const files = (new File(pathLib.resolve(this._defaultDirectory))).search();
+            const files = (new File(pathLib.resolve(this._rootDirectory))).search();
             return !!files;
         } catch (e) {
-            logger.info(`${this._defaultDirectory} is not available default directory`, e.message);
+            logger.info(`${this._rootDirectory} is not available default directory`, e.message);
             return false;
         }
     }
